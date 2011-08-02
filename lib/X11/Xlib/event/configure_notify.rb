@@ -29,14 +29,14 @@
 class X11::Event::ConfigureNotify < X11::Event::Helper
   attribute :xconfigure
 
-  include Common
+  include X11::Event::Common
 
-  manage :event, Window
+  manage :event, X11::Event::Window
   manage :x
   manage :y
   manage :width
   manage :height
   manage :border_width
-  manage :above, Window
+  manage :above, X11::Event::Window
   manage [:override_redirect, :override_redirect?]
 end

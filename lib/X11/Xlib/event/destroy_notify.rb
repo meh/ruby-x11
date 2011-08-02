@@ -29,7 +29,7 @@
 class X11::Event::DestroyNotify < X11::Event::Helper
   attribute :xdestroywindow
 
-  include Common
+  include X11::Event::Common
 
-  manage :event, Window
+  manage :event, X11::Event::Window
 end

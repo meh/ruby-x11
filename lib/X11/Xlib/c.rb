@@ -33,3 +33,4 @@ module X11; module C
 end; end
 
 require 'X11/Xlib/c/types'
+require 'X11/Xlib/c/functions'

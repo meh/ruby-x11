@@ -29,8 +29,8 @@
 class X11::Event::MapNotify < X11::Event::Helper
   attribute :xmap
 
-  include Common
+  include X11::Event::Common
 
-  manage :event, Window
+  manage :event, X11::Event::Window
   manage [:override_redirect, :override_redirect?]
 end

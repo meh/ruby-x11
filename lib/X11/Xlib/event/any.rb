@@ -29,5 +29,5 @@
 class X11::Event::Any < X11::Event::Helper
   attribute :xany
 
-  include Common
+  include X11::Event::Common
 end

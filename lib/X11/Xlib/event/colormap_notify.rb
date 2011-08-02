@@ -26,10 +26,10 @@
 # or implied.
 #++
 
-class X11::Event:: < X11::Event::Helper
+class X11::Event::ColormapNotify < X11::Event::Helper
   attribute :xcolormap
 
-  include Common
+  include X11::Event::Common
 
   manage :colormap
   manage [:new, :c_new]

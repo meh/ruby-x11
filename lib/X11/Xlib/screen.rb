@@ -33,8 +33,14 @@ class Screen
 
   def initialize (display, screen)
     @display = display
-    @screen  = screen.typecast(X11::C::Screen)
+    @screen  = screen.typecast(C::Screen)
   end
+
+  C::Screen.layout.members.each_with_index {|name, index|
+    define_method name do
+      @screen[name]
+    end
+  }
 
   def root_window
     Window.new(@display, @screen[:root])

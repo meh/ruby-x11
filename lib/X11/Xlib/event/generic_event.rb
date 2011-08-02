@@ -29,7 +29,7 @@
 class X11::Event::GenericEvent < X11::Event::Helper
   attribute :xgeneric
 
-  manage :display, Display
+  manage :display, X11::Display
   manage :resourceid
   manage :serial
   manage :error_code

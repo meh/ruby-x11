@@ -26,12 +26,12 @@
 # or implied.
 #++
 
-class X11::Event:: < X11::Event::Helper
+class X11::Event::CreateNotify < X11::Event::Helper
   attribute :xcreatewindow
 
-  include Common
+  include X11::Event::Common
 
-  manage :parent, Window
+  manage :parent, X11::Event::Window
   manage :x
   manage :y
   manage :width

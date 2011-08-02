@@ -99,17 +99,17 @@ class Helper
   alias to_c struct
 end
 
-Window = [lambda {|w|
-  X11::Window.new(self.display, w)
+X11::Event::Window = [lambda {|w|
+  X11::Event::Window.new(display, w)
 }, lambda(&:to_c)]
 
-module Common
+module X11::Event::Common
   def self.included (klass)
     klass.class_eval {
       manage :serial
       manage [:send_event, :send_event?]
-      manage :display, Display
-      manage :window, Window
+      manage :display, X11::Display
+      manage :window, X11::Event::Window
     }
   end
 end

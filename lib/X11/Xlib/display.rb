@@ -31,7 +31,7 @@ module X11
 class Display
   def initialize (name=nil)
     pointer  = (name.is_a?(String) or !name) ? X11::C::XOpenDisplay(name) : name
-    @display = pointer.is_a?(X11::C::Display) ? pointer : pointer.typecast(X11::C::Display)
+    @display = pointer.is_a?(C::Display) ? pointer : pointer.typecast(C::Display)
   end
 
   def ungrab_pointer (time=0)
@@ -63,6 +63,14 @@ class Display
     (0 ... @display[:nscreens]).map {|i|
       screen(i)
     }
+  end
+
+  def width (index=nil)
+    if index
+      screen(index).width
+    else
+      default_screen.width
+    end
   end
 
   def next_event

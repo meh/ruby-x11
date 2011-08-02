@@ -29,7 +29,7 @@
 class X11::Event::MappingNotify < X11::Event::Helper
   attribute :xmapping
 
-  include Common
+  include X11::Event::Common
 
   manage :request
   manage :first_keycode

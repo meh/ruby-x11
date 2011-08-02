@@ -26,30 +26,11 @@
 # or implied.
 #++
 
-require 'X11/Xlib/events'
+class X11::Event::SelectionClear < X11::Event::Helper
+  attribute :xselectionclear
 
-module X11
+  include X11::Event::Common
 
-class Event
-  def self.index (event)
-    Events.to_a.index(event)
-  end
-
-  def self.new (event)
-    event = event.typecast(C::XEvent) unless event.is_a?(C::XEvent)
-
-    (Events[event[:type]] || Any).new(event)
-  end
-end
-
-class C::XEvent
-  Events.to_a.compact.each {|type|
-    next unless type.attribute rescue nil
-
-    define_method(type.attribute) {
-      type.new(self)
-    }
-  }
-end
-
+  manage :selection
+  manage :time
 end

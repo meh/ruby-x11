@@ -29,7 +29,7 @@
 class X11::Event::ClientMessage < X11::Event::Helper
   attribute :xclient
 
-  include Common
+  include X11::Event::Common
 
   manage :message_type
   manage :format

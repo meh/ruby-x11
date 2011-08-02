@@ -28,10 +28,10 @@
 
 require 'X11/Xlib/c'
 
-require 'X11/Xlib/event'
-require 'X11/Xlib/mask'
-
 require 'X11/Xlib/display'
 require 'X11/Xlib/screen'
 require 'X11/Xlib/window'
 require 'X11/Xlib/visual'
+
+require 'X11/Xlib/event'
+require 'X11/Xlib/mask'

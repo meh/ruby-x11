@@ -29,10 +29,10 @@
 class X11::Event::ReparentNotify < X11::Event::Helper
   attribute :xreparent
 
-  include Common
+  include X11::Event::Common
 
-  manage :event, Window
-  manage :parent, Window
+  manage :event, X11::Event::Window
+  manage :parent, X11::Event::Window
   manage :x
   manage :y
   manage [:override_redirect, :override_redirect?]

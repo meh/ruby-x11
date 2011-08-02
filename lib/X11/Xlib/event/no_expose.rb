@@ -16,7 +16,7 @@
 class X11::Event::NoExpose < X11::Event::Helper
   attribute :xnoexpose
 
-  include Common
+  include X11::Event::Common
 
   manage :drawable
   manage :major_code

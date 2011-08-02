@@ -29,7 +29,7 @@
 class X11::Event::Expose < X11::Event::Helper
   attribute :xexpose
 
-  include Common
+  include X11::Event::Common
 
   manage :x
   manage :y

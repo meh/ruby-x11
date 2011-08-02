@@ -29,15 +29,15 @@
 class X11::Event::ConfigureRequest < X11::Event::Helper
   attribute :xconfigurerequest
 
-  include Common
+  include X11::Event::Common
 
-  manage :parent, Window
+  manage :parent, X11::Event::Window
   manage :x
   manage :y
   manage :width
   manage :height
   manage :border_width
-  manage :above, Window
+  manage :above, X11::Event::Window
   manage :detail
   manage :value_mask
 end

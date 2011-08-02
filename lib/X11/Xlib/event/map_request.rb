@@ -29,7 +29,7 @@
 class X11::Event::MapRequest < X11::Event::Helper
   attribute :xmaprequest
 
-  include Common
+  include X11::Event::Common
 
-  manage :parent, Window
+  manage :parent, X11::Event::Window
 end
