@@ -29,9 +29,21 @@
 module X11
 
 class Display
-  def initialize (name=nil)
+  attr_reader :options
+
+  def initialize (*args)
+    name, options = if args.first.is_a?(Hash)
+      [nil, args.first]
+    else
+      args
+    end
+
     pointer  = (name.is_a?(String) or !name) ? X11::C::XOpenDisplay(name) : name
     @display = pointer.is_a?(C::Display) ? pointer : pointer.typecast(C::Display)
+
+    @options = {
+      :autoflush => true
+    }.merge(options || {})
   end
 
   C::Display.layout.members.each_with_index {|name, index|
@@ -40,19 +52,29 @@ class Display
     end
   }
 
+  def flush
+    return unless options[:autoflush]
+    
+    flush!
+  end
+
+  def flush!
+    C::XFlush(to_ffi)
+  end
+
   def ungrab_pointer (time=0)
-    C::XUngrabPointer(to_c, time)
+    C::XUngrabPointer(to_ffi, time)
   end
 
   def keysym_to_keycode (keysym)
-    C::XKeysymToKeycode(to_c, keysym)
+    C::XKeysymToKeycode(to_ffi, keysym)
   end
 
   def check_typed_event (event)
     event = Event.index(event)
     ev    = FFI::MemoryPointer.new(C::XEvent)
 
-    C::XCheckTypedEvent(to_c, event, ev) or return
+    C::XCheckTypedEvent(to_ffi, event, ev) or return
 
     Event.new(ev)
   end
@@ -82,7 +104,7 @@ class Display
   def next_event
     ev = FFI::MemoryPointer.new(C::XEvent)
 
-    C::XNextEvent(to_c, ev)
+    C::XNextEvent(to_ffi, ev)
 
     Event.new(ev)
   end
@@ -96,10 +118,10 @@ class Display
   end
 
   def close
-    C::XCloseDisplay(to_c)
+    C::XCloseDisplay(to_ffi)
   end
 
-  def to_c
+  def to_ffi
     @display.pointer
   end
 end

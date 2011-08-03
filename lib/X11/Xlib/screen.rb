@@ -50,13 +50,14 @@ class Screen
     result = []
 
     window.subwindows.each {|win|
+      result << win
       result << windows(win)
     }
 
     result.flatten.compact.uniq
   end
 
-  def to_c
+  def to_ffi
     @screen.pointer
   end
 end

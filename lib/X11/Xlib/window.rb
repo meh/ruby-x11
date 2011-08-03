@@ -34,7 +34,7 @@ class Window
   attr_reader :display, :parent
 
   def initialize (display, window, parent=nil)
-    displah = display
+    @display = display
     @window  = window
     @parent  = parent
   end
@@ -50,21 +50,27 @@ class Window
   def attributes
     attr = FFI::MemoryPointer.new(C::XWindowAttributes)
 
-    C::XGetWindowAttributes(display.to_c, id, attr)
+    C::XGetWindowAttributes(display.to_ffi, to_ffi, attr)
 
     Attributes.new(attr)
   end
 
   def move (x, y)
-    C::XMoveWindow(displah.to_c, id, x, y)
+    C::XMoveWindow(display.to_ffi, to_ffi, x, y)
+
+    display.flush
   end
 
   def resize (width, height)
-    C::XResizeWindow(displah.to_c, id, width, height)
+    C::XResizeWindow(display.to_ffi, to_ffi, width, height)
+
+    display.flush
   end
 
   def raise
-    C::XRaiseWindow(displah.to_c, id)
+    C::XRaiseWindow(display.to_ffi, to_ffi)
+    
+    display.flush
   end
 
   def subwindows
@@ -74,10 +80,12 @@ class Window
     number   = FFI::MemoryPointer.new :uint
     children = FFI::MemoryPointer.new :pointer
 
-    return result if C::XQueryTree(displah.to_c, id, root, parent, children, number).zero?
+    C::XQueryTree(display.to_ffi, id, root, parent, children, number)
+
+    return result if children.typecast(:pointer).null?
 
     children.typecast(:pointer).read_array_of(:Window, number.typecast(:uint)).each {|win|
-      result << Window.new(displah, win, self)
+      result << Window.new(display, win, self)
     }
 
     C::XFree(children.typecast(:pointer))
@@ -86,34 +94,34 @@ class Window
   end
 
   def grab_pointer (owner_events=true, event_mask=0, pointer_mode=:async, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
-    C::XGrabPointer(displah.to_c, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_c, cursor, time)
+    C::XGrabPointer(display.to_ffi, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor, time)
   end
 
   def ungrab_pointer (time=0)
-    displah.ungrab_pointer(time)
+    display.ungrab_pointer(time)
   end
 
   def keysym_to_keycode (keysym)
-    C::XKeysymToKeycode(to_c, keysym)
+    C::XKeysymToKeycode(to_ffi, keysym)
   end
 
   def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:async)
-    C::XGrabKey(displah.to_c, keycode.to_keycode, modifiers, id, !!owner_events, mode2int(pointer_mode), mode2int(keyboard_mode))
+    C::XGrabKey(display.to_ffi, keycode.to_keycode, modifiers, id, !!owner_events, mode2int(pointer_mode), mode2int(keyboard_mode))
   end
 
   def ungrab_key (keycode, modifiers=0)
-    C::XUngrabKey(displah.to_c, keycode.to_keycode, modifiers, id)
+    C::XUngrabKey(display.to_ffi, keycode.to_keycode, modifiers, id)
   end
 
   def grab_button (button, modifiers=0, owner_events=true, event_mask=4, pointer_mode=:async, keyboard_mode=:async, confine_to=0, cursor=0)
-    C::XGrabButton(displah.to_c, button, modifiers, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_c, cursor.to_c)
+    C::XGrabButton(display.to_ffi, button, modifiers, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
   end
 
   def ungrab_button (button, modifiers=0)
-    C::XUngrabButton(displah.to_c, button, modifiers, id)
+    C::XUngrabButton(display.to_ffi, button, modifiers, id)
   end
 
-  def to_c
+  def to_ffi
     id
   end
 

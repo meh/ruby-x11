@@ -29,27 +29,45 @@
 module X11
 
 class Window
-  def name
+  def title
     text = FFI::MemoryPointer.new :pointer
 
-    C::XFetchName(display.to_c, to_c, text)
+    C::XFetchName(display.to_ffi, to_ffi, text)
 
-    return if text.typecast(:pointer).zero?
+    return if text.typecast(:pointer).null?
 
-    text.typecast(:string).tap {
-      C::XFree(text)
+    text.typecast(:pointer).typecast(:string).tap {
+      C::XFree(text.typecast(:pointer))
+    }
+  end; alias WM_NAME title
+
+  def class_hint
+    return if (hint = C::XAllocClassHint()).null?
+
+    if C::XGetClassHint(display.to_ffi, to_ffi, hint).zero?
+      C::XFree(hint)
+
+      return
+    end
+
+    C::XClassHint.new(hint).tap {|c|
+      break :name => c[:res_name], :class => c[:res_class]
+    }.tap {
+      C::XFree(hint)
     }
   end
 
-  def class_hint
-    return if (hint = C::XAllocClassHint()).zero?
-    
-    if C::XGetClassHint(display, id, hint).zero?
-      C::XFree(hint)
-    end
-
-    hint = C::XClassHint.new(hint)
+  def name
+    class_hint.tap {|hint|
+      break hint[:name] if hint
+    }
   end
+
+  def klass
+    class_hint.tap {|hint|
+      break hint[:class] if hint
+    }
+  end; alias WM_CLASS klass
 end
 
 end

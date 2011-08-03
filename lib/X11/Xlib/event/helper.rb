@@ -72,7 +72,7 @@ class Helper
         }
 
         attach_method("#{new}=") {|x|
-          struct[@attribute][original] = x.to_c
+          struct[@attribute][original] = x.to_ffi
         }
       else
         manage([original, new], args.first, nil)
@@ -96,12 +96,12 @@ class Helper
     @struct
   end
 
-  alias to_c struct
+  alias to_ffi struct
 end
 
 X11::Event::Window = [lambda {|w|
   X11::Event::Window.new(display, w)
-}, lambda(&:to_c)]
+}, lambda(&:to_ffi)]
 
 module X11::Event::Common
   def self.included (klass)
