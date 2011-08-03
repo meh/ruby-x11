@@ -26,82 +26,44 @@
 # or implied.
 #++
 
-module X11
+module X11; module C
 
-class Display
-  def initialize (name=nil)
-    pointer  = (name.is_a?(String) or !name) ? X11::C::XOpenDisplay(name) : name
-    @display = pointer.is_a?(C::Display) ? pointer : pointer.typecast(C::Display)
+class KeySym
+  extend FFI::DataConverter
+
+  native_type :XID
+
+  def self.to_native (value, ctx)
+    value.to_i
   end
 
-  C::Display.layout.members.each_with_index {|name, index|
-    define_method name do
-      @display[name]
-    end
-  }
-
-  def ungrab_pointer (time=0)
-    C::XUngrabPointer(to_c, time)
+  def self.from_native (value, ctx)
+    KeySym.new(value)
   end
 
-  def keysym_to_keycode (keysym)
-    C::XKeysymToKeycode(to_c, keysym)
-  end
-
-  def check_typed_event (event)
-    event = Event.index(event)
-    ev    = FFI::MemoryPointer.new(C::XEvent)
-
-    C::XCheckTypedEvent(to_c, event, ev) or return
-
-    Event.new(ev)
-  end
-
-  def screen (which)
-    Screen.new(self, @display[:screens] + (which * C::Screen.size))
-  end
-
-  def default_screen
-    screen(@display[:default_screen])
-  end
-
-  def screens
-    (0 ... @display[:nscreens]).map {|i|
-      screen(i)
-    }
-  end
-
-  def width (index=nil)
-    if index
-      screen(index).width
+  def initialize (value)
+    if value.is_a?(Integer)
+      @number = value
+      @string = C::XKeysymToString(@number)
     else
-      default_screen.width
+      @string = value.to_s
+      @number = C::XStringToKeysym(@string).to_i
     end
+
+    raise Exceptions::InvalidKeysym if @number.zero?
   end
 
-  def next_event
-    ev = FFI::MemoryPointer.new(C::XEvent)
-
-    C::XNextEvent(to_c, ev)
-
-    Event.new(ev)
+  def to_s
+    @string
   end
 
-  def each_event
-    loop {
-      next_event.tap {|ev|
-        yield ev if block_given?
-      }
-    }
-  end
-
-  def close
-    C::XCloseDisplay(to_c)
-  end
-
-  def to_c
-    @display.pointer
+  def to_i
+    @number
   end
 end
 
+module ::FFI
+  typedef KeySym, :KeySym
 end
+
+end; end

@@ -30,19 +30,21 @@ require 'X11/extensions'
 
 module X11; module C
 
-typedef :ulong, :XID
-typedef :ulong, :Mask
-typedef :ulong, :Atom
-typedef :ulong, :VisualID
-typedef :ulong, :Time
-typedef :XID,   :Window
-typedef :XID,   :Drawable
-typedef :XID,   :Font
-typedef :XID,   :Pixmap
-typedef :XID,   :Cursor
-typedef :XID,   :Colormap
-typedef :XID,   :GContext
-typedef :XID,   :KeySym
-typedef :uchar, :KeyCode
+module ::FFI
+  typedef :ulong, :XID
+  typedef :ulong, :Mask
+  typedef :ulong, :Atom
+  typedef :ulong, :VisualID
+  typedef :ulong, :Time
+  typedef :XID,   :Window
+  typedef :XID,   :Drawable
+  typedef :XID,   :Font
+  typedef :XID,   :Pixmap
+  typedef :XID,   :Cursor
+  typedef :XID,   :Colormap
+  typedef :XID,   :GContext
+  typedef :XID,   :KeySym
+  typedef :uchar, :KeyCode
+end
 
 end; end

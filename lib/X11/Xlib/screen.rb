@@ -46,6 +46,16 @@ class Screen
     Window.new(@display, @screen[:root])
   end
 
+  def windows (window=root_window)
+    result = []
+
+    window.subwindows.each {|win|
+      result << windows(win)
+    }
+
+    result.flatten.compact.uniq
+  end
+
   def to_c
     @screen.pointer
   end

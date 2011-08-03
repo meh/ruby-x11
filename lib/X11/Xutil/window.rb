@@ -28,79 +28,27 @@
 
 module X11
 
-class Display
-  def initialize (name=nil)
-    pointer  = (name.is_a?(String) or !name) ? X11::C::XOpenDisplay(name) : name
-    @display = pointer.is_a?(C::Display) ? pointer : pointer.typecast(C::Display)
-  end
+class Window
+  def name
+    text = FFI::MemoryPointer.new :pointer
 
-  C::Display.layout.members.each_with_index {|name, index|
-    define_method name do
-      @display[name]
-    end
-  }
+    C::XFetchName(display.to_c, to_c, text)
 
-  def ungrab_pointer (time=0)
-    C::XUngrabPointer(to_c, time)
-  end
+    return if text.typecast(:pointer).zero?
 
-  def keysym_to_keycode (keysym)
-    C::XKeysymToKeycode(to_c, keysym)
-  end
-
-  def check_typed_event (event)
-    event = Event.index(event)
-    ev    = FFI::MemoryPointer.new(C::XEvent)
-
-    C::XCheckTypedEvent(to_c, event, ev) or return
-
-    Event.new(ev)
-  end
-
-  def screen (which)
-    Screen.new(self, @display[:screens] + (which * C::Screen.size))
-  end
-
-  def default_screen
-    screen(@display[:default_screen])
-  end
-
-  def screens
-    (0 ... @display[:nscreens]).map {|i|
-      screen(i)
+    text.typecast(:string).tap {
+      C::XFree(text)
     }
   end
 
-  def width (index=nil)
-    if index
-      screen(index).width
-    else
-      default_screen.width
+  def class_hint
+    return if (hint = C::XAllocClassHint()).zero?
+    
+    if C::XGetClassHint(display, id, hint).zero?
+      C::XFree(hint)
     end
-  end
 
-  def next_event
-    ev = FFI::MemoryPointer.new(C::XEvent)
-
-    C::XNextEvent(to_c, ev)
-
-    Event.new(ev)
-  end
-
-  def each_event
-    loop {
-      next_event.tap {|ev|
-        yield ev if block_given?
-      }
-    }
-  end
-
-  def close
-    C::XCloseDisplay(to_c)
-  end
-
-  def to_c
-    @display.pointer
+    hint = C::XClassHint.new(hint)
   end
 end
 

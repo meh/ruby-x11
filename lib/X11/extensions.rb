@@ -21,6 +21,12 @@ require 'ffi'
 require 'memoized'
 require 'refining'
 
+module Kernel
+  def with (*args)
+    yield *args
+  end
+end
+
 module FFI
   module Library
     def ffi_lib_add (*names)
@@ -74,6 +80,14 @@ module FFI
       else
         ArgumentError.new 'You have to pass a Struct, a Builtin type or a Symbol'
       end
+    end
+
+    def read_array_of (type, number)
+      if type.is_a?(Symbol)
+        type = FFI.find_type(type)
+      end
+
+      send "read_array_of_#{type.name.downcase}", number
     end
   end
 

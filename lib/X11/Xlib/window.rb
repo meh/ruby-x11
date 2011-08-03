@@ -29,76 +29,107 @@
 require 'X11/Xlib/window/attributes'
 
 module X11
-  class Window
 
-    GRAB_MODE = {sync: false, async: true}
+class Window
+  attr_reader :display, :parent
 
-    def initialize (dpy, window)
-      @dpy = dpy
-      @win = window
-    end
+  def initialize (display, window, parent=nil)
+    displah = display
+    @window  = window
+    @parent  = parent
+  end
 
-    def nil?
-      @win.zero?
-    end
+  def id
+    @window
+  end; alias hash id
 
-    def attributes
-      attr = FFI::MemoryPointer.new(C::XWindowAttributes)
-      C.XGetWindowAttributes(@dpy.to_c, @win, attr)
-      Attributes.new(attr)
-    end
-    alias attr attributes
+  def nil?
+    id.zero?
+  end
 
-    def grab_pointer (owner_events=true, event_mask=0, pointer_mode=:async,
-                      keyboard_mode=:async, confine_to=0, cursor=0, time=0)
-      C.XGrabPointer(@dpy.to_c, @win, !!owner_events, event_mask, mode2int(pointer_mode),
-                     mode2int(keyboard_mode), confine_to.to_c, cursor, time)
-    end
+  def attributes
+    attr = FFI::MemoryPointer.new(C::XWindowAttributes)
 
-    def ungrab_pointer (time=0)
-      @dpy.ungrab_pointer(time)
-    end
+    C::XGetWindowAttributes(display.to_c, id, attr)
 
-    def keysym_to_keycode (keysym)
-      C.XKeysymToKeycode(to_c, keysym)
-    end
+    Attributes.new(attr)
+  end
 
-    def move_resize (x, y, width, height)
-      C.XMoveResizeWindow(@dpy.to_c, @win, x, y, width, height)
-    end
+  def move (x, y)
+    C::XMoveWindow(displah.to_c, id, x, y)
+  end
 
-    def raise
-      C.XRaiseWindow(@dpy.to_c, @win)
-    end
+  def resize (width, height)
+    C::XResizeWindow(displah.to_c, id, width, height)
+  end
 
-    def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:async)
-      C.XGrabKey(@dpy.to_c, keycode.to_keycode, modifiers, @win, !!owner_events,
-                 mode2int(pointer_mode), mode2int(keyboard_mode))
-    end
+  def raise
+    C::XRaiseWindow(displah.to_c, id)
+  end
 
-    def ungrab_key (keycode, modifiers=0)
-      C.XUngrabKey(@dpy.to_c, keycode.to_keycode, modifiers, @win)
-    end
+  def subwindows
+    result   = []
+    root     = FFI::MemoryPointer.new :Window
+    parent   = FFI::MemoryPointer.new :Window
+    number   = FFI::MemoryPointer.new :uint
+    children = FFI::MemoryPointer.new :pointer
 
-    def grab_button (button, modifiers=0, owner_events=true, event_mask=4,
-                     pointer_mode=:async, keyboard_mode=:async, confine_to=0, cursor=0)
-      C.XGrabButton(@dpy.to_c, button, modifiers, @win, !!owner_events, event_mask,
-                    mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_c, cursor.to_c)
-    end
+    return result if C::XQueryTree(displah.to_c, id, root, parent, children, number).zero?
 
-    def ungrab_button (button, modifiers=0)
-      C.XUngrabButton(@dpy.to_c, button, modifiers, @win)
-    end
+    children.typecast(:pointer).read_array_of(:Window, number.typecast(:uint)).each {|win|
+      result << Window.new(displah, win, self)
+    }
 
-    def to_c
-      @win
-    end
+    C::XFree(children.typecast(:pointer))
 
-    private
-    def mode2int (mode)
-      (mode == true or GRAB_MODE[mode]) ? 1 : 0
+    result
+  end
+
+  def grab_pointer (owner_events=true, event_mask=0, pointer_mode=:async, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
+    C::XGrabPointer(displah.to_c, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_c, cursor, time)
+  end
+
+  def ungrab_pointer (time=0)
+    displah.ungrab_pointer(time)
+  end
+
+  def keysym_to_keycode (keysym)
+    C::XKeysymToKeycode(to_c, keysym)
+  end
+
+  def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:async)
+    C::XGrabKey(displah.to_c, keycode.to_keycode, modifiers, id, !!owner_events, mode2int(pointer_mode), mode2int(keyboard_mode))
+  end
+
+  def ungrab_key (keycode, modifiers=0)
+    C::XUngrabKey(displah.to_c, keycode.to_keycode, modifiers, id)
+  end
+
+  def grab_button (button, modifiers=0, owner_events=true, event_mask=4, pointer_mode=:async, keyboard_mode=:async, confine_to=0, cursor=0)
+    C::XGrabButton(displah.to_c, button, modifiers, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_c, cursor.to_c)
+  end
+
+  def ungrab_button (button, modifiers=0)
+    C::XUngrabButton(displah.to_c, button, modifiers, id)
+  end
+
+  def to_c
+    id
+  end
+
+  def inspect
+    with attributes do |attr|
+      "#<X11::Window: #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
     end
   end
 
+  private
+
+  GRAB_MODE = { :sync => false, :async => true }
+
+  def mode2int (mode)
+    (mode == true or GRAB_MODE[mode]) ? 1 : 0
+  end
+end
 
 end

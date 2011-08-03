@@ -28,6 +28,8 @@
 
 module X11; module C
 
+attach_function :XFree, [:pointer], :int
+
 attach_function :XOpenDisplay, [:string], :pointer
 attach_function :XCloseDisplay, [:pointer], :int
 
@@ -43,12 +45,16 @@ attach_function :XUngrabPointer, [:pointer, :Time], :int
 
 attach_function :XGetWindowAttributes, [:pointer, :Window, :pointer], :int
 attach_function :XMoveResizeWindow, [:pointer, :Window, :int, :int, :uint, :uint], :int
+attach_function :XMoveWindow, [:pointer, :Window, :int, :int], :int
+attach_function :XResizeWindow, [:pointer, :Window, :uint, :uint], :int
 attach_function :XRaiseWindow, [:pointer, :Window], :int
+attach_function :XQueryTree, [:pointer, :Window, :pointer, :pointer, :pointer, :pointer], :Status
 
 attach_function :XNextEvent, [:pointer, :pointer], :int
 attach_function :XCheckTypedEvent, [:pointer, :int, :pointer], :Bool
 
 attach_function :XStringToKeysym, [:string], :KeySym
+attach_function :XKeysymToString, [:KeySym], :string
 attach_function :XKeysymToKeycode, [:pointer, :KeySym], :KeyCode
 
 end; end

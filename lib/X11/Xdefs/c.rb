@@ -44,11 +44,13 @@ module Bool
   end
 end
 
-typedef :ulong, :Atom
-typedef Bool,   :Bool
-typedef :ulong, :XID
-typedef :ulong, :Mask
-typedef :XID,   :Font
-typedef :ulong, :FSID
+module ::FFI
+  typedef :ulong, :Atom
+  typedef Bool,   :Bool
+  typedef :ulong, :XID
+  typedef :ulong, :Mask
+  typedef :XID,   :Font
+  typedef :ulong, :FSID
+end
 
 end; end

@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/Xlib/exceptions'
+
 require 'X11/Xlib/c'
 
 require 'X11/Xlib/display'

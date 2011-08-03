@@ -29,11 +29,14 @@
 require 'X11/X'
 require 'X11/Xdefs'
 
+require 'X11/Xlib/c/type/misc'
+
 require 'X11/Xlib/c/type/display'
 require 'X11/Xlib/c/type/gc'
 require 'X11/Xlib/c/type/screen'
 require 'X11/Xlib/c/type/window_attributes'
 require 'X11/Xlib/c/type/visual'
+require 'X11/Xlib/c/type/key_sym'
 
 require 'X11/Xlib/c/type/any_event'
 require 'X11/Xlib/c/type/key_event'

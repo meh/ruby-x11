@@ -26,82 +26,12 @@
 # or implied.
 #++
 
-module X11
+module X11; module C
 
-class Display
-  def initialize (name=nil)
-    pointer  = (name.is_a?(String) or !name) ? X11::C::XOpenDisplay(name) : name
-    @display = pointer.is_a?(C::Display) ? pointer : pointer.typecast(C::Display)
-  end
+attach_function :XGetClassHint, [:pointer, :Window, :pointer], :Status
+attach_function :XAllocClassHint, [], :pointer
 
-  C::Display.layout.members.each_with_index {|name, index|
-    define_method name do
-      @display[name]
-    end
-  }
+attach_function :XGetWMName, [:pointer, :Window, XTextProperty], :Status
+attach_function :XFetchName, [:pointer, :Window, :pointer], :Status
 
-  def ungrab_pointer (time=0)
-    C::XUngrabPointer(to_c, time)
-  end
-
-  def keysym_to_keycode (keysym)
-    C::XKeysymToKeycode(to_c, keysym)
-  end
-
-  def check_typed_event (event)
-    event = Event.index(event)
-    ev    = FFI::MemoryPointer.new(C::XEvent)
-
-    C::XCheckTypedEvent(to_c, event, ev) or return
-
-    Event.new(ev)
-  end
-
-  def screen (which)
-    Screen.new(self, @display[:screens] + (which * C::Screen.size))
-  end
-
-  def default_screen
-    screen(@display[:default_screen])
-  end
-
-  def screens
-    (0 ... @display[:nscreens]).map {|i|
-      screen(i)
-    }
-  end
-
-  def width (index=nil)
-    if index
-      screen(index).width
-    else
-      default_screen.width
-    end
-  end
-
-  def next_event
-    ev = FFI::MemoryPointer.new(C::XEvent)
-
-    C::XNextEvent(to_c, ev)
-
-    Event.new(ev)
-  end
-
-  def each_event
-    loop {
-      next_event.tap {|ev|
-        yield ev if block_given?
-      }
-    }
-  end
-
-  def close
-    C::XCloseDisplay(to_c)
-  end
-
-  def to_c
-    @display.pointer
-  end
-end
-
-end
+end; end
