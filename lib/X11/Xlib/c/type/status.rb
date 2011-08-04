@@ -26,16 +26,22 @@
 # or implied.
 #++
 
-require 'X11/Xlib/exceptions'
+module X11; module C
 
-require 'X11/Xlib/c'
+module Status
+  extend FFI::DataConverter
 
-require 'X11/Xlib/display'
-require 'X11/Xlib/screen'
-require 'X11/Xlib/window'
-require 'X11/Xlib/visual'
-require 'X11/Xlib/keysym'
+  native_type :int
 
-require 'X11/Xlib/status'
-require 'X11/Xlib/event'
-require 'X11/Xlib/mask'
+  def self.to_native (value, ctx)
+    value.to_i
+  end
+
+  def self.from_native (value, ctx)
+    X11::Status.new(value)
+  end
+end
+
+FFI.typedef Status, :Status
+
+end; end

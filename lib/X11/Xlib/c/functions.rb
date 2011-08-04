@@ -50,6 +50,8 @@ attach_function :XMoveWindow, [:pointer, :Window, :int, :int], :int
 attach_function :XResizeWindow, [:pointer, :Window, :uint, :uint], :int
 attach_function :XRaiseWindow, [:pointer, :Window], :int
 attach_function :XQueryTree, [:pointer, :Window, :pointer, :pointer, :pointer, :pointer], :Status
+attach_function :XListProperties, [:pointer, :Window, :pointer], :pointer
+attach_function :XGetWindowProperty, [:pointer, :Window, :Atom, :long, :long, :Bool, :Atom, :pointer, :pointer, :pointer, :pointer, :pointer], :Status
 
 attach_function :XAllowEvents, [:pointer, :int, :Time], :int
 attach_function :XNextEvent, [:pointer, :pointer], :int

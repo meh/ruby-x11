@@ -9,7 +9,9 @@ Gem::Specification.new {|s|
   s.files        = Dir.glob('lib/**/*.rb')
   s.require_path = 'lib'
 
+  s.add_dependency('ffi')
+
   s.add_dependency('memoized')
   s.add_dependency('refining')
-  s.add_dependency('ffi')
+  s.add_dependency('retarded')
 }

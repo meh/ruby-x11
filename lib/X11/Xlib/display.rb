@@ -29,6 +29,10 @@
 module X11
 
 class Display
+	def self.from (pointer, options={})
+		Display.new(pointer, options.merge(:finalizer => false))
+	end
+
   attr_reader :options
 
   def initialize (*args)
@@ -38,20 +42,26 @@ class Display
       args
     end
 
-    
-    pointer  = (name.is_a?(FFI::Pointer) || name.is_a?(C::Display)) ? name : X11::C::XOpenDisplay(name)
-    @display = pointer.is_a?(C::Display) ? pointer : pointer.typecast(C::Display)
+    @display = if name.is_a?(FFI::Pointer)
+			name
+		elsif name.is_a?(C::Display)
+			name.pointer
+		else
+			X11::C::XOpenDisplay(name)
+		end.typecast(C::Display)
 
     @options = {
       :autoflush => true
     }.merge(options || {})
 
-    ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi)
+		unless @options[:finalizer] == false
+	    ObjectSpace.define_finalizer self, self.class.finalizer(@display)
+		end
   end
 
-  def self.finalizer (pointer)
+  def self.finalizer (display)
     proc {
-      C::XCloseDisplay(pointer)
+      C::XCloseDisplay(display)
     }
   end
 

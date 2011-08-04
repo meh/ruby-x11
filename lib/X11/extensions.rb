@@ -20,6 +20,9 @@
 require 'ffi'
 require 'memoized'
 require 'refining'
+require 'retarded'
+require 'forwardable'
+require 'ostruct'
 
 module Kernel
   def with (*args)

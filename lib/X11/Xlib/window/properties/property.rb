@@ -26,8 +26,42 @@
 # or implied.
 #++
 
-module X11; module C
+module X11; class Window; class Properties
 
-FFI.typedef :int, :Status
+class Property
+  MaxLength = 500000
 
-end; end
+  extend Forwardable
+
+  attr_reader    :window, :atom
+  def_delegators :@atom, :to_s, :to_i, :to_ffi
+  def_delegator  :@atom, :to_s, :name
+  def_delegators :@property, :value, :type, :length, :size
+
+  def initialize (window, atom)
+    @window = window
+    @atom   = atom
+
+    @property = Retarded.new(self) {|p|
+      result = OpenStruct.new
+
+      type     = FFI::MemoryPointer.new :Atom
+      format   = FFI::MemoryPointer.new :int
+      length   = FFI::MemoryPointer.new :ulong
+      after    = FFI::MemoryPointer.new :ulong
+      property = FFI::MemoryPointer.new :pointer
+
+      return result unless C::XGetWindowProperty(p.window.display.to_ffi, p.window.to_ffi, atom.to_ffi,
+        0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
+
+      result.tap {|r|
+        r.size   = format.typecast(:int)
+        r.length = [length.typecast(:ulong) * (r.size / 8), MaxLength].min
+        r.type   = type.typecast(:Atom)
+        r.value  = property.typecast(:pointer).typecast(:string)
+      }
+    }
+  end
+end
+
+end; end; end

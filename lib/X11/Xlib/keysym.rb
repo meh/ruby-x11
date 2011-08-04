@@ -26,16 +26,28 @@
 # or implied.
 #++
 
-require 'X11/Xlib/exceptions'
+module X11
 
-require 'X11/Xlib/c'
+class Keysym
+  def initialize (value)
+    if value.is_a?(Integer)
+      @number = value
+      @string = C::XKeysymToString(@number)
+    else
+      @string = value.to_s
+      @number = C::XStringToKeysym(@string).to_i
+    end
 
-require 'X11/Xlib/display'
-require 'X11/Xlib/screen'
-require 'X11/Xlib/window'
-require 'X11/Xlib/visual'
-require 'X11/Xlib/keysym'
+    raise Exceptions::InvalidKeysym if @number.zero?
+  end
 
-require 'X11/Xlib/status'
-require 'X11/Xlib/event'
-require 'X11/Xlib/mask'
+  def to_s
+    @string
+  end
+
+  def to_i
+    @number
+  end
+end
+
+end

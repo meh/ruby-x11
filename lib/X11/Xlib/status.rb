@@ -26,16 +26,68 @@
 # or implied.
 #++
 
-require 'X11/Xlib/exceptions'
+module X11
 
-require 'X11/Xlib/c'
+class Status
+  @codes = {
+    :Success           => 0,
+    :BadRequest        => 1,
+    :BadValue          => 2,
+    :BadWindow         => 3,
+    :BadPixmap         => 4,
+    :BadAtom           => 5,
+    :BadCursor         => 6,
+    :BadFont           => 7,
+    :BadMatch          => 8,
+    :BadDrawable       => 9,
+    :BadAccess         => 10,
+    :BadAlloc          => 11,
+    :BadColor          => 12,
+    :BadGC             => 13,
+    :BadIDChoice       => 14,
+    :BadName           => 15,
+    :BadLength         => 16,
+    :BadImplementation => 17,
 
-require 'X11/Xlib/display'
-require 'X11/Xlib/screen'
-require 'X11/Xlib/window'
-require 'X11/Xlib/visual'
-require 'X11/Xlib/keysym'
+    :FirstExtensionError => 128,
+    :LastExtensionError  => 255
+  }
 
-require 'X11/Xlib/status'
-require 'X11/Xlib/event'
-require 'X11/Xlib/mask'
+  def self.to_hash
+    @codes
+  end
+
+  def self.const_missing (const)
+    Status.new(to_hash[const])
+  end
+
+  def initialize (value)
+    @value = value.is_a?(Integer) ? value : Atom.const_missing(value)
+  end
+
+  def ok?
+    self == Success
+  end
+
+  def == (value)
+    to_i == value || to_sym == value
+  end
+
+	def hash
+		@value.hash
+	end
+
+  def to_sym
+    Status.to_hash.key(@value)
+  end
+
+  def to_i
+    @value
+  end; alias to_ffi to_i
+
+	def inspect
+		to_sym.to_s
+	end
+end
+
+end

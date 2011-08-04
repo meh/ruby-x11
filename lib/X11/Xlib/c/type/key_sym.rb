@@ -28,7 +28,7 @@
 
 module X11; module C
 
-class KeySym
+module KeySym
   extend FFI::DataConverter
 
   native_type :XID
@@ -38,32 +38,10 @@ class KeySym
   end
 
   def self.from_native (value, ctx)
-    KeySym.new(value)
-  end
-
-  def initialize (value)
-    if value.is_a?(Integer)
-      @number = value
-      @string = C::XKeysymToString(@number)
-    else
-      @string = value.to_s
-      @number = C::XStringToKeysym(@string).to_i
-    end
-
-    raise Exceptions::InvalidKeysym if @number.zero?
-  end
-
-  def to_s
-    @string
-  end
-
-  def to_i
-    @number
+    X11::Keysym.new(value)
   end
 end
 
-module ::FFI
-  typedef KeySym, :KeySym
-end
+FFI.typedef KeySym, :KeySym
 
 end; end

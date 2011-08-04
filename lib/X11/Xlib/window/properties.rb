@@ -26,6 +26,10 @@
 # or implied.
 #++
 
+require 'X11/Xatom'
+
+require 'X11/Xlib/window/properties/property'
+
 module X11; class Window
 
 class Properties
@@ -39,16 +43,17 @@ class Properties
 
   def each (&block)
     number = FFI::MemoryPointer.new :int
-
-    C::XListProperties(display.to_ffi, window.to_ffi, number).tap {|list|
-      return if list.null?
-
-      break list.read_array_of(:Atom, number.typecast(:int)).map {|atom|
-        Property.new(Atom.new(atom))
-      }.each(&block).tap {
-        C::XFree(list)
-      }
+    list   = C::XListProperties(window.display.to_ffi, window.to_ffi, number)
+    
+    return if list.null?
+      
+    list.read_array_of(:Atom, number.typecast(:int)).each {|atom|
+      block.call Property.new(window, Atom.new(atom))
     }
+
+    C::XFree(list)
+
+    self
   end
 end
 

@@ -39,7 +39,7 @@ class Window
     text.typecast(:pointer).typecast(:string).tap {
       C::XFree(text.typecast(:pointer))
     }
-  end; alias WM_NAME title
+  end
 
   def class_hint
     return if (hint = C::XAllocClassHint()).null?
@@ -51,23 +51,11 @@ class Window
     end
 
     C::XClassHint.new(hint).tap {|c|
-      break :name => c[:res_name], :class => c[:res_class]
+      break OpenStruct.new(:name => c[:res_name], :class => c[:res_class])
     }.tap {
       C::XFree(hint)
     }
   end
-
-  def name
-    class_hint.tap {|hint|
-      break hint[:name] if hint
-    }
-  end
-
-  def klass
-    class_hint.tap {|hint|
-      break hint[:class] if hint
-    }
-  end; alias WM_CLASS klass
 end
 
 end

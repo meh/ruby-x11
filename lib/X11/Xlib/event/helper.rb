@@ -105,12 +105,16 @@ X11::Event::Window = [lambda {|w|
   X11::Window.new(display, w)
 }, lambda(&:to_ffi)]
 
+X11::Event::Display = [lambda {|pointer|
+  X11::Display.from(pointer)
+}, lambda(&:to_ffi)]
+
 module X11::Event::Common
   def self.included (klass)
     klass.class_eval {
       manage :serial
       manage [:send_event, :send_event?]
-      manage :display, X11::Display
+      manage :display, X11::Event::Display
       manage :window, X11::Event::Window
     }
   end
