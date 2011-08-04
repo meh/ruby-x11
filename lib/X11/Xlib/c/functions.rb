@@ -51,8 +51,10 @@ attach_function :XResizeWindow, [:pointer, :Window, :uint, :uint], :int
 attach_function :XRaiseWindow, [:pointer, :Window], :int
 attach_function :XQueryTree, [:pointer, :Window, :pointer, :pointer, :pointer, :pointer], :Status
 
+attach_function :XAllowEvents, [:pointer, :int, :Time], :int
 attach_function :XNextEvent, [:pointer, :pointer], :int
 attach_function :XCheckTypedEvent, [:pointer, :int, :pointer], :Bool
+attach_function :XWindowEvent, [:pointer, :Window, :long, :pointer], :int
 
 attach_function :XStringToKeysym, [:string], :KeySym
 attach_function :XKeysymToString, [:KeySym], :string

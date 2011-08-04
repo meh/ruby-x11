@@ -38,12 +38,21 @@ class Display
       args
     end
 
-    pointer  = (name.is_a?(String) or !name) ? X11::C::XOpenDisplay(name) : name
+    
+    pointer  = (name.is_a?(FFI::Pointer) || name.is_a?(C::Display)) ? name : X11::C::XOpenDisplay(name)
     @display = pointer.is_a?(C::Display) ? pointer : pointer.typecast(C::Display)
 
     @options = {
       :autoflush => true
     }.merge(options || {})
+
+    ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi)
+  end
+
+  def self.finalizer (pointer)
+    proc {
+      C::XCloseDisplay(pointer)
+    }
   end
 
   C::Display.layout.members.each_with_index {|name, index|
@@ -62,12 +71,42 @@ class Display
     C::XFlush(to_ffi)
   end
 
+  def screen (which)
+    Screen.new(self, @display[:screens] + (which * C::Screen.size))
+  end
+
+  def default_screen
+    screen(@display[:default_screen])
+  end
+
+  def screens
+    Enumerator.new {
+      (0 ... @display[:nscreens]).map {|i|
+        yield screen(i)
+      }
+    }
+  end
+
+  [:root_window, :width, :height].each {|name|
+    define_method name do
+      default_screen.__send__ name
+    end
+  }
+
+  def grab_pointer (*args)
+    default_screen.root_window.grab_pointer(*args)
+  end
+
   def ungrab_pointer (time=0)
     C::XUngrabPointer(to_ffi, time)
   end
 
   def keysym_to_keycode (keysym)
     C::XKeysymToKeycode(to_ffi, keysym)
+  end
+
+  def allow_events (mode, time=0)
+    C::XAllowEvents(to_ffi, mode, time)
   end
 
   def check_typed_event (event)
@@ -79,34 +118,12 @@ class Display
     Event.new(ev)
   end
 
-  def screen (which)
-    Screen.new(self, @display[:screens] + (which * C::Screen.size))
-  end
-
-  def default_screen
-    screen(@display[:default_screen])
-  end
-
-  def screens
-    (0 ... @display[:nscreens]).map {|i|
-      screen(i)
-    }
-  end
-
-  def width (index=nil)
-    if index
-      screen(index).width
-    else
-      default_screen.width
-    end
-  end
-
   def next_event
-    ev = FFI::MemoryPointer.new(C::XEvent)
+    event = FFI::MemoryPointer.new(C::XEvent)
 
-    C::XNextEvent(to_ffi, ev)
+    C::XNextEvent(to_ffi, event)
 
-    Event.new(ev)
+    Event.new(event)
   end
 
   def each_event

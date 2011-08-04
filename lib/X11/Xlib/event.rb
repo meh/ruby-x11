@@ -31,6 +31,21 @@ require 'X11/Xlib/events'
 module X11
 
 class Event
+	module Mode
+		AsyncPointer   = 0
+		SyncPointer    = 1
+		ReplayPointer  = 2
+		AsyncKeyboard  = 3
+		SyncKeyboard   = 4
+		ReplayKeyboard = 5
+		AsyncBoth      = 6
+		SyncBoth       = 7
+
+		def self.[] (name)
+			const_get name
+		end
+	end
+
   def self.index (event)
     Events.to_a.index(event)
   end

@@ -26,51 +26,30 @@
 # or implied.
 #++
 
-module X11
+module X11; class Window
 
-Mask = Class.new(Hash) {
-  def [] (*args)
-    args.map {|arg|
-      super(arg) || super(arg.to_s.to_sym)
-    }.inject {|a, b|
-      a | b
+class Properties
+  include Enumerable
+
+  attr_reader :window
+  
+  def initialize (window)
+    @window = window
+  end
+
+  def each (&block)
+    number = FFI::MemoryPointer.new :int
+
+    C::XListProperties(display.to_ffi, window.to_ffi, number).tap {|list|
+      return if list.null?
+
+      break list.read_array_of(:Atom, number.typecast(:int)).map {|atom|
+        Property.new(Atom.new(atom))
+      }.each(&block).tap {
+        C::XFree(list)
+      }
     }
   end
-}.new.merge(
-  NoEvent:              0,
-  KeyPress:             1,
-  KeyRelease:           (1 << 1),
-  ButtonPress:          (1 << 2),
-  ButtonRelease:        (1 << 3),
-  EnterWindow:          (1 << 4),
-  LeaveWindow:          (1 << 5),
-  PointerMotion:        (1 << 6),
-  PointerMotionHint:    (1 << 7),
-  Button1Motion:        (1 << 8),
-  Button2Motion:        (1 << 9),
-  Button3Motion:        (1 << 10),
-  Button4Motion:        (1 << 11),
-  Button5Motion:        (1 << 12),
-  ButtonMotion:         (1 << 13),
-  KeymapState:          (1 << 14),
-  Exposure:             (1 << 15),
-  VisibilityChange:     (1 << 16),
-  StructureNotify:      (1 << 17),
-  ResizeRedirect:       (1 << 18),
-  SubstructureNotify:   (1 << 19),
-  SubstructureRedirect: (1 << 20),
-  FocusChange:          (1 << 21),
-  PropertyChange:       (1 << 22),
-  ColormapChange:       (1 << 23),
-  OwnerGrabButton:      (1 << 24),
-  Shift:                1,
-  Lock:                 (1 << 1),
-  Control:              (1 << 2),
-  Mod1:                 (1 << 3),
-  Mod2:                 (1 << 4),
-  Mod3:                 (1 << 5),
-  Mod4:                 (1 << 6),
-  Mod5:                 (1 << 7)
-).freeze
-
 end
+
+end; end

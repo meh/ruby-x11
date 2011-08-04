@@ -94,4 +94,16 @@ module FFI
   find_type(:size_t) rescue typedef(:ulong, :size_t)
 end
 
+class Integer
+	def to_ffi
+		self
+	end
+end
+
+class String
+	def to_ffi
+		self
+	end
+end
+
 module X11; module C; extend FFI::Library; end; end

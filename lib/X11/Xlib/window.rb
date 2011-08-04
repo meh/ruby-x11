@@ -27,6 +27,7 @@
 #++
 
 require 'X11/Xlib/window/attributes'
+require 'X11/Xlib/window/properties'
 
 module X11
 
@@ -53,6 +54,10 @@ class Window
     C::XGetWindowAttributes(display.to_ffi, to_ffi, attr)
 
     Attributes.new(attr)
+  end
+
+  def properties
+    Properties.new(self)
   end
 
   def move (x, y)
@@ -93,8 +98,8 @@ class Window
     result
   end
 
-  def grab_pointer (owner_events=true, event_mask=0, pointer_mode=:async, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
-    C::XGrabPointer(display.to_ffi, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor, time)
+  def grab_pointer (owner_events=true, event_mask=Mask[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
+    C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
   end
 
   def ungrab_pointer (time=0)
@@ -105,20 +110,28 @@ class Window
     C::XKeysymToKeycode(to_ffi, keysym)
   end
 
-  def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:async)
-    C::XGrabKey(display.to_ffi, keycode.to_keycode, modifiers, id, !!owner_events, mode2int(pointer_mode), mode2int(keyboard_mode))
+  def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:sync)
+    C::XGrabKey(display.to_ffi, keycode.to_keycode, modifiers, to_ffi, !!owner_events, mode2int(pointer_mode), mode2int(keyboard_mode))
   end
 
   def ungrab_key (keycode, modifiers=0)
-    C::XUngrabKey(display.to_ffi, keycode.to_keycode, modifiers, id)
+    C::XUngrabKey(display.to_ffi, keycode.to_keycode, modifiers, to_ffi)
   end
 
-  def grab_button (button, modifiers=0, owner_events=true, event_mask=4, pointer_mode=:async, keyboard_mode=:async, confine_to=0, cursor=0)
-    C::XGrabButton(display.to_ffi, button, modifiers, id, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
+  def grab_button (button, modifiers=0, owner_events=true, event_mask=Mask[:ButtonPress], pointer_mode=:async, keyboard_mode=:sync, confine_to=0, cursor=0)
+    C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
   end
 
   def ungrab_button (button, modifiers=0)
-    C::XUngrabButton(display.to_ffi, button, modifiers, id)
+    C::XUngrabButton(display.to_ffi, button, modifiers, to_ffi)
+  end
+
+  def next_event (mask=Mask[:NoEvent])
+    event = FFI::MemoryPointer.new(C::XEvent)
+
+    C::XWindowEvent(display.to_ffi, to_ffi, mask, event)
+
+    Event.new(event)
   end
 
   def to_ffi

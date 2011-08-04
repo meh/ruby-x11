@@ -36,7 +36,11 @@ class Helper
   end
 
   def self.attribute (which=nil)
-    @attribute = which.to_s.to_sym if which
+		if which
+	    @attribute = which.to_s.to_sym
+		else
+			@attribute
+		end
   end
 
   def self.attach_method (meth, &block)
@@ -59,31 +63,31 @@ class Helper
     case args.size
     when 0
       attach_method(new) {
-        struct[@attribute][original]
+        to_ffi[self.class.attribute][original]
       }
 
       attach_method("#{new}=") {|x|
-        struct[@attribute][original] = x
+        to_ffi[self.class.attribute][original] = x
       }
     when 1
       if args.first.is_a?(Class)
         attach_method(new) {
-          args.first.new(struct[@attribute][original])
+          args.first.new(to_ffi[self.class.attribute][original])
         }
 
         attach_method("#{new}=") {|x|
-          struct[@attribute][original] = x.to_ffi
+          to_ffi[self.class.attribute][original] = x.to_ffi
         }
       else
         manage([original, new], args.first, nil)
       end
     when 2
       attach_method(new) {
-        self.instance_exec(struct[@attribute][original], &args[0])
+        instance_exec(to_ffi[self.class.attribute][original], &args[0])
       } if args[0]
 
       attach_method("#{new}=") {|x|
-        struct[attribute][original] = self.instance_exec(x, &args[1])
+        to_ffi[attribute][original] = instance_exec(x, &args[1])
       } if args[1]
     end
   end
@@ -92,15 +96,13 @@ class Helper
     @struct = struct
   end
 
-  def struct
-    @struct
-  end
-
-  alias to_ffi struct
+	def to_ffi
+		@struct
+	end
 end
 
 X11::Event::Window = [lambda {|w|
-  X11::Event::Window.new(display, w)
+  X11::Window.new(display, w)
 }, lambda(&:to_ffi)]
 
 module X11::Event::Common

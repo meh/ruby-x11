@@ -34,6 +34,10 @@ class Keysym
   def self.const_missing (name)
     C::XStringToKeysym(name.to_s)
   end
+
+  def self.method_missing (name)
+    C::XStringToKeysym(name.to_s)
+  end
 end
 
 end
