@@ -62,6 +62,10 @@ class Property
       }
     }
   end
+
+  def inspect
+    "#<X11::Window::Property: #{type.to_sym} #{value.inspect}>"
+  end
 end
 
 end; end; end

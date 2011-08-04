@@ -27,6 +27,7 @@
 #++
 
 require 'X11/extensions'
+require 'X11/Xatom'
 
 module X11; module C
 
@@ -45,7 +46,6 @@ module Bool
 end
 
 module ::FFI
-  typedef :ulong, :Atom
   typedef Bool,   :Bool
   typedef :ulong, :XID
   typedef :ulong, :Mask

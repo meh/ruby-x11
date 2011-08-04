@@ -26,33 +26,22 @@
 # or implied.
 #++
 
-require 'X11/Xlib/window/properties/property'
+module X11; module C
 
-module X11; class Window
+module Atom
+  extend FFI::DataConverter
 
-class Properties
-  include Enumerable
+  native_type :ulong
 
-  attr_reader :window
-  
-  def initialize (window)
-    @window = window
+  def self.to_native (value, ctx)
+    value.to_ffi
   end
 
-  def each (&block)
-    number = FFI::MemoryPointer.new :int
-    list   = C::XListProperties(window.display.to_ffi, window.to_ffi, number)
-    
-    return if list.null?
-      
-    list.read_array_of(:Atom, number.typecast(:int)).each {|atom|
-      block.call Property.new(window, Atom.new(atom))
-    }
-
-    C::XFree(list)
-
-    self
+  def self.from_native (value, ctx)
+    X11::Atom.new(value)
   end
 end
+
+FFI.typedef Atom, :Atom
 
 end; end

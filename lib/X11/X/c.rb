@@ -26,14 +26,13 @@
 # or implied.
 #++
 
-require 'X11/extensions'
+require 'X11/Xatom'
 
 module X11; module C
 
 module ::FFI
   typedef :ulong, :XID
   typedef :ulong, :Mask
-  typedef :ulong, :Atom
   typedef :ulong, :VisualID
   typedef :ulong, :Time
   typedef :XID,   :Window

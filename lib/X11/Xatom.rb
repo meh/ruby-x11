@@ -136,3 +136,5 @@ class Atom
 end
 
 end
+
+require 'X11/Xatom/c'

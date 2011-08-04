@@ -80,15 +80,16 @@ module FFI
         else
           send "read_#{type.name.downcase}"
         end
+      elsif type.respond_to? :from_native
+        type.from_native(typecast(type.native_type), nil)
       else
-        ArgumentError.new 'You have to pass a Struct, a Builtin type or a Symbol'
+        raise ArgumentError, 'you have to pass a Struct, a Builtin type or a Symbol'
       end
     end
 
     def read_array_of (type, number)
-      if type.is_a?(Symbol)
-        type = FFI.find_type(type)
-      end
+      type = FFI.find_type(type) if type.is_a?(Symbol)
+      type = type.native_type    if type.respond_to? :native_type
 
       send "read_array_of_#{type.name.downcase}", number
     end
