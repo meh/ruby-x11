@@ -46,7 +46,7 @@ class Properties
     return if list.null?
       
     list.read_array_of(:Atom, number.typecast(:int)).each {|atom|
-      block.call Property.new(window, Atom.new(atom))
+      block.call Property.new(window, Atom.new(atom.to_i, window.display))
     }
 
     C::XFree(list)

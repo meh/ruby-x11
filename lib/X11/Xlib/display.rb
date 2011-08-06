@@ -50,6 +50,10 @@ class Display
 			X11::C::XOpenDisplay(name)
 		end.typecast(C::Display)
 
+    if @display.pointer.null?
+      raise ArgumentError, "could not connect to display #{name}"
+    end
+
     @options = {
       :autoflush => true
     }.merge(options || {})

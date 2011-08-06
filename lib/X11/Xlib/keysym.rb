@@ -38,7 +38,7 @@ class Keysym
       @number = C::XStringToKeysym(@string).to_i
     end
 
-    raise Exceptions::InvalidKeysym if @number.zero?
+    raise ArgumentError, 'invalid keysym' if @number.zero? or @string.nil?
   end
 
   def to_s

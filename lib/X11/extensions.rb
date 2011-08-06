@@ -17,7 +17,7 @@
 # along with sysctl. If not, see <http://www.gnu.org/licenses/>.
 #++
 
-require 'ffi'
+require 'ffi' unless defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
 require 'memoized'
 require 'refining'
 require 'retarded'
@@ -28,12 +28,51 @@ module Kernel
   def with (*args)
     yield *args
   end
+
+  def suppress_warnings
+    exception = nil
+    tmp, $VERBOSE = $VERBOSE, nil
+
+    begin
+      result = yield
+    rescue Exception => e
+      exception = e
+    end
+
+    $VERBOSE = tmp
+
+    if exception
+      raise exception
+    else
+      result
+    end
+  end
 end
 
 module FFI
+  def self.sizeof (type)
+    type = FFI.find_type(type) if type.is_a?(Symbol)
+
+    if type.is_a?(Class) && (type.ancestors.member?(FFI::Struct) && !type.is_a?(FFI::ManagedStruct)) || type.is_a?(Type::Builtin)
+      type.size
+    elsif type.respond_to? :from_native
+      type.native_type.size
+    else
+      raise ArgumentError, 'you have to pass a Struct, a Builtin type or a Symbol'
+    end
+  end
+
   module Library
     def ffi_lib_add (*names)
-      ffi_lib *((begin; ffi_libraries; rescue Exception; []; end).map { |lib| lib.name } + names).compact.uniq
+      ffi_lib *((begin
+        ffi_libraries
+      rescue Exception
+        []
+      end).map {|lib|
+        lib.name
+      } + names).compact.uniq.reject {|lib|
+        lib == '[current process]'
+      }
     end
 
     def has_function? (sym, libraries=nil)
@@ -58,28 +97,19 @@ module FFI
   end
 
   class Type::Builtin
-    memoize
     def name
-      Type::Builtin.constants.find {|name|
-        Type::Builtin.const_get(name) == self
-      }
+      inspect[/:(\w+) /][1 .. -2]
     end
   end
 
   class Pointer
     def typecast (type)
-      if type.is_a?(Symbol)
-        type = FFI.find_type(type)
-      end
+      type = FFI.find_type(type) if type.is_a?(Symbol)
 
-      if type.is_a?(Class) && type.ancestors.member?(FFI::Struct)
+      if type.is_a?(Class) && type.ancestors.member?(FFI::Struct) && !type.is_a?(FFI::ManagedStruct)
         type.new(self)
       elsif type.is_a?(Type::Builtin)
-        if type.name == :STRING
-          read_string
-        else
-          send "read_#{type.name.downcase}"
-        end
+        send "read_#{type.name.downcase}"
       elsif type.respond_to? :from_native
         type.from_native(typecast(type.native_type), nil)
       else

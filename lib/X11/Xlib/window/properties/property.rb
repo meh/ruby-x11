@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/Xlib/window/properties/property/parser'
+
 module X11; class Window; class Properties
 
 class Property
@@ -33,38 +35,39 @@ class Property
 
   extend Forwardable
 
-  attr_reader    :window, :atom
+  attr_reader    :window, :atom, :value
   def_delegators :@atom, :to_s, :to_i, :to_ffi
   def_delegator  :@atom, :to_s, :name
-  def_delegators :@property, :value, :type, :length, :size
 
   def initialize (window, atom)
     @window = window
     @atom   = atom
 
-    @property = Retarded.new(self) {|p|
-      result = OpenStruct.new
-
+    @value = Retarded.new {
       type     = FFI::MemoryPointer.new :Atom
       format   = FFI::MemoryPointer.new :int
       length   = FFI::MemoryPointer.new :ulong
       after    = FFI::MemoryPointer.new :ulong
       property = FFI::MemoryPointer.new :pointer
 
-      return result unless C::XGetWindowProperty(p.window.display.to_ffi, p.window.to_ffi, atom.to_ffi,
+      return unless C::XGetWindowProperty(window.display.to_ffi, window.to_ffi, atom.to_ffi,
         0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
-      result.tap {|r|
-        r.size   = format.typecast(:int)
-        r.length = [length.typecast(:ulong) * (r.size / 8), MaxLength].min
-        r.type   = type.typecast(:Atom)
-        r.value  = property.typecast(:pointer).typecast(:string)
-      }
+      size   = format.typecast(:int)
+      length = [length.typecast(:ulong) * FFI.sizeof({ 8 => :char, 16 => :short, 32 => :long }[size]), MaxLength].min
+        
+      @type = Atom.new(type.typecast(:Atom).to_i, window.display)
+
+      Property::Parser.parse(self, property.typecast(:pointer).read_string(length - 1))
     }
   end
 
+  def type
+    @type or (~@value; @type)
+  end
+
   def inspect
-    "#<X11::Window::Property: #{type.to_sym} #{value.inspect}>"
+    "#<X11::Window::Property(#{name}): #{type} #{value.inspect}>"
   end
 end
 

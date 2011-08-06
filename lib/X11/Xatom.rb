@@ -110,7 +110,7 @@ class Atom
 
   def self.const_missing (const)
     Atom.new(to_hash.find {|name, value|
-      name.downcase == const.downcase
+      name.to_s.downcase == const.to_s.downcase
     }.last)
   end
 
@@ -118,13 +118,40 @@ class Atom
 		const_missing(id)
 	end
 
-  def initialize (value)
-    @value = value.is_a?(Integer) ? value : Atom.const_missing(value)
+	def self.from_name (display, name, if_exists=false)
+		C::XInternAtom(display.to_ffi, name, if_exists).tap {|atom|
+			break atom.to_i == 0 ? nil : atom.to_i
+		}
+	end
+
+	attr_reader :display
+
+  def initialize (value, display=nil)
+		if display
+			@display = display
+			@value   = value.is_a?(Integer) ? value : Atom.from_name(display, value.to_s).to_i
+		else
+	    @value = value.is_a?(Integer) ? value : Atom.const_missing(value).to_i
+		end
   end
 
-  def to_sym
-    Atom.to_hash.key(@value)
-  end
+	def name
+		@name ||= if display
+			C::XGetAtomName(display.to_ffi, self)
+		else
+			Atom.to_hash.index(@value).tap {|name|
+				break name.nil? ? nil : name.to_s
+			}
+		end
+	end
+
+	def to_sym
+    name.to_sym rescue nil
+	end
+
+	def to_s
+		name
+	end
 
   def to_i
     @value

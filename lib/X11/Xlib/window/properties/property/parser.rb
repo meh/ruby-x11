@@ -26,51 +26,43 @@
 # or implied.
 #++
 
-module X11
+module X11; class Window; class Properties; class Property
 
-Mask = Class.new(Hash) {
-  def [] (*args)
-    args.map {|arg|
-      super(arg) || super(arg.to_s.to_sym)
-    }.inject {|a, b|
-      a | b
+module Parser
+  @parsers = {}
+
+  def self.register (name, &block)
+    @parsers[name.to_s] = block
+  end
+
+  def self.parse (property, data)
+    raise ArgumentError, "no parser for #{property.type.name}" unless @parsers[property.type.to_s]
+
+    @parsers[property.type.to_s].call(property, data)
+  end
+
+  def self.format (property, data, format)
+    data.unpack(format.chars.map {|char|
+      case char
+        when 'c'      then 'L!'
+        when 'i', 'a' then 'l!'
+        else char
+      end
+    }.join).map.with_index {|data, index|
+      char = format[index]
+
+      case char
+        when 'a' then Atom.new(data, property.window.display)
+        else data
+      end
     }
   end
-}.new.merge(
-  :NoEvent              => 0,
-  :KeyPress             => 1,
-  :KeyRelease           => (1 << 1),
-  :ButtonPress          => (1 << 2),
-  :ButtonRelease        => (1 << 3),
-  :EnterWindow          => (1 << 4),
-  :LeaveWindow          => (1 << 5),
-  :PointerMotion        => (1 << 6),
-  :PointerMotionHint    => (1 << 7),
-  :Button1Motion        => (1 << 8),
-  :Button2Motion        => (1 << 9),
-  :Button3Motion        => (1 << 10),
-  :Button4Motion        => (1 << 11),
-  :Button5Motion        => (1 << 12),
-  :ButtonMotion         => (1 << 13),
-  :KeymapState          => (1 << 14),
-  :Exposure             => (1 << 15),
-  :VisibilityChange     => (1 << 16),
-  :StructureNotify      => (1 << 17),
-  :ResizeRedirect       => (1 << 18),
-  :SubstructureNotify   => (1 << 19),
-  :SubstructureRedirect => (1 << 20),
-  :FocusChange          => (1 << 21),
-  :PropertyChange       => (1 << 22),
-  :ColormapChange       => (1 << 23),
-  :OwnerGrabButton      => (1 << 24),
-  :Shift                => 1,
-  :Lock                 => (1 << 1),
-  :Control              => (1 << 2),
-  :Mod1                 => (1 << 3),
-  :Mod2                 => (1 << 4),
-  :Mod3                 => (1 << 5),
-  :Mod4                 => (1 << 6),
-  :Mod5                 => (1 << 7)
-).freeze
 
+  def self.string (data, type)
+
+  end
 end
+
+end; end; end; end
+
+require 'X11/Xlib/window/properties/property/atom'

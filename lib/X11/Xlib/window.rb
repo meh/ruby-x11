@@ -34,10 +34,21 @@ module X11
 class Window
   attr_reader :display, :parent
 
-  def initialize (display, window, parent=nil)
+  def initialize (display, window)
     @display = display
     @window  = window
-    @parent  = parent
+  end
+
+  def parent
+    root     = FFI::MemoryPointer.new :Window
+    parent   = FFI::MemoryPointer.new :Window
+    number   = FFI::MemoryPointer.new :uint
+    children = FFI::MemoryPointer.new :pointer
+
+    C::XQueryTree(display.to_ffi, id, root, parent, children, number)
+    C::XFree(children.typecast(:pointer))
+
+    Window.new(display, parent)
   end
 
   def id
@@ -90,7 +101,7 @@ class Window
     return result if children.typecast(:pointer).null?
 
     children.typecast(:pointer).read_array_of(:Window, number.typecast(:uint)).each {|win|
-      result << Window.new(display, win, self)
+      result << Window.new(display, win)
     }
 
     C::XFree(children.typecast(:pointer))

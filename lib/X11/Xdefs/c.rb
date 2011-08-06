@@ -31,6 +31,8 @@ require 'X11/Xatom'
 
 module X11; module C
 
+ffi_lib_add 'X11'
+
 module Bool
   extend FFI::DataConverter
 

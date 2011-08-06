@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/Xdefs'
+
 module X11; module C
 
 module Atom
@@ -43,5 +45,8 @@ module Atom
 end
 
 FFI.typedef Atom, :Atom
+
+attach_function :XInternAtom, [:pointer, :string, :Bool], :Atom
+attach_function :XGetAtomName, [:pointer, :Atom], :string
 
 end; end
