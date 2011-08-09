@@ -21,6 +21,7 @@ require 'ffi' unless defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
 require 'memoized'
 require 'refining'
 require 'retarded'
+require 'bitmap'
 require 'forwardable'
 require 'ostruct'
 
@@ -50,7 +51,7 @@ module Kernel
 end
 
 module FFI
-  def self.sizeof (type)
+  def self.type_size (type)
     type = FFI.find_type(type) if type.is_a?(Symbol)
 
     if type.is_a?(Class) && (type.ancestors.member?(FFI::Struct) && !type.is_a?(FFI::ManagedStruct)) || type.is_a?(Type::Builtin)
@@ -138,6 +139,10 @@ class String
 	def to_ffi
 		self
 	end
+end
+
+class Bitmap::Value
+  alias to_ffi to_i
 end
 
 module X11; module C; extend FFI::Library; end; end

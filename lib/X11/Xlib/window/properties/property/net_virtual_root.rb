@@ -26,16 +26,14 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
+module X11; class Window; class Properties
 
-require 'X11/Xutil/window'
-
-module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
+Property.register :_NET_VIRTUAL_ROOTS do
+  output do |property, data|
+    data.unpack('L!' * (data.length / FFI.type_size(:long))).map {|win|
+      Window.new(property.display, win)
+    }
+  end
 end
 
-end
+end; end; end

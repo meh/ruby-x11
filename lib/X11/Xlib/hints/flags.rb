@@ -26,16 +26,17 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
+module X11; class Hints
 
-require 'X11/Xutil/window'
+Flags = Bitmap.new(
+  :Input        => (1 << 0),
+  :State        => (1 << 1),
+  :IconPixmap   => (1 << 2),
+  :IconWindow   => (1 << 3),
+  :IconPosition => (1 << 4),
+  :IconMask     => (1 << 5),
+  :WindowGroup  => (1 << 6),
+  :Urgency      => (1 << 8)
+)
 
-module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
-end
-
-end
+end; end

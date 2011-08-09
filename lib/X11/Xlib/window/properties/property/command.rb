@@ -26,16 +26,12 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
+module X11; class Window; class Properties
 
-require 'X11/Xutil/window'
-
-module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
+Property.register :WM_COMMAND do
+  output do |property, data|
+    data.split("\0").compact
+  end
 end
 
-end
+end; end; end

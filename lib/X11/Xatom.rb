@@ -114,52 +114,52 @@ class Atom
     }.last)
   end
 
-	def self.method_missing (id, *)
-		const_missing(id)
-	end
-
-	def self.from_name (display, name, if_exists=false)
-		C::XInternAtom(display.to_ffi, name, if_exists).tap {|atom|
-			break atom.to_i == 0 ? nil : atom.to_i
-		}
-	end
-
-	attr_reader :display
-
-  def initialize (value, display=nil)
-		if display
-			@display = display
-			@value   = value.is_a?(Integer) ? value : Atom.from_name(display, value.to_s).to_i
-		else
-	    @value = value.is_a?(Integer) ? value : Atom.const_missing(value).to_i
-		end
+  def self.method_missing (id, *)
+    const_missing(id)
   end
 
-	def name
-		@name ||= if display
-			C::XGetAtomName(display.to_ffi, self)
-		else
-			Atom.to_hash.index(@value).tap {|name|
-				break name.nil? ? nil : name.to_s
-			}
-		end
-	end
+  def self.from_name (display, name, if_exists=false)
+    C::XInternAtom(display.to_ffi, name, if_exists).tap {|atom|
+      break atom.to_i == 0 ? nil : atom.to_i
+    }
+  end
 
-	def to_sym
+  attr_reader :display
+
+  def initialize (value, display=nil)
+    if display
+      @display = display
+      @value   = value.is_a?(Integer) ? value : Atom.from_name(display, value.to_s).to_i
+    else
+      @value = value.is_a?(Integer) ? value : Atom.const_missing(value).to_i
+    end
+  end
+
+  def name
+    @name ||= if display
+      C::XGetAtomName(display.to_ffi, self)
+    else
+      Atom.to_hash.index(@value).tap {|name|
+        break name.nil? ? nil : name.to_s
+      }
+    end
+  end
+
+  def to_sym
     name.to_sym rescue nil
-	end
+  end
 
-	def to_s
-		name
-	end
+  def to_s
+    name
+  end
 
   def to_i
     @value
   end; alias to_ffi to_i
 
-	def inspect
-		to_sym.to_s
-	end
+  def inspect
+    to_sym.to_s
+  end
 end
 
 end

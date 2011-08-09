@@ -36,7 +36,7 @@ module Parser
   end
 
   def self.parse (property, data)
-    raise ArgumentError, "no parser for #{property.type.name}" unless @parsers[property.type.to_s]
+    return data unless @parsers[property.type.to_s]
 
     @parsers[property.type.to_s].call(property, data)
   end
@@ -44,15 +44,14 @@ module Parser
   def self.format (property, data, format)
     data.unpack(format.chars.map {|char|
       case char
-        when 'c'      then 'L!'
-        when 'i', 'a' then 'l!'
+        when 'c'           then 'L!'
+        when 'i', 'a', 'b' then 'l!'
         else char
       end
-    }.join).map.with_index {|data, index|
-      char = format[index]
-
-      case char
-        when 'a' then Atom.new(data, property.window.display)
+    }.join).each_with_index.map {|data, index|
+      case format[index].chr
+        when 'a' then Atom.new(data, property.display)
+        when 'b' then !data.zero?
         else data
       end
     }
@@ -65,4 +64,6 @@ end
 
 end; end; end; end
 
-require 'X11/Xlib/window/properties/property/atom'
+require 'X11/Xlib/window/properties/property/parser/arc'
+require 'X11/Xlib/window/properties/property/parser/atom'
+require 'X11/Xlib/window/properties/property/parser/cardinal'

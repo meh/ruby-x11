@@ -26,16 +26,12 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
-
-require 'X11/Xutil/window'
-
 module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
-end
+
+RevertTo = {
+  :None        => 0,
+  :PointerRoot => 1,
+  :Parent      => 2
+}
 
 end

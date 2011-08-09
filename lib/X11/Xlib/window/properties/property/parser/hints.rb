@@ -26,6 +26,16 @@
 # or implied.
 #++
 
-X11::Window::Properties::Property::Parser.register :ATOM do |property, data|
-  Parser.format(property, data, 'a').first
+module X11; class Window; class Properties; class Property
+
+Parser.register :WM_HINTS do |property, data|
+  data = Parser.format(property, data, 'ibciiiiii')
+
+  X11::Hints.new(
+    Mask::Hint[data.shift], data.shift, Mask::State[data.shift],
+    X11::Hints::Icon.new(*data.shift(4)), X11::Window.new(property.display, data.shift)
+  )
+)
 end
+
+end; end; end; end

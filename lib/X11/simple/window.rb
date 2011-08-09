@@ -30,6 +30,15 @@ module X11
 
 class Window
 	def client
+    win = properties[:_NET_VIRTUAL_ROOTS].any? {|vroot|
+      next unless self == vroot
+
+      unless (tmp = self.pointer_on?).nil?
+        break tmp
+      else
+        return self
+      end
+    } or self
 	end
 end
 

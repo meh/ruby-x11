@@ -26,16 +26,19 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
+require 'X11/Xlib/hints/icon'
 
-require 'X11/Xutil/window'
+module X11; class Hints
 
-module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
+class Icon
+  attr_reader :pixmap, :window, :x, :y
+
+  def initialize (pixmap, window, x, y)
+    @pixmap = pixmap
+    @window = window
+    @x      = x
+    @y      = y
+  end
 end
 
-end
+end; end

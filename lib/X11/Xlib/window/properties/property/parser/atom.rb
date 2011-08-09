@@ -26,16 +26,10 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
+module X11; class Window; class Properties; class Property
 
-require 'X11/Xutil/window'
-
-module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
+Parser.register :ATOM do |property, data|
+  Parser.format(property, data, 'a').first
 end
 
-end
+end; end; end; end

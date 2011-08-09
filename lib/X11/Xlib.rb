@@ -27,6 +27,7 @@
 #++
 
 require 'X11/Xlib/exceptions'
+require 'X11/Xlib/transform'
 
 require 'X11/Xlib/c'
 
@@ -39,3 +40,4 @@ require 'X11/Xlib/keysym'
 require 'X11/Xlib/status'
 require 'X11/Xlib/event'
 require 'X11/Xlib/mask'
+require 'X11/Xlib/revert_to'

@@ -30,7 +30,7 @@ module X11
 
 class Display
   def select_window (frame=false)
-    return unless grab_pointer(false, Mask[:ButtonPress, :ButtonRelease], :sync, :async, root_window, Cursor::Font.new(self, :crosshair))
+    return unless grab_pointer(false, Mask::Event[:ButtonPress, :ButtonRelease], :sync, :async, root_window, Cursor::Font.new(self, :crosshair))
 
     target  = nil
     buttons = 0
@@ -38,7 +38,7 @@ class Display
     while target.nil? || !buttons.zero?
       allow_events Event::Mode::SyncPointer
 
-      case (event = root_window.next_event Mask[:ButtonPress, :ButtonRelease])
+      case (event = root_window.next_event Mask::Event[:ButtonPress, :ButtonRelease])
       when Event::ButtonPress
         if target.nil?
           target = event.subwindow

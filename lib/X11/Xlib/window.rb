@@ -32,11 +32,25 @@ require 'X11/Xlib/window/properties'
 module X11
 
 class Window
-  attr_reader :display, :parent
+  attr_reader :display, :parent, :revert_to
 
   def initialize (display, window)
     @display = display
     @window  = window
+    
+    self.revert_to = nil
+  end
+
+  def root
+    root     = FFI::MemoryPointer.new :Window
+    parent   = FFI::MemoryPointer.new :Window
+    number   = FFI::MemoryPointer.new :uint
+    children = FFI::MemoryPointer.new :pointer
+
+    C::XQueryTree(display.to_ffi, id, root, parent, children, number)
+    C::XFree(children.typecast(:pointer))
+
+    Window.new(display, root.typecast(:Window))
   end
 
   def parent
@@ -48,15 +62,27 @@ class Window
     C::XQueryTree(display.to_ffi, id, root, parent, children, number)
     C::XFree(children.typecast(:pointer))
 
-    Window.new(display, parent)
+    Window.new(display, parent.typecast(:Window))
   end
 
   def id
     @window
   end; alias hash id
 
+  def == (value)
+    id == value.id
+  end
+
   def nil?
     id.zero?
+  end
+
+  def revert_to= (value)
+    @revert_to = if value.is_a?(Integer)
+      RevertTo.key(value)
+    else
+      self.revert_to = RevertTo[value] || 0
+    end
   end
 
   def attributes
@@ -109,8 +135,8 @@ class Window
     result
   end
 
-  def grab_pointer (owner_events=true, event_mask=Mask[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
-    C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
+  def grab_pointer (owner_events=true, event_mask=Mask::Event[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
+    C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
   end
 
   def ungrab_pointer (time=0)
@@ -129,18 +155,42 @@ class Window
     C::XUngrabKey(display.to_ffi, keycode.to_keycode, modifiers, to_ffi)
   end
 
-  def grab_button (button, modifiers=0, owner_events=true, event_mask=Mask[:ButtonPress], pointer_mode=:async, keyboard_mode=:sync, confine_to=0, cursor=0)
-    C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
+  def grab_button (button, modifiers=0, owner_events=true, event_mask=Mask::Event[:ButtonPress], pointer_mode=:async, keyboard_mode=:sync, confine_to=0, cursor=0)
+    C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
   end
 
   def ungrab_button (button, modifiers=0)
     C::XUngrabButton(display.to_ffi, button, modifiers, to_ffi)
   end
 
-  def next_event (mask=Mask[:NoEvent])
+  def pointer_on?
+    root  = FFI::MemoryPointer.new :Window
+    child = FFI::MemoryPointer.new :Window
+    dummy = FFI::MemoryPointer.new :int
+
+    C::XQueryPointer(display.to_ffi, to_ffi, root, child, dummy, dummy, dummy, dummy, dummy)
+
+    Window.new(display, child.typecast(:Window))
+  end
+
+  def pointer_at? (on_root=false)
+    dummy = FFI::MemoryPointer.new :Window
+    y     = FFI::MemoryPointer.new :int
+    x     = FFI::MemoryPointer.new :int
+
+    if on_root
+      C::XQueryPointer(display.to_ffi, to_ffi, dummy, dummy, x, y, dummy, dummy, dummy)
+    else
+      C::XQueryPointer(display.to_ffi, to_ffi, dummy, dummy, dummy, dummy, x, y, dummy)
+    end
+
+    [x.typecast(:int), y.typecast(:int)]
+  end
+
+  def next_event (mask=Mask::Event[:NoEvent])
     event = FFI::MemoryPointer.new(C::XEvent)
 
-    C::XWindowEvent(display.to_ffi, to_ffi, mask, event)
+    C::XWindowEvent(display.to_ffi, to_ffi, mask.to_ffi, event)
 
     Event.new(event)
   end

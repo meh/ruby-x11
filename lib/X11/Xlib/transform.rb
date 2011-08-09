@@ -26,16 +26,33 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
-
-require 'X11/Xutil/window'
-
 module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
+
+class Transform
+  attr_reader :name
+
+  def initialize (name, &block)
+    @name      = name
+    @callbacks = {}
+
+    instance_eval &block
+  end
+
+  def for (*args)
+    @for = args
+
+    self
+  end
+
+  def method_missing (name, *args, &block)
+    if block
+      @callbacks[name] = block
+    else
+      return super unless @callbacks[name]
+
+      @callbacks[name].call(*@for, *args)
+    end
+  end
 end
 
 end

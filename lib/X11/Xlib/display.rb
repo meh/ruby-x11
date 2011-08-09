@@ -30,8 +30,24 @@ module X11
 
 class Display
 	def self.from (pointer, options={})
-		Display.new(pointer, options.merge(:finalizer => false))
+		Display.new(pointer, options.merge(:close => false))
 	end
+
+  def self.all
+    @displays ||= []
+  end
+
+  def self.finalizer (display)
+    proc {
+      C::XCloseDisplay(FFI::Pointer.new(display))
+    }
+  end
+
+  at_exit do
+    Display.all.each {|d|
+      Display.finalizer(d).call
+    }
+  end
 
   attr_reader :options
 
@@ -48,25 +64,21 @@ class Display
 			name.pointer
 		else
 			X11::C::XOpenDisplay(name)
-		end.typecast(C::Display)
+    end.typecast(C::Display)
 
     if @display.pointer.null?
       raise ArgumentError, "could not connect to display #{name}"
     end
 
     @options = {
-      :autoflush => true
+      :flush => true
     }.merge(options || {})
 
-		unless @options[:finalizer] == false
-	    ObjectSpace.define_finalizer self, self.class.finalizer(@display)
+		if @options[:close]
+	    ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi.to_i)
+    else
+      (Display.all << to_ffi.to_i).uniq!
 		end
-  end
-
-  def self.finalizer (display)
-    proc {
-      C::XCloseDisplay(display)
-    }
   end
 
   C::Display.layout.members.each_with_index {|name, index|
@@ -76,7 +88,7 @@ class Display
   }
 
   def flush
-    return unless options[:autoflush]
+    return unless options[:flush]
     
     flush!
   end
@@ -119,6 +131,21 @@ class Display
     C::XKeysymToKeycode(to_ffi, keysym)
   end
 
+  def focused
+    window = FFI::MemoryPointer.new :Window
+    revert = FFI::MemoryPointer.new :int
+
+    C::XGetInputFocus(to_ffi, window, revert)
+
+    Window.new(self, window.typecast(:Window)).tap {|w|
+      w.revert_to = revert.typecast(:int)
+    }
+  end
+
+  def focus (window, revert=:ToParent, time=0)
+    C::XSetInputFocus(to_ffi, window.to_ffi, revert.is_a?(Integer) ? revert : RevertTo[revert], time)
+  end
+
   def allow_events (mode, time=0)
     C::XAllowEvents(to_ffi, mode, time)
   end
@@ -132,27 +159,41 @@ class Display
     Event.new(ev)
   end
 
-  def next_event
+  def next_event (mask=nil)
     event = FFI::MemoryPointer.new(C::XEvent)
 
-    C::XNextEvent(to_ffi, event)
+    if mask
+      C::XMaskEvent(to_ffi, mask.to_ffi, event)
+    else
+      C::XNextEvent(to_ffi, event)
+    end
 
     Event.new(event)
   end
 
-  def each_event
-    loop {
-      next_event.tap {|ev|
-        yield ev if block_given?
+  def each_event (mask=nil, &block)
+    return unless block
+
+    catch(:skip) {
+      loop {
+        next_event(mask).tap {|event|
+          block.call event
+        }
       }
     }
   end
 
   def close
-    C::XCloseDisplay(to_ffi)
+    pointer, @display = to_ffi, nil
+
+    Display.all.delete pointer.to_i
+
+    C::XCloseDisplay(pointer)
   end
 
   def to_ffi
+    raise RuntimeError, 'this Display is unusable because it has been closed' unless @display
+
     @display.pointer
   end
 end

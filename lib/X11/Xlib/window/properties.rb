@@ -32,8 +32,10 @@ module X11; class Window
 
 class Properties
   include Enumerable
+  extend  Forwardable
 
-  attr_reader :window
+  attr_reader    :window
+  def_delegators :@window, :display
   
   def initialize (window)
     @window = window
@@ -41,17 +43,23 @@ class Properties
 
   def each (&block)
     number = FFI::MemoryPointer.new :int
-    list   = C::XListProperties(window.display.to_ffi, window.to_ffi, number)
+    list   = C::XListProperties(display.to_ffi, window.to_ffi, number)
     
     return if list.null?
       
     list.read_array_of(:Atom, number.typecast(:int)).each {|atom|
-      block.call Property.new(window, Atom.new(atom.to_i, window.display))
+      block.call Property.new(window, Atom.new(atom.to_i, display))
     }
 
     C::XFree(list)
 
     self
+  end
+
+  def [] (name)
+    find {|property|
+      property.name == name.to_s
+    }
   end
 end
 

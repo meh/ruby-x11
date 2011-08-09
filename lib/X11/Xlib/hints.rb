@@ -26,6 +26,24 @@
 # or implied.
 #++
 
-X11::Window::Properties::Property::Parser.register :ARC do |property, data|
-  data = Parser.format(property, data, 'iiccii')
+require 'X11/Xlib/hints/icon'
+
+module X11
+
+class Hints
+  attr_reader :flags, :state, :icon, :group
+
+  def initialize (flags, input, state, icon, group)
+    @flags = flags
+    @input = input
+    @state = state
+    @icon  = icon
+    @group = group
+  end
+
+  def input?
+    @input
+  end
+end
+
 end

@@ -31,11 +31,32 @@ require 'X11/Xlib/window/properties/property/parser'
 module X11; class Window; class Properties
 
 class Property
+  @transforms = {
+    :default => Transform.new(:default) {
+      input do |property, data|
+        data
+      end
+
+      output do |property, data|
+        data
+      end
+    }
+  }
+
+  def self.register (name, &block)
+    @transforms[name.to_s] = Transform.new(name, &block)    
+  end
+
+  def self.transform (property)
+    (@transforms[property.name] || @transforms[:default]).for(property)
+  end
+
   MaxLength = 500000
 
   extend Forwardable
 
   attr_reader    :window, :atom, :value
+  def_delegators :@window, :display
   def_delegators :@atom, :to_s, :to_i, :to_ffi
   def_delegator  :@atom, :to_s, :name
 
@@ -50,15 +71,15 @@ class Property
       after    = FFI::MemoryPointer.new :ulong
       property = FFI::MemoryPointer.new :pointer
 
-      return unless C::XGetWindowProperty(window.display.to_ffi, window.to_ffi, atom.to_ffi,
+      return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
         0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
       size   = format.typecast(:int)
-      length = [length.typecast(:ulong) * FFI.sizeof({ 8 => :char, 16 => :short, 32 => :long }[size]), MaxLength].min
+      length = [length.typecast(:ulong) * FFI.type_size({ 8 => :char, 16 => :short, 32 => :long }[size]), MaxLength].min
         
-      @type = Atom.new(type.typecast(:Atom).to_i, window.display)
+      @type = Atom.new(type.typecast(:Atom).to_i, display)
 
-      Property::Parser.parse(self, property.typecast(:pointer).read_string(length - 1))
+      Property.transform(self).output(Property::Parser.parse(self, property.typecast(:pointer).read_string(length)))
     }
   end
 
@@ -67,8 +88,11 @@ class Property
   end
 
   def inspect
-    "#<X11::Window::Property(#{name}): #{type} #{value.inspect}>"
+    "#<X11::Window::Property(#{name}): #{type}#{" #{value.inspect}" unless value.nil?}>"
   end
 end
 
 end; end; end
+
+require 'X11/Xlib/window/properties/property/class'
+require 'X11/Xlib/window/properties/property/command'

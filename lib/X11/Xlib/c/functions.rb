@@ -33,11 +33,14 @@ attach_function :XFree, [:pointer], :int
 attach_function :XOpenDisplay, [:string], :pointer
 attach_function :XCloseDisplay, [:pointer], :int
 attach_function :XFlush, [:pointer], :int
+attach_function :XGetInputFocus, [:pointer, :pointer, :pointer], :int
+attach_function :XSetInputFocus, [:pointer, :Window, :int, :Time], :int
 
 attach_function :XGrabButton, [:pointer, :uint, :uint, :Window, :Bool, :uint, :int, :int, :Window, :Cursor], :int
 attach_function :XGrabKey, [:pointer, :int, :uint, :Window, :Bool, :int, :int], :int
 attach_function :XGrabKeyboard, [:pointer, :Window, :Bool, :int, :int, :Time], :int
 attach_function :XGrabPointer, [:pointer, :Window, :Bool, :uint, :int, :int, :Window, :Cursor, :Time], :int
+attach_function :XQueryPointer, [:pointer, :Window, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :Bool
 
 attach_function :XUngrabButton, [:pointer, :uint, :uint, :Window], :int
 attach_function :XUngrabKey, [:pointer, :int, :uint, :Window], :int
@@ -55,6 +58,7 @@ attach_function :XGetWindowProperty, [:pointer, :Window, :Atom, :long, :long, :B
 
 attach_function :XAllowEvents, [:pointer, :int, :Time], :int
 attach_function :XNextEvent, [:pointer, :pointer], :int
+attach_function :XMaskEvent, [:pointer, :long, :pointer], :int
 attach_function :XCheckTypedEvent, [:pointer, :int, :pointer], :Bool
 attach_function :XWindowEvent, [:pointer, :Window, :long, :pointer], :int
 

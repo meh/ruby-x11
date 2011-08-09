@@ -26,16 +26,16 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c'
+module X11; class Window; class Properties; class Property
 
-require 'X11/Xutil/window'
+Parser.register :ARC do |property, data|
+  data = Parser.format(property, data, 'iiccii')
 
-module X11
-  
-module State
-  Withdrawn = 0
-  Normal    = 1
-  Iconic    = 3
+  Struct.new(:position, :size, :angles).new(
+    Struct.new(:x, :y).new(data.shift, data.shift),
+    Struct.new(:width, :height).new(data.shift, data.shift),
+    Struct.new(:from, :to).new(data.shift, data.shift)
+  )
 end
 
-end
+end; end; end; end
