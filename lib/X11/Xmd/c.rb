@@ -31,21 +31,21 @@ require 'X11/extensions'
 module X11; module C
 
 module ::FFI
-	typedef :int8,  :INT8
-	typedef :int16, :INT16
-	typedef :int32, :INT32
-	typedef :int64, :INT64
+  typedef :int8,  :INT8
+  typedef :int16, :INT16
+  typedef :int32, :INT32
+  typedef :int64, :INT64
 
-	typedef :uint8,  :CARD8
-	typedef :uint16, :CARD16
-	typedef :uint32, :CARD32
-	typedef :uint64, :CARD64
+  typedef :uint8,  :CARD8
+  typedef :uint16, :CARD16
+  typedef :uint32, :CARD32
+  typedef :uint64, :CARD64
 
-	typedef :CARD16, :BITS16
-	typedef :CARD32, :BITS32
+  typedef :CARD16, :BITS16
+  typedef :CARD32, :BITS32
 
-	typedef :CARD8, :BYTE
-	typedef :CARD8, :BOOL
+  typedef :CARD8, :BYTE
+  typedef :CARD8, :BOOL
 end
 
 end; end

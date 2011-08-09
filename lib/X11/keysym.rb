@@ -39,9 +39,9 @@ class Keysym
     C::XStringToKeysym(name.to_s)
   end
 
-	def self.[] (what)
-		what.is_a?(Integer) ? Keysym.new(what) : self.method_missing(what)
-	end
+  def self.[] (what)
+    what.is_a?(Integer) ? Keysym.new(what) : self.method_missing(what)
+  end
 end
 
 end

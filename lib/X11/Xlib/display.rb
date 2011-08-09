@@ -29,9 +29,9 @@
 module X11
 
 class Display
-	def self.from (pointer, options={})
-		Display.new(pointer, options.merge(:close => false))
-	end
+  def self.from (pointer, options={})
+    Display.new(pointer, options.merge(:close => false))
+  end
 
   def self.all
     @displays ||= []
@@ -59,11 +59,11 @@ class Display
     end
 
     @display = if name.is_a?(FFI::Pointer)
-			name
-		elsif name.is_a?(C::Display)
-			name.pointer
-		else
-			X11::C::XOpenDisplay(name)
+      name
+    elsif name.is_a?(C::Display)
+      name.pointer
+    else
+      X11::C::XOpenDisplay(name)
     end.typecast(C::Display)
 
     if @display.pointer.null?
@@ -74,11 +74,11 @@ class Display
       :flush => true
     }.merge(options || {})
 
-		if @options[:close]
-	    ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi.to_i)
+    if @options[:close]
+      ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi.to_i)
     else
       (Display.all << to_ffi.to_i).uniq!
-		end
+    end
   end
 
   C::Display.layout.members.each_with_index {|name, index|

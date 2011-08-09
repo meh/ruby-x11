@@ -29,7 +29,7 @@
 module X11
 
 class Window
-	def client
+  def client
     win = properties[:_NET_VIRTUAL_ROOTS].any? {|vroot|
       next unless self == vroot
 
@@ -39,7 +39,7 @@ class Window
         return self
       end
     } or self
-	end
+  end
 end
 
 end

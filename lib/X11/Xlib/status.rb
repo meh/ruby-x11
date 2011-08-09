@@ -73,9 +73,9 @@ class Status
     to_i == value || to_sym == value
   end
 
-	def hash
-		@value.hash
-	end
+  def hash
+    @value.hash
+  end
 
   def to_sym
     Status.to_hash.key(@value)
@@ -85,9 +85,9 @@ class Status
     @value
   end; alias to_ffi to_i
 
-	def inspect
-		to_sym.to_s
-	end
+  def inspect
+    to_sym.to_s
+  end
 end
 
 end

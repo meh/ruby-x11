@@ -36,11 +36,11 @@ class Helper
   end
 
   def self.attribute (which=nil)
-		if which
-	    @attribute = which.to_s.to_sym
-		else
-			@attribute
-		end
+    if which
+      @attribute = which.to_s.to_sym
+    else
+      @attribute
+    end
   end
 
   def self.attach_method (meth, &block)
@@ -96,9 +96,9 @@ class Helper
     @struct = struct
   end
 
-	def to_ffi
-		@struct
-	end
+  def to_ffi
+    @struct
+  end
 end
 
 X11::Event::Window = [lambda {|w|

@@ -130,15 +130,15 @@ module FFI
 end
 
 class Integer
-	def to_ffi
-		self
-	end
+  def to_ffi
+    self
+  end
 end
 
 class String
-	def to_ffi
-		self
-	end
+  def to_ffi
+    self
+  end
 end
 
 class Bitmap::Value
