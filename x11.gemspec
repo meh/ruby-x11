@@ -1,6 +1,6 @@
 Gem::Specification.new {|s|
   s.name         = 'x11'
-  s.version      = '0.0.1a1'
+  s.version      = '0.0.1a2'
   s.author       = 'meh.'
   s.email        = 'meh@paranoici.org'
   s.homepage     = 'http://github.com/meh/ruby-x11'
