@@ -26,12 +26,12 @@
 # or implied.
 #++
 
-module X11; class Window; class Properties
+class X11::Event::Error < X11::Event::Helper
+  attribute :xerror
 
-Property.register :WM_CLASS do
-  output do |property, data|
-    data.split("\0").compact
-  end
+  manage :type, X11::Status
+  manage :id
+  manage :error_code
+  manage :request_code
+  manage :minor_code
 end
-
-end; end; end

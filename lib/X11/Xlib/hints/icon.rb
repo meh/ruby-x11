@@ -26,8 +26,6 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
-
 module X11; class Hints
 
 class Icon

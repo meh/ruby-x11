@@ -31,6 +31,16 @@ require 'X11/Xlib/hints/icon'
 module X11
 
 class Hints
+  State = Class.new(Hash) {
+    def [] (name)
+      name.is_a?(Integer) ? key(name) : super
+    end
+  }.new.merge(
+    :Withdrawn => 0,
+    :Normal    => 1,
+    :Iconic    => 3
+  ).freeze
+
   attr_reader :flags, :state, :icon, :group
 
   def initialize (flags, input, state, icon, group)

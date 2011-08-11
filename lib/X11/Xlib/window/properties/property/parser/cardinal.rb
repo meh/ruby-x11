@@ -28,7 +28,12 @@
 
 module X11; class Window; class Properties; class Property
 
-Parser.register :CARDINAL do |property, data|
+Parser.register :CARDINAL do
+  output do |property, data|
+    Parser.format(property, data, 'I!').map {|data|
+      data.first
+    }
+  end
 end
 
 end; end; end; end

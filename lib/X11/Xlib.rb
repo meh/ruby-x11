@@ -36,6 +36,7 @@ require 'X11/Xlib/screen'
 require 'X11/Xlib/window'
 require 'X11/Xlib/visual'
 require 'X11/Xlib/keysym'
+require 'X11/Xlib/hints'
 
 require 'X11/Xlib/status'
 require 'X11/Xlib/event'

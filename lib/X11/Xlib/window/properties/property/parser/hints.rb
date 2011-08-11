@@ -28,14 +28,15 @@
 
 module X11; class Window; class Properties; class Property
 
-Parser.register :WM_HINTS do |property, data|
-  data = Parser.format(property, data, 'ibciiiiii')
-
-  X11::Hints.new(
-    Mask::Hint[data.shift], data.shift, Mask::State[data.shift],
-    X11::Hints::Icon.new(*data.shift(4)), X11::Window.new(property.display, data.shift)
-  )
-)
+Parser.register :WM_HINTS do
+  output do |property, data|
+    Parser.format(property, data, 'ibciiiiii').map {|data|
+      X11::Hints.new(
+        Mask::Hints[data.shift], data.shift, Hints::State[data.shift],
+        X11::Hints::Icon.new(*data.shift(4)), X11::Window.new(property.display, data.shift)
+      )
+    }
+  end
 end
 
 end; end; end; end

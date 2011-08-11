@@ -41,6 +41,14 @@ class Properties
     @window = window
   end
 
+  def [] (atom)
+    Property.new(window, Atom[atom, display])
+  end
+
+  def delete (atom)
+    C::XDeleteProperty(display.to_ffi, window.to_ffi, Atom[atom, display].to_ffi)
+  end
+
   def each (&block)
     number = FFI::MemoryPointer.new :int
     list   = C::XListProperties(display.to_ffi, window.to_ffi, number)
@@ -54,12 +62,6 @@ class Properties
     C::XFree(list)
 
     self
-  end
-
-  def [] (name)
-    find {|property|
-      property.name == name.to_s
-    }
   end
 end
 

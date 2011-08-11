@@ -124,6 +124,10 @@ class Atom
     }
   end
 
+  def self.[] (name, display=nil)
+    name.is_a?(Atom) ? name : Atom.new(name, display)
+  end
+
   attr_reader :display
 
   def initialize (value, display=nil)

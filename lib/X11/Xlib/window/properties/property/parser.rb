@@ -29,36 +29,45 @@
 module X11; class Window; class Properties; class Property
 
 module Parser
-  @parsers = {}
+  @transforms = {
+    :default => Transform.new(:default) {
+      input do |property, data|
+        data
+      end
+
+      output do |property, data|
+        data
+      end
+    }
+  }
 
   def self.register (name, &block)
-    @parsers[name.to_s] = block
+    @transforms[name.to_s] = Transform.new(name, &block)    
   end
 
-  def self.parse (property, data)
-    return data unless @parsers[property.type.to_s]
-
-    @parsers[property.type.to_s].call(property, data)
+  def self.parse (property)
+    (@transforms[property.type.to_s] || @transforms[:default]).for(property)
   end
 
   def self.format (property, data, format)
-    data.unpack(format.chars.map {|char|
+    real = format.chars.map {|char|
       case char
-        when 'c'           then 'L!'
-        when 'i', 'a', 'b' then 'l!'
+        when ?c, ?a, ?w then 'L!'
+        when ?i, ?b     then 'l!'
         else char
       end
-    }.join).each_with_index.map {|data, index|
-      case format[index].chr
-        when 'a' then Atom.new(data, property.display)
-        when 'b' then !data.zero?
-        else data
-      end
+    }.join
+
+    data.bytes.each_slice(data.unpack(real).pack(real).length).map {|s|
+      s.map { |d| d.chr }.join.unpack(real).each_with_index.map {|data, index|
+        case format[index].chr
+          when ?a then Atom.new(data, property.display)
+          when ?w then Window.new(property.display, data)
+          when ?b then !data.nil? && !data.zero?
+          else data
+        end
+      }
     }
-  end
-
-  def self.string (data, type)
-
   end
 end
 
@@ -67,3 +76,5 @@ end; end; end; end
 require 'X11/Xlib/window/properties/property/parser/arc'
 require 'X11/Xlib/window/properties/property/parser/atom'
 require 'X11/Xlib/window/properties/property/parser/cardinal'
+require 'X11/Xlib/window/properties/property/parser/hints'
+require 'X11/Xlib/window/properties/property/parser/string'

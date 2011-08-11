@@ -69,7 +69,7 @@ module Mask
     :Mod5    => (1 << 7)
   )
 
-  Hint = Bitmap.new(
+  Hints = Bitmap.new(
     :Input        => (1 << 0),
     :State        => (1 << 1),
     :IconPixmap   => (1 << 2),

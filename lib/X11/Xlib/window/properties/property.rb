@@ -63,8 +63,29 @@ class Property
   def initialize (window, atom)
     @window = window
     @atom   = atom
+  end
 
-    @value = Retarded.new {
+  def nil?
+    value.nil?
+  end
+
+  def value
+    type     = FFI::MemoryPointer.new :Atom
+    format   = FFI::MemoryPointer.new :int
+    length   = FFI::MemoryPointer.new :ulong
+    after    = FFI::MemoryPointer.new :ulong
+    property = FFI::MemoryPointer.new :pointer
+
+    return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
+      0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
+
+    Property.transform(self).output(Property::Parser.parse(self).output(
+      property.typecast(:pointer).read_string(
+        [length.typecast(:ulong) * FFI.type_size(
+          { 8 => :char, 16 => :short, 32 => :long }[format.typecast(:int)]), MaxLength].min)))
+  end
+
+  def type
       type     = FFI::MemoryPointer.new :Atom
       format   = FFI::MemoryPointer.new :int
       length   = FFI::MemoryPointer.new :ulong
@@ -74,17 +95,7 @@ class Property
       return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
         0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
-      size   = format.typecast(:int)
-      length = [length.typecast(:ulong) * FFI.type_size({ 8 => :char, 16 => :short, 32 => :long }[size]), MaxLength].min
-        
-      @type = Atom.new(type.typecast(:Atom).to_i, display)
-
-      Property.transform(self).output(Property::Parser.parse(self, property.typecast(:pointer).read_string(length)))
-    }
-  end
-
-  def type
-    @type or (~@value; @type)
+      Atom.new(type.typecast(:Atom).to_i, display)
   end
 
   def inspect
@@ -93,6 +104,3 @@ class Property
 end
 
 end; end; end
-
-require 'X11/Xlib/window/properties/property/class'
-require 'X11/Xlib/window/properties/property/command'

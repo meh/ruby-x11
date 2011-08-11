@@ -28,8 +28,12 @@
 
 module X11; class Window; class Properties; class Property
 
-Parser.register :ATOM do |property, data|
-  Parser.format(property, data, 'a').first
+Parser.register :ATOM do
+  output do |property, data|
+    Parser.format(property, data, 'a').map {|data|
+      data.first
+    }
+  end
 end
 
 end; end; end; end

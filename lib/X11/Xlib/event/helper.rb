@@ -30,6 +30,14 @@ module X11; class Event
 
 Events << nil
 
+X11::Event::Window = [lambda {|w|
+  X11::Window.new(display, w)
+}, lambda(&:to_ffi)]
+
+X11::Event::Display = [lambda {|pointer|
+  X11::Display.from(pointer)
+}, lambda(&:to_ffi)]
+
 class Helper
   def self.inherited (klass)
     Events << klass
@@ -47,7 +55,13 @@ class Helper
     return unless block
 
     class_eval {
-      define_method(meth, &block)
+      define_method meth do |*args, &blk|
+        begin
+          block.call(*args, &blk)
+        rescue Exception
+          method_missing(meth, *args, &blk)
+        end
+      end
     }
   end
 
@@ -92,31 +106,17 @@ class Helper
     end
   end
 
+  manage :serial
+  manage [:send_event, :send_event?]
+  manage :display, X11::Event::Display
+  manage :window, X11::Event::Window
+
   def initialize (struct)
     @struct = struct
   end
 
   def to_ffi
     @struct
-  end
-end
-
-X11::Event::Window = [lambda {|w|
-  X11::Window.new(display, w)
-}, lambda(&:to_ffi)]
-
-X11::Event::Display = [lambda {|pointer|
-  X11::Display.from(pointer)
-}, lambda(&:to_ffi)]
-
-module X11::Event::Common
-  def self.included (klass)
-    klass.class_eval {
-      manage :serial
-      manage [:send_event, :send_event?]
-      manage :display, X11::Event::Display
-      manage :window, X11::Event::Window
-    }
   end
 end
 

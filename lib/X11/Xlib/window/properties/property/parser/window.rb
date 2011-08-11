@@ -26,41 +26,12 @@
 # or implied.
 #++
 
-X11::Events = []
+module X11; class Window; class Properties; class Property
 
-require 'X11/Xlib/event/helper'
+Parser.register :WINDOW do
+  output do |property, data|
+    Parser.format(property, data, 'w')
+  end
+end
 
-require 'X11/Xlib/event/any'
-require 'X11/Xlib/event/error'
-require 'X11/Xlib/event/key_press'
-require 'X11/Xlib/event/key_release'
-require 'X11/Xlib/event/button_press'
-require 'X11/Xlib/event/button_release'
-require 'X11/Xlib/event/motion_notify'
-require 'X11/Xlib/event/enter_notify'
-require 'X11/Xlib/event/leave_notify'
-require 'X11/Xlib/event/focus_in'
-require 'X11/Xlib/event/focus_out'
-require 'X11/Xlib/event/keymap_notify'
-require 'X11/Xlib/event/expose'
-require 'X11/Xlib/event/graphics_expose'
-require 'X11/Xlib/event/no_expose'
-require 'X11/Xlib/event/visibility_notify'
-require 'X11/Xlib/event/create_notify'
-require 'X11/Xlib/event/destroy_notify'
-require 'X11/Xlib/event/unmap_notify'
-require 'X11/Xlib/event/map_notify'
-require 'X11/Xlib/event/map_request'
-require 'X11/Xlib/event/reparent_notify'
-require 'X11/Xlib/event/configure_notify'
-require 'X11/Xlib/event/resize_request'
-require 'X11/Xlib/event/circulate_notify'
-require 'X11/Xlib/event/circulate_request'
-require 'X11/Xlib/event/property_notify'
-require 'X11/Xlib/event/selection_clear'
-require 'X11/Xlib/event/selection_request'
-require 'X11/Xlib/event/selection_notify'
-require 'X11/Xlib/event/colormap_notify'
-require 'X11/Xlib/event/client_message'
-require 'X11/Xlib/event/mapping_notify'
-require 'X11/Xlib/event/generic_event'
+end; end; end; end

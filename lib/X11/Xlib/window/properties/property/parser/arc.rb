@@ -28,14 +28,16 @@
 
 module X11; class Window; class Properties; class Property
 
-Parser.register :ARC do |property, data|
-  data = Parser.format(property, data, 'iiccii')
-
-  Struct.new(:position, :size, :angles).new(
-    Struct.new(:x, :y).new(data.shift, data.shift),
-    Struct.new(:width, :height).new(data.shift, data.shift),
-    Struct.new(:from, :to).new(data.shift, data.shift)
-  )
+Parser.register :ARC do
+  output do |property, data|
+    Parser.format(property, data, 'iiccii').map {|data|
+      Struct.new(:position, :size, :angles).new(
+        Struct.new(:x, :y).new(data.shift, data.shift),
+        Struct.new(:width, :height).new(data.shift, data.shift),
+        Struct.new(:from, :to).new(data.shift, data.shift)
+      )
+    }
+  end
 end
 
 end; end; end; end

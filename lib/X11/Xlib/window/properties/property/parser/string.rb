@@ -26,12 +26,22 @@
 # or implied.
 #++
 
-module X11; class Window; class Properties
+module X11; class Window; class Properties; class Property
 
-Property.register :WM_COMMAND do
+Parser.register :STRING do
   output do |property, data|
-    data.split("\0").compact
+    data.force_encoding 'ASCII-8BIT' rescue nil
+
+    data.split("\0")
   end
 end
 
-end; end; end
+Parser.register :UTF8_STRING do
+  output do |property, data|
+    data.force_encoding 'UTF-8' rescue nil
+
+    data.split("\0")
+  end
+end
+
+end; end; end; end

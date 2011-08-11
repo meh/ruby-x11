@@ -145,4 +145,10 @@ class Bitmap::Value
   alias to_ffi to_i
 end
 
+class Array
+  def singly
+    length == 1 ? first : self
+  end
+end
+
 module X11; module C; extend FFI::Library; end; end
