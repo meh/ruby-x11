@@ -29,8 +29,6 @@
 class X11::Event::CreateNotify < X11::Event::Helper
   attribute :xcreatewindow
 
-  include X11::Event::Common
-
   manage :parent, X11::Event::Window
   manage :x
   manage :y

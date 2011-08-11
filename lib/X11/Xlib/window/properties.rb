@@ -42,7 +42,9 @@ class Properties
   end
 
   def [] (atom)
-    Property.new(window, Atom[atom, display])
+    if !(property = Property.new(window, Atom[atom, display])).nil?
+      property
+    end
   end
 
   def delete (atom)

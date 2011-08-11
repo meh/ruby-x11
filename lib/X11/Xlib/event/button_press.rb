@@ -29,8 +29,6 @@
 class X11::Event::ButtonPress < X11::Event::Helper
   attribute :xbutton
 
-  include X11::Event::Common
-
   manage :root, X11::Event::Window
   manage :subwindow, X11::Event::Window
   manage :time

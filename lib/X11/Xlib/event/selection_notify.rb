@@ -29,8 +29,6 @@
 class X11::Event::SelectionNotify < X11::Event::Helper
   attribute :xselection
 
-  include X11::Event::Common
-
   manage :requestor, X11::Event::Window
   manage :selection
   manage :target

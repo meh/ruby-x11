@@ -30,6 +30,8 @@ module X11; module C
 
 attach_function :XFree, [:pointer], :int
 
+attach_function :XSetErrorHandler, [:pointer], :pointer
+
 attach_function :XOpenDisplay, [:string], :pointer
 attach_function :XCloseDisplay, [:pointer], :int
 attach_function :XFlush, [:pointer], :int

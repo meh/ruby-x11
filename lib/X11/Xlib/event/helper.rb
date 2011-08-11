@@ -30,11 +30,11 @@ module X11; class Event
 
 Events << nil
 
-X11::Event::Window = [lambda {|w|
+Window = [lambda {|w|
   X11::Window.new(display, w)
 }, lambda(&:to_ffi)]
 
-X11::Event::Display = [lambda {|pointer|
+Display = [lambda {|pointer|
   X11::Display.from(pointer)
 }, lambda(&:to_ffi)]
 
@@ -55,11 +55,13 @@ class Helper
     return unless block
 
     class_eval {
-      define_method meth do |*args, &blk|
+      define_method meth do |*args|
         begin
-          block.call(*args, &blk)
-        rescue Exception
-          method_missing(meth, *args, &blk)
+          instance_exec *args, &block
+        rescue ArgumentError => e
+          raise unless e.message.start_with? 'No such field'
+
+          method_missing(meth, *args)
         end
       end
     }
@@ -75,34 +77,34 @@ class Helper
     args.flatten!
 
     case args.size
-    when 0
-      attach_method(new) {
-        to_ffi[self.class.attribute][original]
-      }
-
-      attach_method("#{new}=") {|x|
-        to_ffi[self.class.attribute][original] = x
-      }
-    when 1
-      if args.first.is_a?(Class)
+      when 0
         attach_method(new) {
-          args.first.new(to_ffi[self.class.attribute][original])
+          to_ffi[self.class.attribute][original]
         }
 
         attach_method("#{new}=") {|x|
-          to_ffi[self.class.attribute][original] = x.to_ffi
+          to_ffi[self.class.attribute][original] = x
         }
-      else
-        manage([original, new], args.first, nil)
-      end
-    when 2
-      attach_method(new) {
-        instance_exec(to_ffi[self.class.attribute][original], &args[0])
-      } if args[0]
+      when 1
+        if args.first.is_a?(Class)
+          attach_method(new) {
+            args.first.new(to_ffi[self.class.attribute][original])
+          }
 
-      attach_method("#{new}=") {|x|
-        to_ffi[attribute][original] = instance_exec(x, &args[1])
-      } if args[1]
+          attach_method("#{new}=") {|x|
+            to_ffi[self.class.attribute][original] = x.to_ffi
+          }
+        else
+          manage([original, new], args.first, nil)
+        end
+      when 2
+        attach_method(new) {
+          instance_exec(to_ffi[self.class.attribute][original], &args[0])
+        } if args[0]
+
+        attach_method("#{new}=") {|x|
+          to_ffi[attribute][original] = instance_exec(x, &args[1])
+        } if args[1]
     end
   end
 

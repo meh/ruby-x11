@@ -29,8 +29,6 @@
 class X11::Event::FocusIn < X11::Event::Helper
   attribute :xfocus
 
-  include X11::Event::Common
-
   manage :mode
   manage :detail
 end

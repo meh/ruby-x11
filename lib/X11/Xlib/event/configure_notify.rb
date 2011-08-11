@@ -29,8 +29,6 @@
 class X11::Event::ConfigureNotify < X11::Event::Helper
   attribute :xconfigure
 
-  include X11::Event::Common
-
   manage :event, X11::Event::Window
   manage :x
   manage :y

@@ -143,7 +143,7 @@ class Atom
     @name ||= if display
       C::XGetAtomName(display.to_ffi, self)
     else
-      Atom.to_hash.index(@value).tap {|name|
+      Atom.to_hash.key(@value).tap {|name|
         break name.nil? ? nil : name.to_s
       }
     end

@@ -29,8 +29,6 @@
 class X11::Event::KeymapNotify < X11::Event::Helper
   attribute :xkeymap
 
-  include X11::Event::Common
-
   manage :key_vector, lambda { |v| v.to_a }, lambda {|v|
     v = v.join if v.is_a?(Array)
 

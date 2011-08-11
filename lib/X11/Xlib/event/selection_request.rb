@@ -29,8 +29,6 @@
 class X11::Event::SelectionRequest < X11::Event::Helper
   attribute :xselectionrequest
 
-  include X11::Event::Common
-
   manage :owner, X11::Event::Window
   manage :requestor, X11::Event::Window
   manage :selection

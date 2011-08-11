@@ -29,8 +29,6 @@
 class X11::Event::ReparentNotify < X11::Event::Helper
   attribute :xreparent
 
-  include X11::Event::Common
-
   manage :event, X11::Event::Window
   manage :parent, X11::Event::Window
   manage :x

@@ -29,8 +29,6 @@
 class X11::Event::KeyPress < X11::Event::Helper
   attribute :xkey
 
-  include X11::Event::Common
-
   manage :root, X11::Event::Window
   manage :subwindow, X11::Event::Window
   manage :time

@@ -29,7 +29,5 @@
 class X11::Event::VisibilityNotify < X11::Event::Helper
   attribute :xvisibility
 
-  include X11::Event::Common
-
   manage :state
 end

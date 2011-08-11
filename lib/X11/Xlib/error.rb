@@ -1,6 +1,3 @@
-#--
-# Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
-# 
 # Redistribution and use in source and binary forms, with or without modification, are
 # permitted provided that the following conditions are met:
 # 
@@ -26,12 +23,55 @@
 # or implied.
 #++
 
-class X11::Event::Error < X11::Event::Helper
-  attribute :xerror
+module X11
 
-  manage :type, X11::Status
-  manage :id
-  manage :error_code
-  manage :request_code
-  manage :minor_code
+class Error
+  def self.from (event)
+    X11::const_get(Status.new(event[:error_code]).to_sym).new(event)
+  end
+
+  attr_reader :display, :resource, :serial, :error, :request, :minor
+
+  def initialize (event)
+    @type     = event[:type]
+    @display  = X11::Display.from(event[:display])
+    @resource = event[:resourceid]
+    @serial   = event[:serial]
+    @error    = event[:error_code]
+    @request  = event[:request_code]
+    @minor    = event[:minor_code]
+  end
+
+  def to_sym
+    self.class.name[/\w+$/].to_sym
+  end
+
+  def inspect
+    "#<#{to_sym}: 0x#{resource.to_s(16)} #{request}:#{error}.#{minor}>"
+  end
+end
+
+BadRequest        = Class.new(Error)
+BadValue          = Class.new(Error)
+BadWindow         = Class.new(Error)
+BadPixmap         = Class.new(Error)
+BadAtom           = Class.new(Error)
+BadCursor         = Class.new(Error)
+BadFont           = Class.new(Error)
+BadMatch          = Class.new(Error)
+BadDrawable       = Class.new(Error)
+BadAccess         = Class.new(Error)
+BadAlloc          = Class.new(Error)
+BadColor          = Class.new(Error)
+BadGC             = Class.new(Error)
+BadIDChoice       = Class.new(Error)
+BadName           = Class.new(Error)
+BadLength         = Class.new(Error)
+BadImplementation = Class.new(Error)
+
+C::XSetErrorHandler(FFI::Function.new(:int, [:pointer, :pointer]) {|display, event|
+  # TODO: find out how to raise exceptions from within an FFI::Function
+  # raise Error.from(C::XErrorEvent.new(event))
+})
+
 end

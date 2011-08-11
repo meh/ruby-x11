@@ -200,8 +200,12 @@ class Window
   end
 
   def inspect
-    with attributes do |attr|
-      "#<X11::Window: #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
+    begin
+      with attributes do |attr|
+        "#<X11::Window: #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
+      end
+    rescue Exception => e
+      "#<X11::Window: invalid window>"
     end
   end
 

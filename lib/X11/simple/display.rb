@@ -39,19 +39,19 @@ class Display
       allow_events Event::Mode::SyncPointer
 
       case (event = root_window.next_event Mask::Event[:ButtonPress, :ButtonRelease])
-      when Event::ButtonPress
-        if target.nil?
-          target = event.subwindow
-
+        when Event::ButtonPress
           if target.nil?
-            target = root_window
+            target = event.subwindow
+
+            if target.nil?
+              target = root_window
+            end
           end
-        end
 
-        buttons += 1
+          buttons += 1
 
-      when Event::ButtonRelease
-        buttons -= 1 if buttons > 0
+        when Event::ButtonRelease
+          buttons -= 1 if buttons > 0
       end
     end
 

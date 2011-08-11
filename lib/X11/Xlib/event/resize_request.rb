@@ -29,8 +29,6 @@
 class X11::Event::ResizeRequest < X11::Event::Helper
   attribute :xresizerequest
 
-  include X11::Event::Common
-
   manage :width
   manage :height
 end

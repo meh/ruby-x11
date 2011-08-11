@@ -29,8 +29,6 @@
 class X11::Event::UnmapNotify < X11::Event::Helper
   attribute :xunmap
 
-  include X11::Event::Common
-
   manage :event, X11::Event::Window
   manage [:from_configure, :from_configure?]
 end

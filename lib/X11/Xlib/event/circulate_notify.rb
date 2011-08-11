@@ -29,8 +29,6 @@
 class X11::Event::CirculateNotify < X11::Event::Helper
   attribute :xcirculate
 
-  include X11::Event::Common
-
   manage :event, X11::Event::Window
   manage :place
 end

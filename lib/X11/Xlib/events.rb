@@ -30,8 +30,8 @@ X11::Events = []
 
 require 'X11/Xlib/event/helper'
 
+# NOTE: the require order is VITAL
 require 'X11/Xlib/event/any'
-require 'X11/Xlib/event/error'
 require 'X11/Xlib/event/key_press'
 require 'X11/Xlib/event/key_release'
 require 'X11/Xlib/event/button_press'

@@ -29,8 +29,6 @@
 class X11::Event::ColormapNotify < X11::Event::Helper
   attribute :xcolormap
 
-  include X11::Event::Common
-
   manage :colormap
   manage [:new, :c_new]
   manage :state

@@ -29,8 +29,6 @@
 class X11::Event::PropertyNotify < X11::Event::Helper
   attribute :xproperty
 
-  include X11::Event::Common
-
   manage :atom
   manage :time
   manage :state

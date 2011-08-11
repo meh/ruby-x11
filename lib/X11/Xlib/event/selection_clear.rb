@@ -29,8 +29,6 @@
 class X11::Event::SelectionClear < X11::Event::Helper
   attribute :xselectionclear
 
-  include X11::Event::Common
-
   manage :selection
   manage :time
 end

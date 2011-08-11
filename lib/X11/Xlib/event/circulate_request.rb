@@ -29,8 +29,6 @@
 class X11::Event::CirculateRequest < X11::Event::Helper
   attribute :xcirculaterequest
 
-  include X11::Event::Common
-
   manage :event, X11::Event::Window
   manage :place
 end

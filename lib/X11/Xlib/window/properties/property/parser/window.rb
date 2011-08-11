@@ -30,7 +30,9 @@ module X11; class Window; class Properties; class Property
 
 Parser.register :WINDOW do
   output do |property, data|
-    Parser.format(property, data, 'w')
+    Parser.format(property, data, 'w').map {|data|
+      data.first
+    }
   end
 end
 

@@ -79,10 +79,12 @@ class Property
     return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
       0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
+    return if property.typecast(:pointer).null?
+
     Property.transform(self).output(Property::Parser.parse(self).output(
       property.typecast(:pointer).read_string(
         [length.typecast(:ulong) * FFI.type_size(
-          { 8 => :char, 16 => :short, 32 => :long }[format.typecast(:int)]), MaxLength].min)))
+          { 0 => :void, 8 => :char, 16 => :short, 32 => :long }[format.typecast(:int)]), MaxLength].min)))
   end
 
   def type
@@ -95,11 +97,17 @@ class Property
       return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
         0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
+      return if property.typecast(:pointer).null?
+
       Atom.new(type.typecast(:Atom).to_i, display)
   end
 
   def inspect
-    "#<X11::Window::Property(#{name}): #{type}#{" #{value.inspect}" unless value.nil?}>"
+    if nil?
+      "#<X11::Window::Property(#{name})>"
+    else
+      "#<X11::Window::Property(#{name}): #{type}#{" #{value.inspect}" unless value.nil?}>"
+    end
   end
 end
 

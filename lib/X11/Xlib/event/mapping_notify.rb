@@ -29,8 +29,6 @@
 class X11::Event::MappingNotify < X11::Event::Helper
   attribute :xmapping
 
-  include X11::Event::Common
-
   manage :request
   manage :first_keycode
   manage :count
