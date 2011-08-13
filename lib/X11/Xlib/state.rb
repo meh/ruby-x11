@@ -26,24 +26,18 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
-
 module X11
 
-class Hints
-  attr_reader :flags, :state, :icon, :group
-
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
+State = Class.new(Hash) {
+  def [] (name)
+    name.is_a?(Integer) ? key(name) : super
   end
-
-  def input?
-    @input
-  end
-end
+}.new.merge(
+  :Withdrawn => 0,
+  :Normal    => 1,
+  :Zoom      => 2,
+  :Iconic    => 3,
+  :Inactive  => 4
+).freeze
 
 end

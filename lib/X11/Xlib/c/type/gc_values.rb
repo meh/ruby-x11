@@ -26,24 +26,29 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
-
-module X11
-
-class Hints
-  attr_reader :flags, :state, :icon, :group
-
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
-  end
-
-  def input?
-    @input
-  end
-end
-
+class X11::C::XGCValues < FFI::Struct
+	layout \
+		:function,           :int,
+		:plane_mask,         :ulong,
+		:foreground,         :ulong,
+		:background,         :ulong,
+		:line_width,         :int,
+		:line_style,         :int,
+		:cap_style,          :int,
+		:join_style,         :int,
+		:fill_style,         :int,
+		:fill_rule,          :int,
+		:arc_mode,           :int,
+		:tile,               :Pixmap,
+		:stipple,            :Pixmap,
+		:ts_x_origin,        :int,
+		:ts_y_origin,        :int,
+		:font,               :Font,
+		:subwindow_mode,     :int,
+		:graphics_exposures, :Bool,
+		:clip_x_origin,      :int,
+		:clip_y_origin,      :int,
+		:clip_mask,          :Pixmap,
+		:dash_offset,        :int,
+		:dashes,             :char
 end

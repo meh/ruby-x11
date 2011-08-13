@@ -24,6 +24,7 @@ require 'retarded'
 require 'bitmap'
 require 'forwardable'
 require 'ostruct'
+require 'named_parameter'
 
 module Kernel
   def with (*args)
@@ -129,10 +130,24 @@ module FFI
   find_type(:size_t) rescue typedef(:ulong, :size_t)
 end
 
+class Object
+	def drawable?
+		false
+	end
+end
+
+class Class
+	extend NamedParameter
+end
+
 class Integer
   def to_ffi
     self
   end
+
+	def drawable?
+		true
+	end
 end
 
 class String
@@ -151,4 +166,6 @@ class Array
   end
 end
 
-module X11; module C; extend FFI::Library; end; end
+module X11; module C
+  extend FFI::Library
+end; end

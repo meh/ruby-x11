@@ -26,24 +26,14 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
+module X11; class Window; class Properties; class Property
 
-module X11
-
-class Hints
-  attr_reader :flags, :state, :icon, :group
-
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
-  end
-
-  def input?
-    @input
+Parser.register :ARC do
+  output do |property, data|
+    Parser.format(property, data, 'i').map {|data|
+      State.new(data.first)
+    }
   end
 end
 
-end
+end; end; end; end

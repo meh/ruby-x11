@@ -37,8 +37,16 @@ class Window
   def initialize (display, window)
     @display = display
     @window  = window
-    
-    self.revert_to = nil
+
+    if nil?
+      (methods - Object.instance_methods).each {|name|
+        define_singleton_method name do |*|
+          raise BadWindow
+        end
+      }
+    else
+      self.revert_to = nil
+    end
   end
 
   def root
@@ -75,6 +83,10 @@ class Window
 
   def nil?
     id.zero?
+  end
+
+  def drawable?
+    true
   end
 
   def revert_to= (value)

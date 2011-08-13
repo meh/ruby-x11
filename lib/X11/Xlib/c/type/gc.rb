@@ -29,5 +29,5 @@
 class X11::C::GC < FFI::Struct
   layout \
     :ext_data, :pointer,
-    :gid,      :GContext
+    :gid,      :GC
 end

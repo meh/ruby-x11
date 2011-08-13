@@ -31,6 +31,7 @@ require 'X11/Xdefs'
 
 require 'X11/Xlib/c/type/display'
 require 'X11/Xlib/c/type/gc'
+require 'X11/Xlib/c/type/gc_values'
 require 'X11/Xlib/c/type/screen'
 require 'X11/Xlib/c/type/window_attributes'
 require 'X11/Xlib/c/type/visual'

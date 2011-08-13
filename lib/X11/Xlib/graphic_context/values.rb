@@ -26,24 +26,16 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
+module X11; class GraphicContext
 
-module X11
+class Values
+	def initialize (hash={})
+		@struct = C::XGCValues.new
+	end
 
-class Hints
-  attr_reader :flags, :state, :icon, :group
-
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
-  end
-
-  def input?
-    @input
-  end
+	def to_ffi
+		@struct
+	end
 end
 
-end
+end; end

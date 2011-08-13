@@ -26,24 +26,31 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
+class X11::C::XImage < FFI::Struct
+  layout \
+    :width,            :int,
+    :height,           :int,
+    :xoffset,          :int,
+    :format,           :int,
+    :data,             :pointer,
+    :byte_order,       :int,
+    :bitmap_unit,      :int,
+    :bitmap_bit_order, :int,
+    :bitmap_pad,       :int,
+    :depth,            :int,
+    :bytes_per_line,   :int,
+    :red_mask,         :ulong,
+    :green_mask,       :ulong,
+    :blue_mask,        :ulong,
+    :obdata,           :pointer,
 
-module X11
-
-class Hints
-  attr_reader :flags, :state, :icon, :group
-
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
-  end
-
-  def input?
-    @input
-  end
-end
-
+    :f, Class.new(FFI::Struct) {
+      layout \
+        :create_image,  :pointer,
+        :destroy_image, :pointer,
+        :get_pixel,     :pointer,
+        :put_pixel,     :pointer,
+        :sub_image,     :pointer,
+        :add_pixel,     :pointer
+    }
 end

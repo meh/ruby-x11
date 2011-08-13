@@ -26,24 +26,34 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
-
 module X11
 
-class Hints
-  attr_reader :flags, :state, :icon, :group
+class Pixmap
+	module Format
+		XY = 1
+		Z  = 2
+	end
 
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
+  def self.finalizer (display, pixmap)
+    proc {
+      C::XFreePixmap(display, pixmap)
+    }
   end
 
-  def input?
-    @input
-  end
+	def initialize (display, drawable, width, height, depth=24)
+    raise ArgumentError, 'the passed value is not drawable' unless drawable.drawable?
+
+		@value = C::XCreatePixmap(display.to_ffi, drawable.to_ffi, width, height, depth)
+
+		ObjectSpace.define_finalizer self, self.class.finalizer(display, to_ffi)
+	end
+
+	def to_image
+	end
+
+	def to_ffi
+		@value
+	end
 end
 
 end

@@ -26,23 +26,38 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
+require 'X11/Xlib/graphic_context/functions'
+require 'X11/Xlib/graphic_context/values'
 
 module X11
 
-class Hints
-  attr_reader :flags, :state, :icon, :group
+class GraphicContext
+  attr_reader :display, :drawable, :values
 
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
+  def initialize (display, drawable, values=nil)
+    raise ArgumentError, 'the passed value is not drawable' unless drawable.drawable?
+
+    @display  = display
+    @drawable = drawable
+    @values   = Values.new(self, values)
+
+    @value = C::XCreateGC(@display.to_ffi, @drawable.to_ffi, *@values.to_ffi)
   end
 
-  def input?
-    @input
+  def copy (mask=nil)
+    GraphicContext.new(display, drawable).tap {|gc|
+      C::XCopyGC(display.to_ffi, to_ffi, gc.to_ffi, mask ? mask.to_ffi : result.values.to_ffi.first)
+
+      gc.values.mask = mask || gc.values.mask
+    }
+  end
+
+  def flush
+    C::XFlushGC(display.to_ffi, to_ffi)
+  end
+
+  def to_ffi
+    @value
   end
 end
 

@@ -25,14 +25,16 @@
 
 module X11
 
-class Error
+class Error < Exception
   def self.from (event)
     X11::const_get(Status.new(event[:error_code]).to_sym).new(event)
   end
 
-  attr_reader :display, :resource, :serial, :error, :request, :minor
+  attr_reader :type, :display, :resource, :serial, :error, :request, :minor
 
-  def initialize (event)
+  def initialize (event=nil)
+    return super(self.class.name[/\w+$/]) unless event
+
     @type     = event[:type]
     @display  = X11::Display.from(event[:display])
     @resource = event[:resourceid]
@@ -40,6 +42,12 @@ class Error
     @error    = event[:error_code]
     @request  = event[:request_code]
     @minor    = event[:minor_code]
+
+    with FFI::MemoryPointer.new(512) do |string|
+      C::XGetErrorText(@display, @error, string, string.size)
+
+      super(string.typecast(:string))
+    end
   end
 
   def to_sym
@@ -70,8 +78,7 @@ BadLength         = Class.new(Error)
 BadImplementation = Class.new(Error)
 
 C::XSetErrorHandler(FFI::Function.new(:int, [:pointer, :pointer]) {|display, event|
-  # TODO: find out how to raise exceptions from within an FFI::Function
-  # raise Error.from(C::XErrorEvent.new(event))
+  raise Error.from(C::XErrorEvent.new(event))
 })
 
 end

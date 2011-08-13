@@ -15,6 +15,6 @@ end.parse!
 
 X11::Display.new.select_window(options[:frame]).tap {|window|
   window.properties.each {|property|
-    puts "#{property.name}(#{property.type}) = #{property.value.singly}"
+    puts "#{property.name}(#{property.type}) = #{property.value.join(', ')}"
   }
 }

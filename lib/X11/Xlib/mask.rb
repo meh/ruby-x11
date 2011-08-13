@@ -79,6 +79,32 @@ module Mask
     :WindowGroup  => (1 << 6),
     :Urgency      => (1 << 8)
   )
+
+  GC = Bitmap.new(
+    :Function          => (1L<<0)
+    :PlaneMask         => (1L<<1)
+    :Foreground        => (1L<<2)
+    :Background        => (1L<<3)
+    :LineWidth         => (1L<<4)
+    :LineStyle         => (1L<<5)
+    :CapStyle          => (1L<<6)
+    :JoinStyle         => (1L<<7)
+    :FillStyle         => (1L<<8)
+    :FillRule          => (1L<<9)
+    :Tile              => (1L<<10)
+    :Stipple           => (1L<<11)
+    :TileStipXOrigin   => (1L<<12)
+    :TileStipYOrigin   => (1L<<13)
+    :Font              => (1L<<14)
+    :SubwindowMode     => (1L<<15)
+    :GraphicsExposures => (1L<<16)
+    :ClipXOrigin       => (1L<<17)
+    :ClipYOrigin       => (1L<<18)
+    :ClipMask          => (1L<<19)
+    :DashOffset        => (1L<<20)
+    :DashList          => (1L<<21)
+    :ArcMode           => (1L<<22)
+  )
 end
 
 end
