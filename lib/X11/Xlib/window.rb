@@ -109,13 +109,25 @@ class Window
     Properties.new(self)
   end
 
-  def move (x, y)
+  namedic :x, :y, :optional => [:x, :y]
+  def move (x=nil, y=nil)
+    with attributes do |attr|
+      x ||= attr.x
+      y ||= attr.y
+    end
+
     C::XMoveWindow(display.to_ffi, to_ffi, x, y)
 
     display.flush
   end
 
-  def resize (width, height)
+  namedic :width, :height, :optional => [:width, :height], :alias => { :w => :width, :h => :height }
+  def resize (width=nil, height=nil)
+    with attributes do |attr|
+      width  ||= attr.width
+      height ||= attr.height
+    end
+
     C::XResizeWindow(display.to_ffi, to_ffi, width, height)
 
     display.flush

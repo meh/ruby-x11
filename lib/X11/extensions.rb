@@ -24,7 +24,7 @@ require 'retarded'
 require 'bitmap'
 require 'forwardable'
 require 'ostruct'
-require 'named_parameter'
+require 'namedic'
 
 module Kernel
   def with (*args)
@@ -134,10 +134,6 @@ class Object
 	def drawable?
 		false
 	end
-end
-
-class Class
-	extend NamedParameter
 end
 
 class Integer
