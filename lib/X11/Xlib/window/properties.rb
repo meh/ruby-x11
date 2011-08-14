@@ -47,6 +47,10 @@ class Properties
     end
   end
 
+  def has? (atom)
+    !!self[atom]
+  end
+
   def delete (atom)
     C::XDeleteProperty(display.to_ffi, window.to_ffi, Atom[atom, display].to_ffi)
   end

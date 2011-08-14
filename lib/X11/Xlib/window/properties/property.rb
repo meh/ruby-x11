@@ -88,18 +88,18 @@ class Property
   end
 
   def type
-      type     = FFI::MemoryPointer.new :Atom
-      format   = FFI::MemoryPointer.new :int
-      length   = FFI::MemoryPointer.new :ulong
-      after    = FFI::MemoryPointer.new :ulong
-      property = FFI::MemoryPointer.new :pointer
+    type     = FFI::MemoryPointer.new :Atom
+    format   = FFI::MemoryPointer.new :int
+    length   = FFI::MemoryPointer.new :ulong
+    after    = FFI::MemoryPointer.new :ulong
+    property = FFI::MemoryPointer.new :pointer
 
-      return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
-        0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
+    return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
+      0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
-      return if property.typecast(:pointer).null?
+    return if property.typecast(:pointer).null?
 
-      Atom.new(type.typecast(:Atom).to_i, display)
+    Atom.new(type.typecast(:Atom).to_i, display)
   end
 
   def inspect

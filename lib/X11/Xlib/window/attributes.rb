@@ -29,15 +29,36 @@
 module X11; class Window
 
 class Attributes
-  def initialize (attributes)
+  attr_reader :window
+
+  def initialize (window, attributes)
+    @window     = window
     @attributes = attributes.is_a?(C::XWindowAttributes) ? attributes : attributes.typecast(C::XWindowAttributes)
   end
 
   C::XWindowAttributes.layout.members.each_with_index {|name, index|
+    next if respond_to? name
+
     define_method name do
       @attributes[name]
     end
   }
+
+  def input_only?
+    @attributes[:class] == 2
+  end
+
+  def unmapped?
+    @attributes[:map_state] == 0
+  end
+
+  def unviewable?
+    @attributes[:map_state] == 1
+  end
+
+  def viewable?
+    @attributes[:map_state] == 2
+  end
 
   def override_redirect?
     @attributes[:override_redirect]
@@ -52,15 +73,15 @@ class Attributes
   end
 
   def root
-    Window.new(@attributes[:root])
+    Window.new(window.display, @attributes[:root])
   end
 
   def visual
-    Visual.new(@attributes[:visual])
+    Visual.new(window.display, @attributes[:visual])
   end
 
   def screen
-    Screen.new(@attributes[:screen])
+    Screen.new(window.display, @attributes[:screen])
   end
 end
 

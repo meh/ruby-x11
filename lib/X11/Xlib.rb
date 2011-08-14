@@ -30,6 +30,7 @@ require 'X11/Xlib/exceptions'
 require 'X11/Xlib/transform'
 
 require 'X11/Xlib/c'
+require 'X11/Xlib/error'
 
 require 'X11/Xlib/display'
 require 'X11/Xlib/screen'
@@ -45,4 +46,4 @@ require 'X11/Xlib/status'
 require 'X11/Xlib/event'
 require 'X11/Xlib/mask'
 require 'X11/Xlib/revert_to'
-require 'X11/Xlib/error'
+require 'X11/Xlib/planes'

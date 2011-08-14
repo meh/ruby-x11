@@ -1,6 +1,7 @@
 #! /usr/bin/env ruby
 require 'optparse'
 require 'X11/simple'
+require 'ap'
 
 options = {}
 
@@ -12,9 +13,36 @@ OptionParser.new do |o|
   end
 end.parse!
 
+module Output
+  @outputs = {
+    String => lambda {|item|
+      item.inspect
+    },
+
+    X11::Window => lambda {|item|
+      "window id # #{item.id}"
+    }
+  }
+
+  def self.do (item)
+    if tmp = @outputs[item.class]
+      tmp.call(item)
+    else
+      if item.method(:to_s).owner == item.class
+        item.to_s
+      else
+        item.inspect
+      end
+    end
+  end
+end
 
 X11::Display.new.select_window(options[:frame]).tap {|window|
   window.properties.each {|property|
-    puts "#{property.name}(#{property.type}) = #{property.value.join(', ')}"
+    if property.value.is_a?(Array)
+      puts "#{property.name}(#{property.type}) = #{property.value.map { |i| Output.do(i) }.join(', ')}"
+    else
+      puts "#{property.name}(#{property.type}) = #{property.value.bytes.map { |b| "%02X" % b }.join ' '}"
+    end
   }
 }

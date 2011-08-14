@@ -32,33 +32,27 @@ require 'X11/Xlib/window/properties'
 module X11
 
 class Window
+  extend ForwardTo
+
   attr_reader :display, :parent, :revert_to
+  forward_to  :attributes
 
   def initialize (display, window)
     @display = display
     @window  = window
 
     if nil?
-      (methods - Object.instance_methods).each {|name|
+      methods.each {|name|
+        next if [:to_ffi, :id, :hash].member?(name.to_sym) or (Object.instance_method(name) rescue false)
+
         define_singleton_method name do |*|
-          raise BadWindow
+          puts name
+          Kernel.raise X11::BadWindow
         end
       }
     else
       self.revert_to = nil
     end
-  end
-
-  def root
-    root     = FFI::MemoryPointer.new :Window
-    parent   = FFI::MemoryPointer.new :Window
-    number   = FFI::MemoryPointer.new :uint
-    children = FFI::MemoryPointer.new :pointer
-
-    C::XQueryTree(display.to_ffi, id, root, parent, children, number)
-    C::XFree(children.typecast(:pointer))
-
-    Window.new(display, root.typecast(:Window))
   end
 
   def parent
@@ -75,7 +69,11 @@ class Window
 
   def id
     @window
-  end; alias hash id
+  end
+  
+  def hash
+    "#{display.to_ffi}-#{to_ffi}"
+  end
 
   def == (value)
     id == value.id
@@ -102,23 +100,41 @@ class Window
 
     C::XGetWindowAttributes(display.to_ffi, to_ffi, attr)
 
-    Attributes.new(attr)
+    Attributes.new(self, attr)
+  end
+
+  def viewable?
+    with attributes do |attr|
+      !attr.input_only? && attr.viewable?
+    end
   end
 
   def properties
     Properties.new(self)
   end
 
+  def position
+    child = FFI::MemoryPointer.new :Window
+    x     = FFI::MemoryPointer.new :int
+    y     = FFI::MemoryPointer.new :int
+ 
+    C::XTranslateCoordinates(display.to_ffi, to_ffi, root.to_ffi, 0, 0, x, y, child)
+
+    Struct.new(:x, :y).new(x.typecast(:int), y.typecast(:int))
+  end
+
   namedic :x, :y, :optional => [:x, :y]
   def move (x=nil, y=nil)
-    with attributes do |attr|
-      x ||= attr.x
-      y ||= attr.y
+    with position do |p|
+      x ||= p.x
+      y ||= p.y
     end
 
     C::XMoveWindow(display.to_ffi, to_ffi, x, y)
 
     display.flush
+
+    self
   end
 
   namedic :width, :height, :optional => [:width, :height], :alias => { :w => :width, :h => :height }
@@ -131,12 +147,16 @@ class Window
     C::XResizeWindow(display.to_ffi, to_ffi, width, height)
 
     display.flush
+
+    self
   end
 
   def raise
     C::XRaiseWindow(display.to_ffi, to_ffi)
     
     display.flush
+
+    self
   end
 
   def subwindows
@@ -159,6 +179,7 @@ class Window
     result
   end
 
+  namedic :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
   def grab_pointer (owner_events=true, event_mask=Mask::Event[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
     C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
   end
@@ -171,6 +192,7 @@ class Window
     C::XKeysymToKeycode(to_ffi, keysym)
   end
 
+  namedic :key, :modifiers, :normal?, :pointer, :keyboard, :optional => 1 .. -1
   def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:sync)
     C::XGrabKey(display.to_ffi, keycode.to_keycode, modifiers, to_ffi, !!owner_events, mode2int(pointer_mode), mode2int(keyboard_mode))
   end
@@ -179,6 +201,7 @@ class Window
     C::XUngrabKey(display.to_ffi, keycode.to_keycode, modifiers, to_ffi)
   end
 
+  namedic :button, :modifiers, :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :optional => 0 .. -1
   def grab_button (button, modifiers=0, owner_events=true, event_mask=Mask::Event[:ButtonPress], pointer_mode=:async, keyboard_mode=:sync, confine_to=0, cursor=0)
     C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
   end
@@ -187,7 +210,7 @@ class Window
     C::XUngrabButton(display.to_ffi, button, modifiers, to_ffi)
   end
 
-  def pointer_on?
+  def under_pointer
     root  = FFI::MemoryPointer.new :Window
     child = FFI::MemoryPointer.new :Window
     dummy = FFI::MemoryPointer.new :int

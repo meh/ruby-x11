@@ -91,10 +91,14 @@ class Display
     return unless options[:flush]
     
     flush!
+
+    self
   end
 
   def flush!
     C::XFlush(to_ffi)
+
+    self
   end
 
   def screen (which)

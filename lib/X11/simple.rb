@@ -31,3 +31,4 @@ require 'X11/Xutil'
 require 'X11/cursorfont'
 
 require 'X11/simple/display'
+require 'X11/simple/window'

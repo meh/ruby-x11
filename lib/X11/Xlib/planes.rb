@@ -26,24 +26,24 @@
 # or implied.
 #++
 
-require 'X11/Xlib/hints/icon'
-
 module X11
 
-class Hints
-  attr_reader :flags, :state, :icon, :group
+class Planes
+  def self.[] (*index)
+    index  = index.map { |item| item.is_a?(Range) ? item.to_a : item.to_i }.flatten.compact
+    binary = '0' * index.max
 
-  namedic :flags, :input?, :state, :icon, :group
-  def initialize (flags, input, state, icon, group)
-    @flags = flags
-    @input = input
-    @state = state
-    @icon  = icon
-    @group = group
+    index.each {|index|
+      next if index.zero?
+
+      binary[index] = '1'
+    }
+
+    binary.reverse.to_i(2)
   end
 
-  def input?
-    @input
+  def self.all
+    2 ** (1.size * 8)
   end
 end
 

@@ -162,6 +162,32 @@ class Array
   end
 end
 
+module ForwardTo
+  def forward_to (*what)
+    refine_method :method_missing do |old, name, *args, &block|
+      what.each {|target|
+        begin
+          if target.to_s.start_with?('@')
+            target = instance_variable_get name
+          else
+            if target.is_a?(Array)
+              target = __send__ target.first, *target[1 .. -1]
+            else
+              target = __send__ target
+            end
+          end
+        rescue Exception; next; end
+
+        if target.respond_to? name
+          return target.__send__ name, *args, &block
+        end
+      }
+
+      old.call(name, *args, &block)
+    end
+  end
+end
+
 module X11; module C
   extend FFI::Library
 end; end

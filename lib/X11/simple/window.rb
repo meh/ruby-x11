@@ -30,15 +30,35 @@ module X11
 
 class Window
   def client
-    win = properties[:_NET_VIRTUAL_ROOTS].any? {|vroot|
-      next unless self == vroot
+    win = if roots = properties[:_NET_VIRTUAL_ROOTS]
+      roots.value.any? {|vroot|
+        next unless self == vroot
 
-      unless (tmp = self.pointer_on?).nil?
-        break tmp
+        unless (tmp = under_pointer).nil?
+          break tmp
+        else
+          return self
+        end
+      }
+    end || self
+
+    return win if properties.has? :WM_STATE
+
+    win.subwindows.reverse.select {|subwin|
+      next unless subwin.viewable?
+
+      unless subwin.properties.has? :WM_STATE
+        true
       else
-        return self
+        return subwin
       end
-    } or self
+    }.each {|subwin|
+      if result = subwin.client
+        return result
+      end
+    }
+
+    return win
   end
 end
 
