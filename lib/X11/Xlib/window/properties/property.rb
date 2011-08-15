@@ -28,7 +28,7 @@
 
 require 'X11/Xlib/window/properties/property/parser'
 
-module X11; class Window; class Properties
+module X11; class Window < Drawable; class Properties
 
 class Property
   @transforms = {

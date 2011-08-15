@@ -28,7 +28,7 @@
 
 require 'X11/Xlib/window/properties/property'
 
-module X11; class Window
+module X11; class Window < Drawable
 
 class Properties
   include Enumerable

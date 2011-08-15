@@ -34,6 +34,7 @@ require 'X11/Xlib/error'
 
 require 'X11/Xlib/display'
 require 'X11/Xlib/screen'
+require 'X11/Xlib/id'
 require 'X11/Xlib/drawable'
 require 'X11/Xlib/window'
 require 'X11/Xlib/pixmap'

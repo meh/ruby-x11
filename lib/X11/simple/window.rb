@@ -28,7 +28,7 @@
 
 module X11
 
-class Window
+class Window < Drawable
   def client
     win = if roots = properties[:_NET_VIRTUAL_ROOTS]
       roots.value.any? {|vroot|

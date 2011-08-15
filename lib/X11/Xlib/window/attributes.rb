@@ -26,7 +26,7 @@
 # or implied.
 #++
 
-module X11; class Window
+module X11; class Window < Drawable
 
 class Attributes
   attr_reader :window

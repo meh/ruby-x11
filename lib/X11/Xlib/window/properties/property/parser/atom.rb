@@ -26,7 +26,7 @@
 # or implied.
 #++
 
-module X11; class Window; class Properties; class Property
+module X11; class Window < Drawable; class Properties; class Property
 
 Parser.register :ATOM do
   output do |property, data|

@@ -26,7 +26,7 @@
 # or implied.
 #++
 
-module X11; class Window; class Properties
+module X11; class Window < Drawable; class Properties
 
 Property.register :_NET_VIRTUAL_ROOTS do
   output do |property, data|

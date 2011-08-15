@@ -28,7 +28,7 @@
 
 module X11
 
-class Window
+class Window < Drawable
   def title
     text = FFI::MemoryPointer.new :pointer
 
