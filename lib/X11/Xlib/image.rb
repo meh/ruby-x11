@@ -35,21 +35,23 @@ class Image
     }
   end
 
-	def initialize (*args)
-    if args.length == 8
-      
-    elsif args.length == 10
+  singleton_namedic :drawable, :x, :y, :width, :height, :plane, :format, :optional => 1 .. -1, :alias => { :w => :width, :h => :height }
+  def self.from (drawable, x=nil, y=nil, width=nil, height=nil, plane_mask=nil, format=nil)
+    display      = drawable.display
+    x          ||= 0
+    y          ||= 0
+    width      ||= drawable.width
+    height     ||= drawable.height
+    plane_mask ||= Planes.all
+    format     ||= Pixmap::Format::Z
 
-    elsif args.length == 5
+    Image.new(C::XGetImage(drawable.display.to_ffi, drawable.to_ffi, x, y, width, height, plane_mask, format))
+  end
 
-    end
-    # 8 => get image
-    # 10 => create image
-    # 5 => sub image
+	def initialize (pointer)
+    raise ArgumentError, 'you have to pass a pointer to the XImage struct' unless pointer.is_a?(FFI::Pointer)
 
-    raise ArgumentError, 'the passed value is not drawable' unless drawable.drawable?
-
-		@value = C::XCreatePixmap(display.to_ffi, drawable.to_ffi, width, height, depth)
+    @value = pointer
 
 		ObjectSpace.define_finalizer self, self.class.finalizer(display, to_ffi)
 	end

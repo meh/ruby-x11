@@ -17,7 +17,7 @@
 # along with sysctl. If not, see <http://www.gnu.org/licenses/>.
 #++
 
-require 'ffi' unless defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
+require 'ffi'
 require 'memoized'
 require 'refining'
 require 'retarded'
@@ -130,20 +130,10 @@ module FFI
   find_type(:size_t) rescue typedef(:ulong, :size_t)
 end
 
-class Object
-	def drawable?
-		false
-	end
-end
-
 class Integer
   def to_ffi
     self
   end
-
-	def drawable?
-		true
-	end
 end
 
 class String

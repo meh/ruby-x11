@@ -31,15 +31,14 @@ require 'X11/Xlib/window/properties'
 
 module X11
 
-class Window
+class Window < Drawable
   extend ForwardTo
 
   attr_reader :display, :parent, :revert_to
   forward_to  :attributes
 
-  def initialize (display, window)
-    @display = display
-    @window  = window
+  def initialize (display, value)
+    super
 
     if nil?
       methods.each {|name|
@@ -67,26 +66,6 @@ class Window
     Window.new(display, parent.typecast(:Window))
   end
 
-  def id
-    @window
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
-  end
-
-  def == (value)
-    id == value.id
-  end
-
-  def nil?
-    id.zero?
-  end
-
-  def drawable?
-    true
-  end
-
   def revert_to= (value)
     @revert_to = if value.is_a?(Integer)
       RevertTo.key(value)
@@ -111,6 +90,12 @@ class Window
 
   def properties
     Properties.new(self)
+  end
+
+  def size
+    with attributes do |attr|
+      Struct.new(:width, :height).new(attr.width, attr.height)
+    end
   end
 
   def position
@@ -240,10 +225,6 @@ class Window
     C::XWindowEvent(display.to_ffi, to_ffi, mask.to_ffi, event)
 
     Event.new(event)
-  end
-
-  def to_ffi
-    id
   end
 
   def inspect

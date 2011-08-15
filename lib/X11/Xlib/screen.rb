@@ -29,7 +29,10 @@
 module X11
 
 class Screen
+  extend ForwardTo
+
   attr_reader :display
+  forward_to  :root_window
 
   def initialize (display, screen)
     @display = display

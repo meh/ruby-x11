@@ -27,10 +27,3 @@
 #++
 
 require 'X11/X/c'
-
-module X11
-
-CurrentTime = 0
-AnyProperty = 0
-
-end

@@ -32,16 +32,17 @@ require 'X11/Xlib/graphic_context/values'
 module X11
 
 class GraphicContext
-  attr_reader :display, :drawable, :values
+  def self.create (display, drawable, values=nil)
+    raise ArgumentError, 'the passed value is not drawable' unless drawable.is_a?(Drawable)
 
-  def initialize (display, drawable, values=nil)
-    raise ArgumentError, 'the passed value is not drawable' unless drawable.drawable?
+    GraphicContext.new(display, C::XCreateGC(display.to_ffi, drawable.to_ffi, *Values.new(self, values).to_ffi))
+  end
 
-    @display  = display
-    @drawable = drawable
-    @values   = Values.new(self, values)
+  attr_reader :display
 
-    @value = C::XCreateGC(@display.to_ffi, @drawable.to_ffi, *@values.to_ffi)
+  def initialize (display, value)
+    @display = display
+    @value   = value
   end
 
   def copy (mask=nil)
@@ -50,6 +51,10 @@ class GraphicContext
 
       gc.values.mask = mask || gc.values.mask
     }
+  end
+  
+  def id
+    C::XGContextFromGC(to_ffi)
   end
 
   def flush

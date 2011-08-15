@@ -29,42 +29,24 @@
 module X11
 
 class Display
-  def self.from (pointer, options={})
-    Display.new(pointer, options.merge(:close => false))
-  end
-
   def self.all
     @displays ||= []
   end
 
-  def self.finalizer (display)
-    proc {
-      C::XCloseDisplay(FFI::Pointer.new(display))
-    }
-  end
+  def self.open (*args)
+    name, options = if args.first.is_a?(Hash)
+      [nil, args.first]
+    else
+      [args, {}]
+    end
 
-  at_exit do
-    Display.all.each {|d|
-      Display.finalizer(d).call
-    }
+    Display.new(X11::C::XOpenDisplay(name), options)
   end
 
   attr_reader :options
 
-  def initialize (*args)
-    name, options = if args.first.is_a?(Hash)
-      [nil, args.first]
-    else
-      args
-    end
-
-    @display = if name.is_a?(FFI::Pointer)
-      name
-    elsif name.is_a?(C::Display)
-      name.pointer
-    else
-      X11::C::XOpenDisplay(name)
-    end.typecast(C::Display)
+  def initialize (pointer, options={})
+    @display = pointer.is_a?(C::Display) ? pointer : C::Display.new(pointer)
 
     if @display.pointer.null?
       raise ArgumentError, "could not connect to display #{name}"
@@ -73,12 +55,6 @@ class Display
     @options = {
       :flush => true
     }.merge(options || {})
-
-    if @options[:close]
-      ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi.to_i)
-    else
-      (Display.all << to_ffi.to_i).uniq!
-    end
   end
 
   C::Display.layout.members.each_with_index {|name, index|

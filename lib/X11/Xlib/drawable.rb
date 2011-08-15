@@ -28,33 +28,21 @@
 
 module X11
 
-class Pixmap < Drawable
-	module Format
-		XY = 1
-		Z  = 2
-	end
+class Drawable < ID
+  namedic :x, :y, :width, :height, :to, :destination, :gc, :optional => 0 .. -1
+  def copy (x=nil, y=nil, width=nil, height=nil, to=nil, destination=nil, gc=nil)
+    x           ||= 0
+    y           ||= 0
+    width       ||= self.width
+    height      ||= self.height
+    to          ||= [0, 0]
+    destination ||= Pixmap.create(to_ffi, width, height)
+    gc          ||= GraphicContext.new
 
-  def self.finalizer (display, pixmap)
-    proc {
-      C::XFreePixmap(display, pixmap)
-    }
+    C::XCopyArea(display.to_ffy, to_ffi, destination.to_ffi, gc.to_ffi, x, y, width, height, to.first, to.last)
+
+    destination
   end
-
-  singleton_namedic :screen, :width, :height, :depth, :optional => [:width, :height, :depth => 24]
-	def self.create (drawable, width, height, depth=24)
-		id = C::XCreatePixmap(display.to_ffi, drawable.to_ffi, width, height, depth)
-
-    new(screen.display, id).tap {|pixmap|
-  		ObjectSpace.define_finalizer pixmap, finalizer(screen.display, pixmap.to_ffi)
-    }
-	end
-
-	def to_image
-	end
-
-	def to_ffi
-		@value
-	end
 end
 
 end
