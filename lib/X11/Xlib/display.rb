@@ -37,7 +37,7 @@ class Display
     name, options = if args.first.is_a?(Hash)
       [nil, args.first]
     else
-      [args, {}]
+      args
     end
 
     Display.new(X11::C::XOpenDisplay(name), options)

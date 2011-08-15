@@ -29,7 +29,7 @@
 module X11
 
 class Screen
-  extend ForwardTo
+  include ForwardTo
 
   attr_reader :display
   forward_to  :root_window
@@ -49,15 +49,8 @@ class Screen
     Window.new(@display, @screen[:root])
   end
 
-  def windows (window=root_window)
-    result = []
-
-    window.subwindows.each {|win|
-      result << win
-      result << windows(win)
-    }
-
-    result.flatten.compact.uniq
+  def windows
+    [root_window] + root_window.subwindows(true)
   end
 
   def to_ffi

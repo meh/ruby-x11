@@ -153,28 +153,37 @@ class Array
 end
 
 module ForwardTo
-  def forward_to (*what)
-    refine_method :method_missing do |old, name, *args, &block|
-      what.each {|target|
-        begin
-          if target.to_s.start_with?('@')
-            target = instance_variable_get name
-          else
-            if target.is_a?(Array)
-              target = __send__ target.first, *target[1 .. -1]
-            else
-              target = __send__ target
-            end
-          end
-        rescue Exception; next; end
+  def self.included (what)
+    what.instance_eval {
+      @@__forward_to__ = []
 
-        if target.respond_to? name
-          return target.__send__ name, *args, &block
+      def self.forward_to (*what)
+        @@__forward_to__ << what
+        @@__forward_to__.flatten!
+        @@__forward_to__.compact!
+        @@__forward_to__.uniq!
+      end
+    }
+  end
+
+  def method_missing (name, *args, &block)
+    @@__forward_to__.each {|target|
+      target = if target.to_s.start_with?('@')
+        instance_variable_get name
+      else
+        if target.is_a?(Array)
+          __send__ target.first, *target[1 .. -1]
+        else
+          __send__ target
         end
-      }
+      end
 
-      old.call(name, *args, &block)
-    end
+      if target.respond_to? name
+        return target.__send__ name, *args, &block
+      end
+    }
+
+    super
   end
 end
 

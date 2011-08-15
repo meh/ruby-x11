@@ -35,7 +35,7 @@ Window = [lambda {|w|
 }, lambda(&:to_ffi)]
 
 Display = [lambda {|pointer|
-  X11::Display.from(pointer)
+  X11::Display.new(pointer)
 }, lambda(&:to_ffi)]
 
 class Helper

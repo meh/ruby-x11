@@ -32,7 +32,7 @@ require 'X11/Xlib/window/properties'
 module X11
 
 class Window < Drawable
-  extend ForwardTo
+  include ForwardTo
 
   attr_reader :display, :parent, :revert_to
   forward_to  :attributes
@@ -144,7 +144,7 @@ class Window < Drawable
     self
   end
 
-  def subwindows
+  def subwindows (deep=false)
     result   = []
     root     = FFI::MemoryPointer.new :Window
     parent   = FFI::MemoryPointer.new :Window
@@ -156,12 +156,15 @@ class Window < Drawable
     return result if children.typecast(:pointer).null?
 
     children.typecast(:pointer).read_array_of(:Window, number.typecast(:uint)).each {|win|
-      result << Window.new(display, win)
+      with Window.new(display, win) do |win|
+        result << win
+        result << win.subwindows(true) if deep
+      end
     }
 
     C::XFree(children.typecast(:pointer))
 
-    result
+    result.flatten.compact
   end
 
   namedic :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
