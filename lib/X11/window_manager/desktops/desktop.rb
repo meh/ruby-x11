@@ -26,46 +26,53 @@
 # or implied.
 #++
 
-module X11
+module X11; class WindowManager; class Desktops
 
-class ID
-  class << self
-    alias [] new
+class Desktop
+  attr_reader :name, :index, :window
+
+  def initialize (parent, name, index, window)
+    @parent = parent
+    @name   = name
+    @index  = index
+    @window = window
   end
 
-  attr_reader :display
+  def size
+    begin
+      geometry = @parent.wm.root.properties[:_NET_DESKTOP_GEOMETRY].value
 
-  def initialize (display, value)
-    @display = display
-    @value   = value.to_i
+      Struct.new(:width, :height).new(geometry[0], geometry[2])
+    rescue
+      Supports.raise :_NET_DESKTOP_GEOMETRY
+    end
   end
 
-  def id
-    @value
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
+  def starts_at
+    begin
+      viewport = @parent.wm.root.properties[:_NET_DESKTOP_VIEWPORT].value
+
+      Struct.new(:x, :y).new(viewport[0], viewport[2])
+    rescue
+      Supports.raise :_NET_DESKTOP_VIEWPORT
+    end
   end
 
-  def == (value)
-    id == value.id
+  def current?
+    begin
+      @parent.wm.root.properties[:_NET_CURRENT_DESKTOP].value.first == index
+    rescue
+      Supports.raise :_NET_CURRENT_DESKTOP
+    end
   end
-
-  def nil?
-    to_i.zero?
-  end
-
-  def ok?
-    !nil?
-  end
-
-  alias to_i id
-  alias to_ffi to_i
 
   def to_s
-    to_i.to_s(16)
+    name
+  end
+
+  def inspect
+    "#<Desktop[#{index}]: #{to_s.inspect} #{size.width}x#{size.height} (#{starts_at.x}; #{starts_at.y})>"
   end
 end
 
-end
+end; end; end

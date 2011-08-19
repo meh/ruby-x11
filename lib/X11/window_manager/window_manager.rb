@@ -26,45 +26,39 @@
 # or implied.
 #++
 
+require 'X11/window_manager/supports'
+require 'X11/window_manager/desktops'
+
 module X11
 
-class ID
-  class << self
-    alias [] new
+class WindowManager
+  extend Forwardable
+
+  attr_reader   :display
+  def_delegator :@display, :root_window, :root
+
+  def initialize (display=nil)
+    @display = display || X11::Display.open
   end
 
-  attr_reader :display
-
-  def initialize (display, value)
-    @display = display
-    @value   = value.to_i
+  def supports
+    Supports.new(self)
   end
 
-  def id
-    @value
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
+  def desktops
+    Desktops.new(self)
   end
 
-  def == (value)
-    id == value.id
+  def supports? (what)
+    supports.has?(what)
   end
 
-  def nil?
-    to_i.zero?
-  end
-
-  def ok?
-    !nil?
-  end
-
-  alias to_i id
-  alias to_ffi to_i
-
-  def to_s
-    to_i.to_s(16)
+  def clients
+    begin
+      root.properties[:_NET_CLIENT_LIST].value
+    rescue
+      raise NoMethodError, 'the current window manager does not support _NET_CLIENT_LIST, whine to the developers'
+    end
   end
 end
 

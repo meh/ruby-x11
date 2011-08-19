@@ -46,8 +46,12 @@ class Event
     end
   end
 
-  def self.index (event)
-    Events.to_a.index(event)
+  def self.index (name)
+    Events.each_with_index {|event, index|
+      next if event.nil?
+
+      return index if event.name[/[^:]*$/] == name.to_s
+    }
   end
 
   def self.new (event)

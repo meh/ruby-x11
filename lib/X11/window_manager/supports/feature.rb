@@ -26,46 +26,21 @@
 # or implied.
 #++
 
-module X11
+module X11; class WindowManager; class Supports
 
-class ID
-  class << self
-    alias [] new
+class Feature
+  include ForwardTo
+
+  forward_to :to_atom
+
+  def initialize (parent, atom)
+    @parent = parent
+    @atom   = atom
   end
 
-  attr_reader :display
-
-  def initialize (display, value)
-    @display = display
-    @value   = value.to_i
-  end
-
-  def id
-    @value
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
-  end
-
-  def == (value)
-    id == value.id
-  end
-
-  def nil?
-    to_i.zero?
-  end
-
-  def ok?
-    !nil?
-  end
-
-  alias to_i id
-  alias to_ffi to_i
-
-  def to_s
-    to_i.to_s(16)
+  def to_atom
+    @atom
   end
 end
 
-end
+end; end; end

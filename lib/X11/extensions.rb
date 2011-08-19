@@ -155,19 +155,21 @@ end
 module ForwardTo
   def self.included (what)
     what.instance_eval {
-      @@__forward_to__ = []
+      @__forward_to__ = []
 
       def self.forward_to (*what)
-        @@__forward_to__ << what
-        @@__forward_to__.flatten!
-        @@__forward_to__.compact!
-        @@__forward_to__.uniq!
+        return @__forward_to__ if what.empty?
+
+        @__forward_to__ << what
+        @__forward_to__.flatten!
+        @__forward_to__.compact!
+        @__forward_to__.uniq!
       end
     }
   end
 
   def method_missing (name, *args, &block)
-    @@__forward_to__.each {|target|
+    self.class.forward_to.each {|target|
       target = if target.to_s.start_with?('@')
         instance_variable_get name
       else

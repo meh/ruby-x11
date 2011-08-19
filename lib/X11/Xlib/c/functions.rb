@@ -63,9 +63,15 @@ attach_function :XTranslateCoordinates, [:pointer, :Window, :Window, :int, :int,
 
 attach_function :XAllowEvents, [:pointer, :int, :Time], :int
 attach_function :XNextEvent, [:pointer, :pointer], :int
+attach_function :XPeekEvent, [:pointer, :pointer], :int
 attach_function :XMaskEvent, [:pointer, :long, :pointer], :int
 attach_function :XCheckTypedEvent, [:pointer, :int, :pointer], :Bool
+attach_function :XCheckMaskEvent, [:pointer, :int, :pointer], :Bool
+attach_function :XIfEvent, [:pointer, :pointer, :pointer, :pointer], :int
+attach_function :XPeekIfEvent, [:pointer, :pointer, :pointer, :pointer], :int
+attach_function :XCheckIfEvent, [:pointer, :pointer, :pointer, :pointer], :Bool
 attach_function :XWindowEvent, [:pointer, :Window, :long, :pointer], :int
+
 
 attach_function :XStringToKeysym, [:string], :KeySym
 attach_function :XKeysymToString, [:KeySym], :string

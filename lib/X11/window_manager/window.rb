@@ -28,43 +28,74 @@
 
 module X11
 
-class ID
-  class << self
-    alias [] new
+class Window < Drawable
+  def resource
+    Struct.new(:name, :class).new(*properties[:WM_CLASS].value)
   end
 
-  attr_reader :display
-
-  def initialize (display, value)
-    @display = display
-    @value   = value.to_i
+  def title
+    properties[:_NET_WM_VISIBLE_NAME].value.first rescue
+    properties[:_NET_WM_NAME].value.first rescue
+    properties[:WM_NAME].value.first rescue
+    nil
   end
 
-  def id
-    @value
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
-  end
+  def desktop
+    begin
+      index = properties[:_NET_WM_DESKTOP].value.first
 
-  def == (value)
-    id == value.id
-  end
+      return true if index == 0xFFFFFFFF
 
-  def nil?
-    to_i.zero?
+      WindowManager.new(display).desktops[index]
+    rescue
+      WindowManager::Supports.raise :_NET_WM_DESKTOP
+    end
   end
 
-  def ok?
-    !nil?
+  def types
+    begin
+      properties[:_NET_WM_WINDOW_TYPE].value.map {|type|
+        type.to_s[/[^_]*$/].to_sym
+      }
+    rescue
+      WindowManager::Supports.raise :_NET_WM_WINDOW_TYPE
+    end
   end
 
-  alias to_i id
-  alias to_ffi to_i
+  def states
+    begin
+      properties[:_NET_WM_WINDOW_STATE].value.map {|type|
+        type.to_s[/[^_]*$/].to_sym
+      }
+    rescue
+      WindowManager::Supports.raise :_NET_WM_WINDOW_STATE
+    end
+  end
 
-  def to_s
-    to_i.to_s(16)
+  def allowed_actions
+    begin
+      properties[:_NET_WM_ALLOWED_ACTIONS].value.map {|type|
+        type.to_s[/[^_]*$/].to_sym
+      }
+    rescue
+      WindowManager::Supports.raise :_NET_WM_USER_TIME
+    end
+  end
+
+  def pid
+    begin
+      properties[:_NET_WM_PID].value.first
+    rescue
+      WindowManager::Supports.raise :_NET_WM_PID
+    end
+  end
+
+  def last_action_at
+    begin
+      Time.at properties[:_NET_WM_USER_TIME].value.first
+    rescue
+      WindowManager::Supports.raise :_NET_WM_USER_TIME
+    end
   end
 end
 

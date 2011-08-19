@@ -28,11 +28,11 @@
 
 module X11; class Window < Drawable; class Properties; class Property
 
-Parser.register :ARC do
+Parser.register :WM_STATE do
   output do |property, data|
-    Parser.format(property, data, 'i').map {|data|
-      State.new(data.first)
-    }
+    Parser.format(property, data, 'iw').map {|data|
+      [State[data.first], data.last]
+    }.first
   end
 end
 

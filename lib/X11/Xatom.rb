@@ -154,16 +154,12 @@ class Atom
   end
 
   def to_s
-    name
+    to_sym.to_s
   end
 
   def to_i
     @value
   end; alias to_ffi to_i
-
-  def inspect
-    to_sym.to_s
-  end
 end
 
 end

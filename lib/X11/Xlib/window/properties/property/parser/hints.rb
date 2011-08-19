@@ -31,9 +31,9 @@ module X11; class Window < Drawable; class Properties; class Property
 Parser.register :WM_HINTS do
   output do |property, data|
     Parser.format(property, data, 'ibciiiiii').map {|data|
-      X11::Hints.new(
+      Hints.new(
         Mask::Hints[data.shift], data.shift, State[data.shift],
-        X11::Hints::Icon.new(*data.shift(4)), X11::Window.new(property.display, data.shift)
+        Hints::Icon.new(*data.shift(4)), ID.new(property.display, data.shift)
       )
     }
   end

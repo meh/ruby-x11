@@ -26,46 +26,7 @@
 # or implied.
 #++
 
-module X11
+require 'X11/Xlib'
 
-class ID
-  class << self
-    alias [] new
-  end
-
-  attr_reader :display
-
-  def initialize (display, value)
-    @display = display
-    @value   = value.to_i
-  end
-
-  def id
-    @value
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
-  end
-
-  def == (value)
-    id == value.id
-  end
-
-  def nil?
-    to_i.zero?
-  end
-
-  def ok?
-    !nil?
-  end
-
-  alias to_i id
-  alias to_ffi to_i
-
-  def to_s
-    to_i.to_s(16)
-  end
-end
-
-end
+require 'X11/window_manager/window_manager'
+require 'X11/window_manager/window'

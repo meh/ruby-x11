@@ -42,10 +42,9 @@ class Window < Drawable
 
     if nil?
       methods.each {|name|
-        next if [:to_ffi, :id, :hash].member?(name.to_sym) or (Object.instance_method(name) rescue false)
+        next if name.to_sym != :to_ffi && (ID.instance_method(name) rescue false)
 
         define_singleton_method name do |*|
-          puts name
           Kernel.raise X11::BadWindow
         end
       }
@@ -75,11 +74,11 @@ class Window < Drawable
   end
 
   def attributes
-    attr = FFI::MemoryPointer.new(C::XWindowAttributes)
+    with FFI::MemoryPointer.new(C::XWindowAttributes) do |attr|
+      C::XGetWindowAttributes(display.to_ffi, to_ffi, attr)
 
-    C::XGetWindowAttributes(display.to_ffi, to_ffi, attr)
-
-    Attributes.new(self, attr)
+      Attributes.new(self, attr)
+    end
   end
 
   def viewable?
@@ -222,10 +221,11 @@ class Window < Drawable
     [x.typecast(:int), y.typecast(:int)]
   end
 
-  def next_event (mask=Mask::Event[:NoEvent])
+  namedic :mask, :delete, :alias => { :type => :mask }
+  def next_event (mask=nil, delete=true)
     event = FFI::MemoryPointer.new(C::XEvent)
 
-    C::XWindowEvent(display.to_ffi, to_ffi, mask.to_ffi, event)
+      C::XWindowEvent(display.to_ffi, to_ffi, mask.to_ffi, event)
 
     Event.new(event)
   end

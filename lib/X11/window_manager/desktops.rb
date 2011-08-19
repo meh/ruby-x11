@@ -26,46 +26,57 @@
 # or implied.
 #++
 
-module X11
+require 'X11/window_manager/desktops/desktop'
 
-class ID
-  class << self
-    alias [] new
+module X11; class WindowManager
+
+class Desktops
+  include ForwardTo
+
+  attr_reader :window_manager
+  forward_to  :to_a
+
+  alias wm window_manager
+
+  def initialize (window_manager)
+    @window_manager = window_manager
   end
 
-  attr_reader :display
+  def to_a
+    length   = wm.root.properties[:_NET_NUMBER_OF_DESKTOPS].value.first rescue nil
+    roots    = wm.root.properties[:_NET_VIRTUAL_ROOTS].value rescue []
+    desktops = wm.root.properties[:_NET_DESKTOP_NAMES].value.each_with_index.map {|name, index|
+      Desktop.new(self, name, index, roots[index])
+    } rescue []
 
-  def initialize (display, value)
-    @display = display
-    @value   = value.to_i
+    return desktops if length.nil? || desktops.length == length
+
+    if length > desktops.length
+      (desktops.length ... length).each {|index|
+        desktops.push Desktop.new(self, nil, index, roots[index])
+      }
+    else
+      desktops.pop(desktops.length - length)
+    end
+
+    desktops
   end
 
-  def id
-    @value
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
-  end
-
-  def == (value)
-    id == value.id
+  def current
+    begin
+      self[wm.root.properties[:_NET_CURRENT_DESKTOP].value.first]
+    rescue
+      Supports.raise :_NET_CURRENT_DESKTOP
+    end
   end
 
-  def nil?
-    to_i.zero?
-  end
-
-  def ok?
-    !nil?
-  end
-
-  alias to_i id
-  alias to_ffi to_i
-
-  def to_s
-    to_i.to_s(16)
+  def showing?
+    begin
+      wm.root.properties[:_NET_SHOWING_DESKTOP].value.first == 1
+    rescue
+      Supports.raise :_NET_SHOWING_DESKTOP
+    end
   end
 end
 
-end
+end; end

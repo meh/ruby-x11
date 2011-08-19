@@ -109,7 +109,7 @@ class Helper
   end
 
   manage :serial
-  manage [:send_event, :send_event?]
+  manage [:send_event, :fake?]
   manage :display, X11::Event::Display
   manage :window, X11::Event::Window
 

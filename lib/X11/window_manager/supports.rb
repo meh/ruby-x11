@@ -26,46 +26,31 @@
 # or implied.
 #++
 
-module X11
+require 'X11/window_manager/supports/feature'
 
-class ID
-  class << self
-    alias [] new
+module X11; class WindowManager
+
+class Supports
+  def self.raise (name)
+    Kernel.raise NoMethodError, "the current window manager doesn't support #{name}, whine to the developers"
   end
 
-  attr_reader :display
+  include ForwardTo
 
-  def initialize (display, value)
-    @display = display
-    @value   = value.to_i
+  attr_reader :window_manager
+  forward_to  :to_a
+
+  alias wm window_manager
+
+  def initialize (window_manager)
+    @window_manager = window_manager
   end
 
-  def id
-    @value
-  end
-  
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
-  end
-
-  def == (value)
-    id == value.id
-  end
-
-  def nil?
-    to_i.zero?
-  end
-
-  def ok?
-    !nil?
-  end
-
-  alias to_i id
-  alias to_ffi to_i
-
-  def to_s
-    to_i.to_s(16)
+  def to_a
+    wm.root.properties[:_NET_SUPPORTED].value.map {|feature|
+      Feature.new(self, feature)
+    }
   end
 end
 
-end
+end; end
