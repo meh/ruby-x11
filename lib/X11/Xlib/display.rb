@@ -148,7 +148,7 @@ class Display
         raise ArgumentError, 'cannot look for event by type and block'
       end
 
-      if !mask.is_a?(Symbol) && blocking
+      if !mask.is_a?(Symbol) && blocking != false
         if delete
           if mask
             C::XMaskEvent(to_ffi, mask.to_ffi, event)

@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/X'
+
 require 'X11/Xlib/exceptions'
 require 'X11/Xlib/transform'
 
@@ -49,3 +51,5 @@ require 'X11/Xlib/event'
 require 'X11/Xlib/mask'
 require 'X11/Xlib/revert_to'
 require 'X11/Xlib/planes'
+
+require 'X11/Xutil'

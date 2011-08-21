@@ -92,7 +92,7 @@ class Window < Drawable
 
   def last_action_at
     begin
-      Time.at properties[:_NET_WM_USER_TIME].value.first
+      properties[:_NET_WM_USER_TIME].value.first
     rescue
       WindowManager::Supports.raise :_NET_WM_USER_TIME
     end

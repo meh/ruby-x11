@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/Xatom'
+
 require 'X11/X/c'
 
 module X11

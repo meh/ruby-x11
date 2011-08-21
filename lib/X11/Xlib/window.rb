@@ -34,11 +34,13 @@ module X11
 class Window < Drawable
   include ForwardTo
 
-  attr_reader :display, :parent, :revert_to
+  attr_reader :display, :parent, :revert_to, :reported_events
   forward_to  :attributes
 
   def initialize (display, value)
     super
+
+    @reported_events = Mask::Event[]
 
     if nil?
       methods.each {|name|
@@ -221,14 +223,84 @@ class Window < Drawable
     [x.typecast(:int), y.typecast(:int)]
   end
 
-  namedic :mask, :delete, :alias => { :type => :mask }
-  def next_event (mask=nil, delete=true)
+  def reported_events= (mask)
+    (@reported_events = mask).tap {
+      C::XSelectInput(display.to_ffi, to_ffi, mask.to_ffi)
+    }
+  end; alias select_input reported_events=
+
+  namedic :mask, :delete, :blocking?, :alias => { :type => :mask }, :optional => { :delete => true }
+  def next_event (mask=nil, delete=true, blocking=nil, &block)
     event = FFI::MemoryPointer.new(C::XEvent)
 
-      C::XWindowEvent(display.to_ffi, to_ffi, mask.to_ffi, event)
+    raise ArgumentError, 'windows do not support event peeking, yet' unless delete
+
+    if block
+      callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) do |display, event, _|
+        block.call Display.new(display), Event.new(event) if event.window == self
+      end
+
+      @reported_events.tap {|old|
+        self.reported_events = Mask::Event.all
+
+        begin
+          if blocking == false
+            C::XCheckIfEvent(display.to_ffi, event, callback, nil) or return
+          else
+            if delete
+              C::XIfEvent(display.to_ffi, event, callback, nil)
+            else
+              C::XPeekIfEvent(display.to_ffi, event, callback, nil)
+            end
+          end
+        ensure
+          self.reported_events = old
+        end
+      }
+    else
+      if mask.is_a?(Symbol) && blocking
+        raise ArgumentError, 'cannot look for event by type and block'
+      end
+
+      if mask && mask.is_a?(Symbol)
+        C::XCheckTypedWindowEvent(display.to_ffi, to_ffi, Event.index(mask), event) or return
+      else
+        old  = reported_events
+        mask = Mask::Event.all if mask.nil?
+
+        self.reported_events += mask unless reported_events.has?(mask)
+
+        if blocking == false
+          C::XCheckWindowEvent(display.to_ffi, to_ffi, mask.to_ffi, event) or return
+        else
+          C::XWindowEvent(display.to_ffi, to_ffi, mask.to_ffi, event)
+        end
+
+        self.reported_events = old
+      end
+    end
 
     Event.new(event)
   end
+
+  namedic :mask, :delete, :blocking?, :alias => { :type => :mask }, :optional => { :delete => true }
+  def each_event (mask=nil, delete=true, blocking=nil, &block)
+    return unless block
+
+    catch(:skip) {
+      loop {
+        next_event(mask, delete, blocking).tap {|event|
+          if !event
+            return if blocking == false
+            next
+          end
+
+          block.call event
+        }
+      }
+    }
+  end
+
 
   def inspect
     begin

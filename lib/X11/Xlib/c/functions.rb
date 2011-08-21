@@ -61,6 +61,7 @@ attach_function :XChangeProperty, [:pointer, :Window, :Atom, :Atom, :int, :int, 
 attach_function :XDeleteProperty, [:pointer, :Window, :Atom], :int
 attach_function :XTranslateCoordinates, [:pointer, :Window, :Window, :int, :int, :pointer, :pointer, :pointer], :Bool
 
+attach_function :XSelectInput, [:pointer, :Window, :long], :int
 attach_function :XAllowEvents, [:pointer, :int, :Time], :int
 attach_function :XNextEvent, [:pointer, :pointer], :int
 attach_function :XPeekEvent, [:pointer, :pointer], :int
@@ -71,7 +72,8 @@ attach_function :XIfEvent, [:pointer, :pointer, :pointer, :pointer], :int
 attach_function :XPeekIfEvent, [:pointer, :pointer, :pointer, :pointer], :int
 attach_function :XCheckIfEvent, [:pointer, :pointer, :pointer, :pointer], :Bool
 attach_function :XWindowEvent, [:pointer, :Window, :long, :pointer], :int
-
+attach_function :XCheckWindowEvent, [:pointer, :Window, :long, :pointer], :Bool
+attach_function :XCheckTypedWindowEvent, [:pointer, :Window, :int, :pointer], :Bool
 
 attach_function :XStringToKeysym, [:string], :KeySym
 attach_function :XKeysymToString, [:KeySym], :string

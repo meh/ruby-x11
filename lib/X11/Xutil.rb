@@ -26,6 +26,9 @@
 # or implied.
 #++
 
+require 'X11/Xlib'
+require 'X11/keysym'
+
 require 'X11/Xutil/c'
 
 require 'X11/Xutil/window'
