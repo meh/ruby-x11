@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::CreateNotify < X11::Event::Helper
+  mask      :StructureNotify, :SubstructureNotify
   attribute :xcreatewindow
 
   manage :parent, X11::Event::Window

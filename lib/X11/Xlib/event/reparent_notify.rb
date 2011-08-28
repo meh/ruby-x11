@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::ReparentNotify < X11::Event::Helper
+  mask      :StructureNotify, :SubstructureNotify
   attribute :xreparent
 
   manage :event, X11::Event::Window

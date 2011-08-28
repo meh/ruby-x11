@@ -27,15 +27,7 @@
 #++
 
 class X11::Event::EnterNotify < X11::Event::Helper
-  attribute :xcrossing
+  extend X11::Event::Generic::Crossing
 
-  manage :root, X11::Event::Window
-  manage :subwindow, X11::Event::Window
-  manage :time
-  manage :x
-  manage :y
-  manage :x_root
-  manage :y_root
-  manage :mode
-  manage :detail
+  mask :LeaveWindow
 end

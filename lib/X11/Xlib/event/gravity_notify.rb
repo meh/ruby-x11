@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::GravityNotify < X11::Event::Helper
+  mask      :StructureNotify, :SubstructureNotify
   attribute :xgravity
 
   manage :event, X11::Event::Window

@@ -27,16 +27,8 @@
 #++
 
 class X11::Event::MotionNotify < X11::Event::Helper
-  attribute :xmotion
+  extend X11::Event::Generic::Motion
 
-  manage :root, X11::Event::Window
-  manage :subwindow, X11::Event::Window
-  manage :time
-  manage :x
-  manage :y
-  manage :x_root
-  manage :y_root
-  manage :state
-  manage :is_hint
-  manage [:same_screen, :same_screen?]
+  mask :ButtonMotion, :Button1Motion, :Button2Motion, :Button3Motion, :Button4Motion, :Button5Motion,
+       :PointerMotion
 end

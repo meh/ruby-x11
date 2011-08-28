@@ -26,10 +26,23 @@
 # or implied.
 #++
 
-class X11::Event::CirculateNotify < X11::Event::Helper
-  mask      :StructureNotify, :SubstructureNotify
-  attribute :xcirculate
+module X11::Event::Generic::Crossing
+  def self.extended (klass)
+    klass.instance_eval {
+      attribute :xcrossing
 
-  manage :event, X11::Event::Window
-  manage :place
+      manage :root, X11::Event::Window
+      manage :subwindow, X11::Event::Window
+      manage :time
+      manage :x
+      manage :y
+      manage :x_root
+      manage :y_root
+      manage :mode
+      manage :detail
+      manage [:same_screen, :same_screen?]
+      manage [:focus, :focus?]
+      manage :state
+    }
+  end
 end

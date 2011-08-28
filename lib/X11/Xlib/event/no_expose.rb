@@ -14,6 +14,7 @@
 #++
 
 class X11::Event::NoExpose < X11::Event::Helper
+  mask      :GCGraphicsExposures
   attribute :xnoexpose
 
   manage :drawable

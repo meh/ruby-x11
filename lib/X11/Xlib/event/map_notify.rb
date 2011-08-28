@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::MapNotify < X11::Event::Helper
+  mask      :StructureNotify, :SubstructureNotify
   attribute :xmap
 
   manage :event, X11::Event::Window

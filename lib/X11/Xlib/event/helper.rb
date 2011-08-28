@@ -51,6 +51,14 @@ class Helper
     end
   end
 
+  def self.mask (*mask)
+    if mask.length > 0
+      @mask = mask.flatten.compact.uniq
+    else
+      @mask
+    end
+  end
+
   def self.attach_method (meth, &block)
     return unless block
 
@@ -115,6 +123,18 @@ class Helper
 
   def initialize (struct)
     @struct = struct
+  end
+
+  def name
+    self.class.name[/[^:]*$/].to_sym
+  end
+
+  def mask
+    self.class.mask || []
+  end
+
+  def attribute
+    self.class.attribute
   end
 
   def to_ffi

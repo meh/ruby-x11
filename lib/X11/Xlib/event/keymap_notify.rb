@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::KeymapNotify < X11::Event::Helper
+  mask      :KeymapState
   attribute :xkeymap
 
   manage :key_vector, lambda { |v| v.to_a }, lambda {|v|

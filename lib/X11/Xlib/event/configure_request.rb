@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::ConfigureRequest < X11::Event::Helper
+  mask      :SubstructureRedirect
   attribute :xconfigurerequest
 
   manage :parent, X11::Event::Window

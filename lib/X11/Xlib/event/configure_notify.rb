@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::ConfigureNotify < X11::Event::Helper
+  mask      :StructureNotify, :SubstructureNotify
   attribute :xconfigure
 
   manage :event, X11::Event::Window

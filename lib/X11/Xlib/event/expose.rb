@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::Expose < X11::Event::Helper
+  mask      :Exposure
   attribute :xexpose
 
   manage :x

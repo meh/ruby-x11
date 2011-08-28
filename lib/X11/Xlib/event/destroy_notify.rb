@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::DestroyNotify < X11::Event::Helper
+  mask      :StructureNotify, :SubstructureNotify
   attribute :xdestroywindow
 
   manage :event, X11::Event::Window

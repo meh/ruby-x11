@@ -38,8 +38,8 @@ class Display
     while target.nil? || !buttons.zero?
       allow_events Event::Mode::SyncPointer
 
-      case (event = root_window.next_event Mask::Event[:ButtonPress, :ButtonRelease])
-        when Event::ButtonPress
+      case (event = root_window.next_event [:ButtonPress, :ButtonRelease]).name
+        when :ButtonPress
           if target.nil?
             target = event.subwindow
 
@@ -50,7 +50,7 @@ class Display
 
           buttons += 1
 
-        when Event::ButtonRelease
+        when :ButtonRelease
           buttons -= 1 if buttons > 0
       end
     end

@@ -28,16 +28,7 @@
 #++
 
 class X11::Event::KeyRelease < X11::Event::Helper
-  attribute :xkey
+  extend X11::Event::Generic::Key
 
-  manage :root, X11::Event::Window
-  manage :subwindow, X11::Event::Window
-  manage :time
-  manage :x
-  manage :y
-  manage :x_root
-  manage :y_root
-  manage :state
-  manage :keycode
-  manage [:same_screen, :same_screen?]
+  mask :KeyRelease
 end

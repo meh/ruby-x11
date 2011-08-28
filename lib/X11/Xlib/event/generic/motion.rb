@@ -26,10 +26,21 @@
 # or implied.
 #++
 
-class X11::Event::CirculateNotify < X11::Event::Helper
-  mask      :StructureNotify, :SubstructureNotify
-  attribute :xcirculate
+module X11::Event::Generic::Motion
+  def self.extended (klass)
+    klass.instance_eval {
+      attribute :xmotion
 
-  manage :event, X11::Event::Window
-  manage :place
+      manage :root, X11::Event::Window
+      manage :subwindow, X11::Event::Window
+      manage :time
+      manage :x
+      manage :y
+      manage :x_root
+      manage :y_root
+      manage :state
+      manage [:is_hint, :is_hint?]
+      manage [:same_screen, :same_screen?]
+    }
+  end
 end

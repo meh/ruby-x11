@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::ResizeRequest < X11::Event::Helper
+  mask      :ResizeRedirect
   attribute :xresizerequest
 
   manage :width

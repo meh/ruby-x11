@@ -27,8 +27,7 @@
 #++
 
 class X11::Event::FocusOut < X11::Event::Helper
-  attribute :xfocus
+  extend X11::Event::Generic::FocusChange
 
-  manage :mode
-  manage :detail
+  mask :FocusChange
 end

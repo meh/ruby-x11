@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::UnmapNotify < X11::Event::Helper
+  mask      :StructureNotify, :SubstructureNotify
   attribute :xunmap
 
   manage :event, X11::Event::Window

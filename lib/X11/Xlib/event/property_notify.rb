@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::PropertyNotify < X11::Event::Helper
+  mask      :PropertyChange
   attribute :xproperty
 
   manage :atom

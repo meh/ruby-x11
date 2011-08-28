@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::GraphicsExpose < X11::Event::Helper
+  mask      :GCGraphicsExposures
   attribute :xnoexpose
 
   manage :serial

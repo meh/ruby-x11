@@ -27,5 +27,7 @@
 #++
 
 class X11::Event::EnterNotify < X11::Event::Helper
-  attribute :xcrossing
+  extend X11::Event::Generic::Crossing
+
+  mask :EnterWindow
 end

@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::MapRequest < X11::Event::Helper
+  mask      :SubstructureRedirect
   attribute :xmaprequest
 
   manage :parent, X11::Event::Window

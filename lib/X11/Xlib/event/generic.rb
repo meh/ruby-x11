@@ -26,10 +26,10 @@
 # or implied.
 #++
 
-class X11::Event::CirculateNotify < X11::Event::Helper
-  mask      :StructureNotify, :SubstructureNotify
-  attribute :xcirculate
+module X11::Event::Generic; end
 
-  manage :event, X11::Event::Window
-  manage :place
-end
+require 'X11/Xlib/event/generic/button'
+require 'X11/Xlib/event/generic/crossing'
+require 'X11/Xlib/event/generic/focus_change'
+require 'X11/Xlib/event/generic/key'
+require 'X11/Xlib/event/generic/motion'

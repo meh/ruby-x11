@@ -26,10 +26,4 @@
 # or implied.
 #++
 
-class X11::Event::CirculateNotify < X11::Event::Helper
-  mask      :StructureNotify, :SubstructureNotify
-  attribute :xcirculate
-
-  manage :event, X11::Event::Window
-  manage :place
-end
+require 'X11/Xlib'

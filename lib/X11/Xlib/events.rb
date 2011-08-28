@@ -29,6 +29,7 @@
 X11::Events = []
 
 require 'X11/Xlib/event/helper'
+require 'X11/Xlib/event/generic'
 
 # NOTE: the require order is VITAL
 require 'X11/Xlib/event/any'

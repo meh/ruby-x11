@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::VisibilityNotify < X11::Event::Helper
+  mask      :VisibilityChange
   attribute :xvisibility
 
   manage :state

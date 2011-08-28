@@ -121,62 +121,59 @@ class Display
     C::XAllowEvents(to_ffi, mode, time)
   end
 
-  namedic :mask, :delete, :blocking?, :alias => { :type => :mask }, :optional => { :delete => true }
-  def next_event (mask=nil, delete=true, blocking=nil, &block)
-    event = FFI::MemoryPointer.new(C::XEvent)
+  def event_matches? (event, what)
+    case what
+      when Array         then what.any? { |what| event_matches?(event, what) }
+      when Symbol        then event.name == what
+      when Bitmap::Value then event.mask.any? { |name| what.has?(name) }
+      when Regexp        then event.name.to_s.match(what)
+    end
+  end
 
-    if block
-      if delete && blocking == false
-        raise ArgumentError, 'non blocking checking is only available when deleting'
+  def next_event (what=nil, options=nil, &block)
+    what, options = if what.is_a?(Hash)
+      [Mask::Event.all, what]
+    else
+      [what, options || {}]
+    end
+
+    event    = FFI::MemoryPointer.new(C::XEvent)
+    callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) do |display, event|
+      event = Event.new(event)
+
+      with event_matches?(event, what) do |ok|
+        (block && ok) ? block.call(event) : ok
       end
+    end
 
-      callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) do |display, event, _|
-        block.call Display.new(display), Event.new(event)
-      end
-
-      if blocking == false
-        C::XCheckIfEvent(to_ffi, event, callback, nil) or return
+    unless options[:blocking?] == false
+      unless options[:delete] == false
+        C::XIfEvent(to_ffi, event, callback, nil)
       else
-        if delete
-          C::XIfEvent(to_ffi, event, callback, nil)
-        else
-          C::XPeekIfEvent(to_ffi, event, callback, nil)
-        end
+        C::XPeekIfEvent(to_ffi, event, callback, nil)
       end
     else
-      if mask.is_a?(Symbol) && blocking
-        raise ArgumentError, 'cannot look for event by type and block'
+      if options[:delete] == true
+        raise ArgumentError, 'cannot delete and not block at the same time'
       end
 
-      if !mask.is_a?(Symbol) && blocking != false
-        if delete
-          if mask
-            C::XMaskEvent(to_ffi, mask.to_ffi, event)
-          else
-            C::XNextEvent(to_ffi, event)
-          end
-        else
-          C::XPeekEvent(to_ffi, event)
-        end
-      else
-        if mask.is_a?(Symbol)
-          C::XCheckTypedEvent(to_ffi, Event.index(mask), event) or return
-        else
-          C::XCheckMaskEvent(to_ffi, mask.to_ffi, event) or return
-        end
-      end
+      C::XCheckIfEvent(to_ffi, event, callback, nil) or return
     end
 
     Event.new(event)
   end
 
-  namedic :mask, :delete, :blocking?, :alias => { :type => :mask }, :optional => { :delete => true }
-  def each_event (mask=nil, delete=true, blocking=nil, &block)
+  def each_event (what=nil, options=nil, &block)
     return unless block
 
     catch(:skip) {
       loop {
-        next_event(mask, delete, blocking).tap {|event|
+        next_event(what, options).tap {|event|
+          if !event
+            return if options[:blocking] == false
+            next
+          end
+
           block.call event
         }
       }

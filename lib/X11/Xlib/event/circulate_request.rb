@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::CirculateRequest < X11::Event::Helper
+  mask      :SubstructureRedirect
   attribute :xcirculaterequest
 
   manage :event, X11::Event::Window

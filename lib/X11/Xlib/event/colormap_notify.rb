@@ -27,6 +27,7 @@
 #++
 
 class X11::Event::ColormapNotify < X11::Event::Helper
+  mask      :ColormapChange
   attribute :xcolormap
 
   manage :colormap

@@ -16,4 +16,5 @@ Gem::Specification.new {|s|
   s.add_dependency('retarded')
 	s.add_dependency('bitmap')
   s.add_dependency('namedic')
+  s.add_dependency('with')
 }
