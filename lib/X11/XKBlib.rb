@@ -26,39 +26,4 @@
 # or implied.
 #++
 
-module X11
-
-class Display
-  def select_window (frame=false)
-    return unless grab_pointer(false, Mask::Event[:ButtonPress, :ButtonRelease], :sync, :async, root_window, Cursor::Font.new(self, :crosshair))
-
-    target  = nil
-    buttons = 0
-
-    while target.nil? || !buttons.zero?
-      allow_events Event::Mode::SyncPointer
-
-      case (event = root_window.next_event([:ButtonPress, :ButtonRelease], :select => false)).name
-        when :ButtonPress
-          if target.nil?
-            target = event.subwindow
-
-            if target.nil?
-              target = root_window
-            end
-          end
-
-          buttons += 1
-
-        when :ButtonRelease
-          buttons -= 1 if buttons > 0
-      end
-    end
-
-    ungrab_pointer
-
-    frame ? target : target.client
-  end
-end
-
-end
+require 'X11/Xlib'

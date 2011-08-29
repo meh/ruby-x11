@@ -121,15 +121,6 @@ class Display
     C::XAllowEvents(to_ffi, mode, time)
   end
 
-  def event_matches? (event, what)
-    case what
-      when Array         then what.any? { |what| event_matches?(event, what) }
-      when Symbol        then event.name == what
-      when Bitmap::Value then event.mask.any? { |name| what.has?(name) }
-      when Regexp        then event.name.to_s.match(what)
-    end
-  end
-
   def next_event (what=nil, options=nil, &block)
     what, options = if what.is_a?(Hash)
       [Mask::Event.all, what]
@@ -138,13 +129,13 @@ class Display
     end
 
     event    = FFI::MemoryPointer.new(C::XEvent)
-    callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) do |display, event|
+    callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) {|_, event|
       event = Event.new(event)
 
-      with event_matches?(event, what) do |ok|
-        (block && ok) ? block.call(event) : ok
+      if event.matches?(what)
+        block ? block.call(event) : true
       end
-    end
+    }
 
     unless options[:blocking?] == false
       unless options[:delete] == false

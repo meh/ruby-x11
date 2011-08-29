@@ -137,6 +137,16 @@ class Helper
     self.class.attribute
   end
 
+  def matches? (what)
+    !!case what
+      when Array         then what.any? { |what| matches?(what) }
+      when Symbol        then name == what
+      when Bitmap::Value then mask.any? { |name| what.has?(name) }
+      when Regexp        then name.to_s.match(what)
+      when nil           then true
+    end
+  end
+
   def to_ffi
     @struct
   end

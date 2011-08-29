@@ -224,15 +224,33 @@ class Window < Drawable
   end
 
   def reported_events= (mask)
+    return unless mask.is_a?(Bitmap::Value)
+
     (@reported_events = mask).tap {
       C::XSelectInput(display.to_ffi, to_ffi, mask.to_ffi)
     }
   end; alias select_input reported_events=
 
-  def next_event (*args, &block)
-    display.next_event *args do |event|
-      event.window == self
+  def next_event (what=nil, options=nil, &block)
+    what, options = if what.is_a?(Hash)
+      [Mask::Event.all, what]
+    else
+      [what, options || {}]
     end
+
+    mask = Event.mask_for(what)
+
+    old, self.reported_events = if options[:select] != false && !reported_events.has?(mask)
+      [reported_events, mask]
+    end
+
+    display.next_event(what, options) {|event|
+      if event.window == self
+        block ? block.call(event) : true
+      end
+    }.tap {
+      self.reported_events = old if old
+    }
   end
 
   def each_event (what=nil, options=nil, &block)
@@ -255,9 +273,9 @@ class Window < Drawable
   def inspect
     begin
       with attributes do |attr|
-        "#<X11::Window: #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
+        "#<X11::Window(#{id}): #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
       end
-    rescue Exception => e
+    rescue Exception
       "#<X11::Window: invalid window>"
     end
   end

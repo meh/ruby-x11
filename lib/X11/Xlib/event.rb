@@ -59,6 +59,31 @@ class Event
 
     (Events[event[:type]] || Any).new(event)
   end
+
+  def self.mask_for (what)
+    case what
+      when Array
+        what.inject(Mask::Event[]) {|a, b| mask_for(a) + mask_for(b) }
+
+      when Symbol
+        Mask::Event[*(Events.find {|event|
+          event && event.name[/[^:]*$/].to_sym == what
+        }.mask rescue [])]
+
+      when Bitmap::Value
+        what
+
+      when Regexp
+        Mask::Event[*Events.select {|event|
+          event && event.name[/[^:]*$/].match(what)
+        }.map {|event|
+          event.mask
+        }.flatten.compact.uniq]
+      
+      when nil
+        Mask::Event.all
+    end
+  end
 end
 
 class C::XEvent

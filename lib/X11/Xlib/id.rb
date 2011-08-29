@@ -50,7 +50,7 @@ class ID
 
   def == (value)
     id == value.id
-  end
+  end; alias === ==
 
   def nil?
     to_i.zero?
@@ -65,6 +65,10 @@ class ID
 
   def to_s
     to_i.to_s(16)
+  end
+
+  def inspect
+    "#<X11::ID: #{to_i}>"
   end
 end
 
