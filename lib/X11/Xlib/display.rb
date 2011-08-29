@@ -64,14 +64,18 @@ class Display
 
   def flush
     flush! if options[:flush]
-
-    self
   end
 
   def flush!
     C::XFlush(to_ffi)
+  end
 
-    self
+  def sync! (discard=false)
+    C::XSync(to_ffi, discard)
+  end
+
+  def pending
+    C::XPending(to_ffi)
   end
 
   def screen (which)
@@ -88,6 +92,10 @@ class Display
         yield screen(i)
       }
     }
+  end
+
+  def window (id)
+    X11::Window.new(self, id.to_i)
   end
 
   def grab_pointer (*args)
@@ -128,7 +136,10 @@ class Display
       [what, options || {}]
     end
 
-    event    = FFI::MemoryPointer.new(C::XEvent)
+    event = FFI::MemoryPointer.new(C::XEvent)
+
+# this would be cool, but it's slow as hell, if anyone finds a way to optimize it, let me know
+=begin
     callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) {|_, event|
       event = Event.new(event)
 
@@ -149,6 +160,53 @@ class Display
       end
 
       C::XCheckIfEvent(to_ffi, event, callback, nil) or return
+    end
+=end
+
+    if block
+      callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) do |_, event|
+        block.call Event.new(event)
+      end
+
+      if options[:blocking?] == false
+        C::XCheckIfEvent(to_ffi, event, callback, nil) or return
+
+        if options[:delete] == false
+          C::XPutBackEvent(to_ffi, event.to_ffi)
+        end
+      else
+        if options[:delete] != false
+          C::XIfEvent(to_ffi, event, callback, nil)
+        else
+          C::XPeekIfEvent(to_ffi, event, callback, nil)
+        end
+      end
+    else
+      if what.is_a?(Symbol) && options[:blocking?] != false
+        raise ArgumentError, 'cannot look for event by type and block'
+      end
+
+      if !what.is_a?(Symbol) && options[:blocking?] != false
+        if options[:delete] != false
+          if what
+            C::XMaskEvent(to_ffi, what.to_ffi, event)
+          else
+            C::XNextEvent(to_ffi, event)
+          end
+        else
+          C::XPeekEvent(to_ffi, event)
+        end
+      else
+        if what.is_a?(Symbol)
+          C::XCheckTypedEvent(to_ffi, Event.index(what), event) or return
+        else
+          C::XCheckMaskEvent(to_ffi, what.to_ffi, event) or return
+        end
+
+        if options[:delete] == false
+          C::XPutBackEvent(to_ffi, event.to_ffi)
+        end
+      end
     end
 
     Event.new(event)

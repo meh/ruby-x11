@@ -238,6 +238,9 @@ class Window < Drawable
       [what, options || {}]
     end
 
+
+# this would be cool, but it's slow as hell, if anyone finds a way to optimize it, let me know
+=begin
     mask = Event.mask_for(what)
 
     old, self.reported_events = if options[:select] != false && !reported_events.has?(mask)
@@ -251,6 +254,60 @@ class Window < Drawable
     }.tap {
       self.reported_events = old if old
     }
+=end
+
+    event = FFI::MemoryPointer.new(C::XEvent)
+
+    if block
+      callback = FFI::Function.new(:Bool, [:pointer, :pointer, :pointer]) do |_, event| 
+        block.call Event.new(event) if event.window == self
+      end
+
+      @reported_events.tap {|old|
+        self.reported_events = Mask::Event.all unless options[:select] == false
+
+        begin
+          if options[:blocking?] == false
+            C::XCheckIfEvent(display.to_ffi, event, callback, nil) or return
+          else
+            if options[:delete] != false
+              C::XIfEvent(display.to_ffi, event, callback, nil)
+            else
+              C::XPeekIfEvent(display.to_ffi, event, callback, nil)
+            end
+          end
+        ensure
+          self.reported_events = old unless options[:select] == false
+        end
+      }
+    else
+      if what.is_a?(Symbol) && options[:blocking?] == false
+        Kernel.raise ArgumentError, 'cannot look for event by type and block'
+      end
+
+      if what.is_a?(Symbol)
+        C::XCheckTypedWindowEvent(display.to_ffi, to_ffi, Event.index(what), event) or return
+      else
+        old  = reported_events
+        what = Mask::Event.all if what.nil?
+
+        self.reported_events += what unless options[:select] == false || old.has?(what)
+
+        if options[:blocking?] == false
+          C::XCheckWindowEvent(display.to_ffi, to_ffi, what.to_ffi, event) or return
+        else
+          C::XWindowEvent(display.to_ffi, to_ffi, what.to_ffi, event)
+        end
+
+        if options[:delete] == false
+          C::XPutBackEvent(to_ffi, event.to_ffi)
+        end
+
+        self.reported_events = old unless reported_events == old
+      end
+    end
+
+    Event.new(event)
   end
 
   def each_event (what=nil, options=nil, &block)

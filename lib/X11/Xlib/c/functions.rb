@@ -35,6 +35,8 @@ attach_function :XSetErrorHandler, [:pointer], :pointer
 attach_function :XOpenDisplay, [:string], :pointer
 attach_function :XCloseDisplay, [:pointer], :int
 attach_function :XFlush, [:pointer], :int
+attach_function :XSync, [:pointer, :Bool], :void
+attach_function :XPending, [:pointer], :int
 attach_function :XGetInputFocus, [:pointer, :pointer, :pointer], :int
 attach_function :XSetInputFocus, [:pointer, :Window, :int, :Time], :int
 
@@ -74,6 +76,7 @@ attach_function :XCheckIfEvent, [:pointer, :pointer, :pointer, :pointer], :Bool
 attach_function :XWindowEvent, [:pointer, :Window, :long, :pointer], :int
 attach_function :XCheckWindowEvent, [:pointer, :Window, :long, :pointer], :Bool
 attach_function :XCheckTypedWindowEvent, [:pointer, :Window, :int, :pointer], :Bool
+attach_function :XPutBackEvent, [:pointer, :pointer], :void
 
 attach_function :XStringToKeysym, [:string], :KeySym
 attach_function :XKeysymToString, [:KeySym], :string
