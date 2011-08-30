@@ -31,6 +31,8 @@ module X11; module C
 attach_function :XFree, [:pointer], :int
 
 attach_function :XSetErrorHandler, [:pointer], :pointer
+attach_function :XSetIOErrorHandler, [:pointer], :pointer
+attach_function :XGetErrorText, [:pointer, :int, :pointer, :int], :int
 
 attach_function :XOpenDisplay, [:string], :pointer
 attach_function :XCloseDisplay, [:pointer], :int

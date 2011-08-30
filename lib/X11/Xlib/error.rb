@@ -36,18 +36,18 @@ class Error < Exception
     return super(self.class.name[/\w+$/]) unless event
 
     @type     = event[:type]
-    @display  = X11::Display.from(event[:display])
+    @display  = X11::Display.new(event[:display])
     @resource = event[:resourceid]
     @serial   = event[:serial]
     @error    = event[:error_code]
     @request  = event[:request_code]
     @minor    = event[:minor_code]
 
-    with FFI::MemoryPointer.new(512) do |string|
-      C::XGetErrorText(@display, @error, string, string.size)
+    FFI::MemoryPointer.new(512).tap {|string|
+      C::XGetErrorText(@display.to_ffi, @error, string, string.size)
 
       super(string.typecast(:string))
-    end
+    }
   end
 
   def to_sym
@@ -77,8 +77,12 @@ BadName           = Class.new(Error)
 BadLength         = Class.new(Error)
 BadImplementation = Class.new(Error)
 
-C::XSetErrorHandler(FFI::Function.new(:int, [:pointer, :pointer]) {|display, event|
+C::XSetErrorHandler(ErrorHandler = FFI::Function.new(:int, [:pointer, :pointer]) {|display, event|
   raise Error.from(C::XErrorEvent.new(event))
+})
+
+C::XSetIOErrorHandler(IOErrorHandler = FFI::Function.new(:int, [:pointer]) {|display|
+  raise IOError, 'fatal X IO error'
 })
 
 end
