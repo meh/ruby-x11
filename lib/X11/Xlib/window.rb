@@ -32,6 +32,20 @@ require 'X11/Xlib/window/properties'
 module X11
 
 class Window < Drawable
+  singleton_namedic :display, :parent, :x, :y, :width, :height, :border_width, :depth, :input_only?, :visual, :attributes, :optional => 1 .. -1, :alias => { :w => :width, :h => :height }
+  def self.create (display, parent=nil, x=nil, y=nil, width=nil, height=nil, border_width=nil, depth=nil, input_only=nil, visual=nil, attributes=nil)
+    parent       ||= display.root_window
+    x            ||= display.width / 2
+    y            ||= display.height / 2
+    width        ||= 320
+    height       ||= 200
+    border_width ||= 0
+    depth        ||= :copy
+    input_only   ||= :copy
+    visual       ||= :copy
+    attributes   ||= Attributes.new
+  end
+
   include ForwardTo
 
   attr_reader :display, :parent, :revert_to, :reported_events
@@ -42,17 +56,7 @@ class Window < Drawable
 
     @reported_events = Mask::Event[]
 
-    if nil?
-      methods.each {|name|
-        next if name.to_sym != :to_ffi && (ID.instance_method(name) rescue false)
-
-        define_singleton_method name do |*|
-          Kernel.raise X11::BadWindow
-        end
-      }
-    else
-      self.revert_to = nil
-    end
+    self.revert_to = nil
   end
 
   def parent
@@ -139,8 +143,43 @@ class Window < Drawable
 
   def raise
     C::XRaiseWindow(display.to_ffi, to_ffi)
-    
+
     display.flush
+
+    self
+  end
+
+  def map (subwindows=false)
+    if subwindows
+      C::XMapSubwindows(display.to_ffi, to_ffi)
+    else
+      C::XMapWindow(display.to_ffi, to_ffi)
+    end
+
+    display.flush
+
+    self
+  end
+
+  def unmap (subwindows=false)
+    if subwindows
+      C::XMapSubwindows(display.to_ffi, to_ffi)
+    else
+      C::XMapWindow(display.to_ffi, to_ffi)
+    end
+
+    self
+  end
+
+  def destroy (subwindows=false)
+    if subwindows
+      C::XDetroyWindow(display.to_ffi, to_ffi)
+    else
+      C::XDestroySubwindows(display.to_ffi, to_ffi)
+    end
+
+    display.flush
+    make_unusable
 
     self
   end
@@ -169,8 +208,18 @@ class Window < Drawable
   end
 
   namedic :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
-  def grab_pointer (owner_events=true, event_mask=Mask::Event[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0)
-    C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
+  def grab_pointer (owner_events=true, event_mask=Mask::Event[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0, &block)
+    result = C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
+
+    if block && result
+      begin
+        result = block.call self
+      ensure
+        ungrab_pointer
+      end
+    end
+
+    result
   end
 
   def ungrab_pointer (time=0)
@@ -332,7 +381,7 @@ class Window < Drawable
       with attributes do |attr|
         "#<X11::Window(#{id}): #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
       end
-    rescue Exception
+    rescue BadWindow
       "#<X11::Window: invalid window>"
     end
   end

@@ -98,8 +98,18 @@ class Display
     X11::Window.new(self, id.to_i)
   end
 
-  def grab_pointer (*args)
-    default_screen.root_window.grab_pointer(*args)
+  def create_window (*args)
+    if args.first.is_a?(Hash)
+      X11::Window.create(args.first.tap {|args|
+        args[:display] = self
+      })
+    else
+      X11::Window.create(self, *args)
+    end
+  end
+
+  def grab_pointer (*args, &block)
+    default_screen.root_window.grab_pointer(*args, &block)
   end
 
   def ungrab_pointer (time=0)

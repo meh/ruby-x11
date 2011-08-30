@@ -31,12 +31,16 @@ module X11; class Window < Drawable
 class Attributes
   attr_reader :window
 
-  def initialize (window, attributes)
+  def initialize (window, attributes=nil)
     @window     = window
-    @attributes = attributes.is_a?(C::XWindowAttributes) ? attributes : attributes.typecast(C::XWindowAttributes)
+    @attributes = if attributes
+      attributes.is_a?(C::XWindowAttributes) ? attributes : attributes.typecast(C::XWindowAttributes)
+    else
+      C::XWindowAttributes.new
+    end
   end
 
-  C::XWindowAttributes.layout.members.each_with_index {|name, index|
+  C::XWindowAttributes.layout.members.each {|name|
     next if respond_to? name
 
     define_method name do
@@ -82,6 +86,14 @@ class Attributes
 
   def screen
     Screen.new(window.display, @attributes[:screen])
+  end
+
+  def save
+    
+  end
+
+  def to_ffi
+    @attributes
   end
 end
 
