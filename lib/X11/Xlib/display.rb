@@ -127,7 +127,7 @@ class Display
     C::XGetInputFocus(to_ffi, window, revert)
 
     Window.new(self, window.typecast(:Window)).tap {|w|
-      w.revert_to = revert.typecast(:int)
+      w.revert_to revert.typecast(:int)
     }
   end
 

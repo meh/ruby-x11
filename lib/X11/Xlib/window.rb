@@ -48,7 +48,7 @@ class Window < Drawable
 
   include ForwardTo
 
-  attr_reader :display, :parent, :revert_to, :reported_events
+  attr_reader :display, :parent, :reported_events
   forward_to  :attributes
 
   def initialize (display, value)
@@ -56,7 +56,7 @@ class Window < Drawable
 
     @reported_events = Mask::Event[]
 
-    self.revert_to = nil
+    revert_to
   end
 
   def parent
@@ -71,11 +71,15 @@ class Window < Drawable
     Window.new(display, parent.typecast(:Window))
   end
 
-  def revert_to= (value)
+  def revert_to?
+    @revert_to
+  end
+
+  def revert_to (value=nil)
     @revert_to = if value.is_a?(Integer)
       RevertTo.key(value)
     else
-      self.revert_to = RevertTo[value] || 0
+      revert_to RevertTo[value] || 0
     end
   end
 
