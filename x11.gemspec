@@ -17,4 +17,5 @@ Gem::Specification.new {|s|
 	s.add_dependency('bitmap')
   s.add_dependency('namedic')
   s.add_dependency('with')
+  s.add_dependency('require-extra')
 }

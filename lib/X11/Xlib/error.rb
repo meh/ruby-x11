@@ -30,11 +30,13 @@ class Error < Exception
     X11::const_get(Status.new(event[:error_code]).to_sym).new(event)
   end
 
-  def self.raise (klass, message=nil)
-    @error = message ? klass.new(message) : klass
+  def self.raise (exception)
+    @error = exception
   end
 
   def self.pop
+    return unless @error
+
     @error.tap {
       @error = nil
     }
@@ -87,31 +89,12 @@ BadName           = Class.new(Error)
 BadLength         = Class.new(Error)
 BadImplementation = Class.new(Error)
 
+C::XSetErrorHandler(X11::ErrorHandler = FFI::Function.new(:int, [:pointer, :pointer]) {|display, event|
+  X11::Error.raise Error.from(C::XErrorEvent.new(event)); 1
+})
+
+C::XSetIOErrorHandler(X11::IOErrorHandler = FFI::Function.new(:int, [:pointer]) {|display|
+  X11::Error.raise IOError.new('fatal X IO error'); 1
+})
+
 end
-
-# NOTE: this is an ugly hack while we wait for FFI.raise
-module X11; module C
-  attach_function :XSetErrorHandler, [:pointer], :pointer
-  attach_function :XSetIOErrorHandler, [:pointer], :pointer
-  attach_function :XGetErrorText, [:pointer, :int, :pointer, :int], :int
-
-  refine_singleton_method :attach_function do |old, name, *rest|
-    old.call(name, *rest)
-
-    refine_singleton_method name do |old, *args, &block|
-      old.call(*args, &block).tap {
-        if error = X11::Error.pop
-          raise error
-        end
-      }
-    end
-  end
-
-  XSetErrorHandler(X11::ErrorHandler = FFI::Function.new(:int, [:pointer, :pointer]) {|display, event|
-    X11::Error.raise Error.from(C::XErrorEvent.new(event)); 1
-  })
-
-  XSetIOErrorHandler(X11::IOErrorHandler = FFI::Function.new(:int, [:pointer]) {|display|
-    X11::Error.raise IOError, 'fatal X IO error'; 1
-  })
-end; end

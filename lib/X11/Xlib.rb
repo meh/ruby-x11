@@ -31,8 +31,8 @@ require 'X11/X'
 require 'X11/Xlib/exceptions'
 require 'X11/Xlib/transform'
 
-require 'X11/Xlib/error'
 require 'X11/Xlib/c'
+require 'X11/Xlib/error'
 
 require 'X11/Xlib/display'
 require 'X11/Xlib/screen'

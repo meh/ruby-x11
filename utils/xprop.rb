@@ -70,7 +70,7 @@ end
 
 X11::Display.open(options[:display]).tap {|display|
   if options[:id]
-    display.window(options[:id])
+    display.window(options[:id].match(/^0x/i) ? options[:id].to_i(16) : options[:id].to_i)
   elsif options[:root]
     display.root_window
   else

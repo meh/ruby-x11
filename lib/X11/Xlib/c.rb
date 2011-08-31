@@ -30,6 +30,34 @@ require 'X11/extensions'
 
 module X11; module C
   ffi_lib_add 'X11'
+
+  def self.lock!;    @mutex = Mutex.new;     end
+  def self.no_lock!; @mutex = nil;           end
+  def self.lock?;    @mutex.to_bool;         end
+  def self.lock;     @mutex.lock   if lock?; end
+  def self.unlock;   @mutex.unlock if lock?; end
+
+  on_require 'thread' do
+    C.lock!
+  end
+
+  refine_singleton_method :attach_function do |old, name, *rest|
+    old.call(name, *rest)
+
+    refine_singleton_method name do |old, *args, &block|
+      C.lock
+
+      old.call(*args, &block).tap {
+        C.unlock
+
+        # NOTE: this is an ugly hack while we wait for FFI.raise
+        # NOTE: on a second thought, I think I will keep this because I need to lock anyway
+        if error = X11::Error.pop
+          raise error
+        end
+      }
+    end
+  end
 end; end
 
 require 'X11/Xlib/c/types'

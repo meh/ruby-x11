@@ -41,6 +41,14 @@ class WindowManager
     @display = display || X11::Display.open
   end
 
+  def name
+    begin
+      root.properties[:_NET_SUPPORTING_WM_CHECK].value.first.properties[:_NET_WM_NAME].value.first
+    rescue
+      Supports.raise '_NET_WM_NAME or _NET_SUPPORTING_WM_CHECK'
+    end
+  end
+
   def supports
     Supports.new(self)
   end
@@ -57,7 +65,7 @@ class WindowManager
     begin
       root.properties[:_NET_CLIENT_LIST].value
     rescue
-      raise NoMethodError, 'the current window manager does not support _NET_CLIENT_LIST, whine to the developers'
+      Supports.raise :_NET_CLIENT_LIST
     end
   end
 end
