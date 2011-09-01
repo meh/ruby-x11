@@ -26,6 +26,21 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+class X11::C::XRROutputInfo < FFI::Struct
+  layout \
+    :timestamp,      :Time,
+    :crtc,           :RRCrtc,
+    :name,           :string,
+    :nameLen,        :int,
+    :mm_width,       :ulong,
+    :mm_height,      :ulong,
+    :connection,     :Connection,
+    :subpixel_order, :SubpixelOrder,
+    :ncrtc,          :int,
+    :crtcs,          :pointer,
+    :nclone,         :int,
+    :clones,         :pointer,
+    :nmode,          :int,
+    :npreferred,     :int,
+    :modes,          :pointer
+end

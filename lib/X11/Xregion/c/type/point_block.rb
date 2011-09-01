@@ -26,6 +26,8 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+class X11::C::PointBlock < FFI::Struct
+  layout \
+		:pts, [X11::C::XPoint, 200],
+		:next, :pointer
+end

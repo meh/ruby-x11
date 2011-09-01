@@ -26,6 +26,23 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+module X11; module C
+
+attach_function :XRenderQueryExtension, [:pointer, :pointer, :pointer], :Bool
+attach_function :XRenderQueryVersion, [:pointer, :pointer, :pointer], :Status
+attach_function :XRenderQueryFormats, [:pointer], :Status
+attach_function :XRenderQuerySubpixelOrder, [:pointer, :int], :int
+attach_function :XRenderQueryPictIndexValues, [:pointer, :pointer, :pointer], :pointer
+
+attach_function :XRenderSetSubpixelOrder, [:pointer, :int, :int], :Bool
+
+attach_function :XRenderFindVisualFormat, [:pointer, :pointer], :pointer
+attach_function :XRenderFindFormat, [:pointer, :ulong, :pointer, :int], :pointer
+attach_function :XRenderFindStandardFormat, [:pointer, :int], :pointer
+
+attach_function :XRenderCreatePicture, [:pointer, :Drawable, :pointer, :ulong, :pointer], :Picture
+attach_function :XRenderChangePicture, [:pointer, :Picture, :ulong, :pointer], :void
+attach_function :XRenderSetPictureClipRectangle, [:pointer, :Picture, :int, :int, :pointer, :int], :void
+attach_function :XRenderSetPictureRegion, [:pointer, :Picture, :Region], :void
+
+end; end

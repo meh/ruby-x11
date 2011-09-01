@@ -26,6 +26,21 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+require 'X11/X'
+require 'X11/Xdefs'
+
+module FFI
+  typedef :XID, :RROutput
+  typedef :XID, :RRCrtc
+  typedef :XID, :RRMode
+end
+
+require 'X11/extensions/Xrandr/c/type/screen_size'
+require 'X11/extensions/Xrandr/c/type/mode_info'
+require 'X11/extensions/Xrandr/c/type/screen_resources'
+require 'X11/extensions/Xrandr/c/type/output_info'
+require 'X11/extensions/Xrandr/c/type/property_info'
+require 'X11/extensions/Xrandr/c/type/crtc_info'
+require 'X11/extensions/Xrandr/c/type/crtc_gamma'
+require 'X11/extensions/Xrandr/c/type/crtc_transform_attributes'
+require 'X11/extensions/Xrandr/c/type/panning'

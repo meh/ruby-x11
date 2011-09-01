@@ -26,4 +26,7 @@
 # or implied.
 #++
 
-require 'X11/Xlib'
+require 'X11/extensions/randr'
+require 'X11/extensions/Xrender'
+
+require 'X11/extensions/Xrandr/c'

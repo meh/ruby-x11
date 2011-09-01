@@ -26,6 +26,8 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+class X11::C::XSpanFix < FFI::Struct
+  layout \
+		:top,    X11::C::XSpanFix,
+		:bottom, X11::C::XSpanFix
+end

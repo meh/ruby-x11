@@ -26,6 +26,13 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+module FFI
+  typedef :ushort, :Rotation
+  typedef :ushort, :SizeID
+  typedef :ushort, :SubpixelOrder
+  typedef :ushort, :Connection
+  typedef :ushort, :XRandrRotation
+  typedef :ushort, :XRandrSizeID
+  typedef :ushort, :XRandrSubpixelOrder
+  typedef :ulong,  :XRandrModeFlags
+end

@@ -37,6 +37,7 @@ require 'X11/Xlib/c/type/window_attributes'
 require 'X11/Xlib/c/type/visual'
 require 'X11/Xlib/c/type/key_sym'
 require 'X11/Xlib/c/type/status'
+require 'X11/Xlib/c/type/point'
 
 require 'X11/Xlib/c/type/any_event'
 require 'X11/Xlib/c/type/key_event'

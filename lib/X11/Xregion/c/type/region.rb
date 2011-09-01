@@ -26,6 +26,10 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+class X11::C::XRegion < FFI::Struct
+  layout \
+		:size,     :long,
+		:numRects, :long,
+		:rects,    :pointer,
+		:extents,  X11::C::Box
+end

@@ -26,6 +26,18 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+class X11::C::XRRCrtcInfo < FFI::Struct
+  layout \
+    :timestamp, :Time,
+    :x,         :int,
+    :y,         :int,
+    :width,     :uint,
+    :height,    :uint,
+    :mode,      :RRMode,
+    :rotation,  :Rotation,
+    :noutput,   :int,
+    :outputs,   :pointer,
+    :rotations, :Rotation,
+    :npossible, :int,
+    :possible,  :pointer
+end

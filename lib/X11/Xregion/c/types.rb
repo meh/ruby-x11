@@ -26,6 +26,7 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+require 'X11/Xregion/c/type/box'
+require 'X11/Xregion/c/type/rectangle'
+require 'X11/Xregion/c/type/region'
+require 'X11/Xregion/c/type/point_block'

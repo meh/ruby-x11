@@ -90,11 +90,11 @@ BadLength         = Class.new(Error)
 BadImplementation = Class.new(Error)
 
 C::XSetErrorHandler(X11::ErrorHandler = FFI::Function.new(:int, [:pointer, :pointer]) {|display, event|
-  X11::Error.raise Error.from(C::XErrorEvent.new(event)); 1
+  Error.raise Error.from(C::XErrorEvent.new(event)); 1
 })
 
 C::XSetIOErrorHandler(X11::IOErrorHandler = FFI::Function.new(:int, [:pointer]) {|display|
-  X11::Error.raise IOError.new('fatal X IO error'); 1
+  Error.raise IOError.new('fatal X IO error'); 1
 })
 
 end

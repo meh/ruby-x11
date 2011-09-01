@@ -26,6 +26,20 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+class X11::C::XRRModeInfo < FFI::Struct
+  layout \
+    :id,         :RRMode,
+    :width,      :uint,
+    :height,     :uint,
+    :dotClock,   :ulong,
+    :hSyncStart, :uint,
+    :hSyncEnd,   :uint,
+    :hTotal,     :uint,
+    :hSkew,      :uint,
+    :vSyncStart, :uint,
+    :vSyncEnd,   :uint,
+    :vTotal,     :uint,
+    :name,       :string,
+    :nameLength, :uint,
+    :modeFlags,  :XRRModeFlags
+end

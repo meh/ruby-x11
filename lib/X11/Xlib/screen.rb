@@ -45,6 +45,14 @@ class Screen
     end
   }
 
+  def width (metric=false)
+    @screen[metric ? :mwidth : :width]
+  end
+
+  def height (metric=false)
+    @screen[metric ? :mheight : :height]
+  end
+
   def root_window
     Window.new(@display, @screen[:root])
   end

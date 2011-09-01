@@ -26,6 +26,23 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+module X11
+
+module Mask
+  PictFormat = Bitmap.new(
+    :ID        => (1 << 0),
+    :Type      => (1 << 1),
+    :Depth     => (1 << 2),
+    :Red       => (1 << 3),
+    :RedMask   => (1 << 4),
+    :Green     => (1 << 5),
+    :GreenMask => (1 << 6),
+    :Blue      => (1 << 7),
+    :BlueMask  => (1 << 8),
+    :Alpha     => (1 << 9),
+    :AlphaMask => (1 << 10),
+    :Colormap  => (1 << 11)
+  )
+end
+
+end

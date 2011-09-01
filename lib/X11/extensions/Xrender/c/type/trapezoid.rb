@@ -26,6 +26,10 @@
 # or implied.
 #++
 
-require 'X11/Xutil/c/type/region'
-require 'X11/Xutil/c/type/class_hint'
-require 'X11/Xutil/c/type/text_property'
+class X11::C::XTrapezoid < FFI::Struct
+  layout \
+		:top,    :XFixed,
+		:bottom, :XFixed,
+		:left,   X11::C::XLineFixed,
+		:right,  X11::C::XLineFixed
+end
