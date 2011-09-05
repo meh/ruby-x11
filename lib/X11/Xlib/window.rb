@@ -189,26 +189,29 @@ class Window < Drawable
   end
 
   def subwindows (deep=false)
-    result   = []
-    root     = FFI::MemoryPointer.new :Window
-    parent   = FFI::MemoryPointer.new :Window
-    number   = FFI::MemoryPointer.new :uint
-    children = FFI::MemoryPointer.new :pointer
+    Enumerator.new do |e|
+      root     = FFI::MemoryPointer.new :Window
+      parent   = FFI::MemoryPointer.new :Window
+      number   = FFI::MemoryPointer.new :uint
+      children = FFI::MemoryPointer.new :pointer
 
-    C::XQueryTree(display.to_ffi, id, root, parent, children, number)
+      C::XQueryTree(display.to_ffi, id, root, parent, children, number)
 
-    return result if children.typecast(:pointer).null?
+      return if children.typecast(:pointer).null?
 
-    children.typecast(:pointer).read_array_of(:Window, number.typecast(:uint)).each {|win|
-      with Window.new(display, win) do |win|
-        result << win
-        result << win.subwindows(true) if deep
-      end
-    }
+      children.typecast(:pointer).read_array_of(:Window, number.typecast(:uint)).each {|win|
+        with Window.new(display, win) do |win|
+          e << win
 
-    C::XFree(children.typecast(:pointer))
+          if deep
+            win.subwindows(true).each {|win|
+              e << win
+            }
+          end
+        end
+      }
 
-    result.flatten.compact
+      C::XFree(children.typecast(:pointer))
   end
 
   namedic :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1

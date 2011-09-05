@@ -28,9 +28,9 @@
 
 class X11::C::XGlyphElt8 < FFI::Struct
   layout \
-		:glyphset, :GlyphSet,
-		:chars,    :pointer,
-		:nchars,   :int,
-		:xOff,     :int,
-		:yOff,     :int
+    :glyphset, :GlyphSet,
+    :chars,    :pointer,
+    :nchars,   :int,
+    :xOff,     :int,
+    :yOff,     :int
 end

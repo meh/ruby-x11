@@ -28,7 +28,7 @@
 
 class X11::C::XCircle < FFI::Struct
   layout \
-		:x,      :XFixed,
-		:y,      :XFixed,
-		:radius, :XFixed
+    :x,      :XFixed,
+    :y,      :XFixed,
+    :radius, :XFixed
 end

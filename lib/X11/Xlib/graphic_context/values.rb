@@ -29,13 +29,13 @@
 module X11; class GraphicContext
 
 class Values
-	def initialize (hash={})
-		@struct = C::XGCValues.new
-	end
+  def initialize (hash={})
+    @struct = C::XGCValues.new
+  end
 
-	def to_ffi
-		@struct
-	end
+  def to_ffi
+    @struct
+  end
 end
 
 end; end

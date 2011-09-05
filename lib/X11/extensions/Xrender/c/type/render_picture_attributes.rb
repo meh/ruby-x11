@@ -28,17 +28,17 @@
 
 class X11::C::XRenderPictureAttributes < FFI::Struct
   layout \
-		:repeat,             :int,
-		:alpha_map,          :Picture,
-		:alpha_x_origin,     :int,
-		:alpha_y_origin,     :int,
-		:clip_x_origin,      :int,
-		:clip_y_origin,      :int,
-		:clip_mask,          :Pixmap,
-		:graphics_exposures, :Bool,
-		:subwindow_mode,     :int,
-		:poly_edge,          :int,
-		:poly_mode,          :int,
-		:dither,             :Atom,
-		:component_alpha,    :Bool
+    :repeat,             :int,
+    :alpha_map,          :Picture,
+    :alpha_x_origin,     :int,
+    :alpha_y_origin,     :int,
+    :clip_x_origin,      :int,
+    :clip_y_origin,      :int,
+    :clip_mask,          :Pixmap,
+    :graphics_exposures, :Bool,
+    :subwindow_mode,     :int,
+    :poly_edge,          :int,
+    :poly_mode,          :int,
+    :dither,             :Atom,
+    :component_alpha,    :Bool
 end

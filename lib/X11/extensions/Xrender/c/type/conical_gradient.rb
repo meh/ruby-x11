@@ -28,6 +28,6 @@
 
 class X11::C::XConicalGradient < FFI::Struct
   layout \
-		:center, X11::C::XPointFixed,
-		:angle,  :XFixed
+    :center, X11::C::XPointFixed,
+    :angle,  :XFixed
 end

@@ -28,6 +28,6 @@
 
 class X11::C::PointBlock < FFI::Struct
   layout \
-		:pts, [X11::C::XPoint, 200],
-		:next, :pointer
+    :pts, [X11::C::XPoint, 200],
+    :next, :pointer
 end

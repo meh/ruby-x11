@@ -28,8 +28,8 @@
 
 class X11::C::XFilters < FFI::Struct
   layout \
-		:nfilter, :int,
-		:filter,  :pointer,
-		:nalias,  :int,
-		:alias,   :pointer
+    :nfilter, :int,
+    :filter,  :pointer,
+    :nalias,  :int,
+    :alias,   :pointer
 end

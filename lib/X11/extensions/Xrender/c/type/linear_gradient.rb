@@ -28,6 +28,6 @@
 
 class X11::C::XLinearGradient < FFI::Struct
   layout \
-		:p1, X11::C::XPointFixed,
-		:p2, X11::C::XPointFixed
+    :p1, X11::C::XPointFixed,
+    :p2, X11::C::XPointFixed
 end

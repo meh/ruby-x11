@@ -28,9 +28,9 @@
 
 class X11::C::XIndexValue < FFI::Struct
   layout \
-		:pixel, :ulong,
-		:red,   :ushort,
-		:green, :ushort,
-		:blue,  :ushort,
-		:alpha, :ushort
+    :pixel, :ulong,
+    :red,   :ushort,
+    :green, :ushort,
+    :blue,  :ushort,
+    :alpha, :ushort
 end

@@ -28,6 +28,6 @@
 
 class X11::C::XAnimCursor < FFI::Struct
   layout \
-		:cursor, :Cursor,
-		:delay,  :ulong
+    :cursor, :Cursor,
+    :delay,  :ulong
 end

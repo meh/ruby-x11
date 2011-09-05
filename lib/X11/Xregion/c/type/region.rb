@@ -28,8 +28,8 @@
 
 class X11::C::XRegion < FFI::Struct
   layout \
-		:size,     :long,
-		:numRects, :long,
-		:rects,    :pointer,
-		:extents,  X11::C::Box
+    :size,     :long,
+    :numRects, :long,
+    :rects,    :pointer,
+    :extents,  X11::C::Box
 end

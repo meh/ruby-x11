@@ -28,6 +28,6 @@
 
 class X11::C::XPoint < FFI::Struct
   layout \
-		:x, :short,
-		:y, :short
+    :x, :short,
+    :y, :short
 end

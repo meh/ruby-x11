@@ -28,6 +28,6 @@
 
 class X11::C::XSpanFix < FFI::Struct
   layout \
-		:top,    X11::C::XSpanFix,
-		:bottom, X11::C::XSpanFix
+    :top,    X11::C::XSpanFix,
+    :bottom, X11::C::XSpanFix
 end

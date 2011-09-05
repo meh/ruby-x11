@@ -28,7 +28,7 @@
 
 class X11::C::XSpanFix < FFI::Struct
   layout \
-		:left,  :XFixed,
-		:right, :XFixed,
-		:y,     :XFixed
+    :left,  :XFixed,
+    :right, :XFixed,
+    :y,     :XFixed
 end

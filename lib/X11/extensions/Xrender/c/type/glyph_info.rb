@@ -28,10 +28,10 @@
 
 class X11::C::XGlyphInfo < FFI::Struct
   layout \
-		:width,  :ushort,
-		:height, :ushort,
-		:x,      :short,
-		:y,      :short,
-		:xOff,   :int,
-		:yOff,   :int
+    :width,  :ushort,
+    :height, :ushort,
+    :x,      :short,
+    :y,      :short,
+    :xOff,   :int,
+    :yOff,   :int
 end

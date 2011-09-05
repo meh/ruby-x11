@@ -28,6 +28,6 @@
 
 class X11::C::XPointDouble < FFI::Struct
   layout \
-		:x, :XDouble,
-		:y, :XDouble
+    :x, :XDouble,
+    :y, :XDouble
 end

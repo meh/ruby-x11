@@ -28,8 +28,8 @@
 
 class X11::C::Rectangle < FFI::Struct
   layout \
-		:x,      :short,
-		:y,      :short,
-		:width,  :short,
-		:height, :short
+    :x,      :short,
+    :y,      :short,
+    :width,  :short,
+    :height, :short
 end

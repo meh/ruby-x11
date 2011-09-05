@@ -29,22 +29,22 @@
 module X11; class GraphicContext
 
 module Functions
-	Clear        = 0x0
-	And          = 0x1
-	AndReverse   = 0x2
-	Copy         = 0x3
-	AndInverted  = 0x4
-	Noop         = 0x5
-	Xor          = 0x6
-	Or           = 0x7
-	Nor          = 0x8
-	Equiv        = 0x9
-	Invert       = 0xa
-	OrReverse    = 0xb
-	CopyInverted = 0xc
-	OrInverted   = 0xd
-	Nand         = 0xe
-	Set          = 0xf
+  Clear        = 0x0
+  And          = 0x1
+  AndReverse   = 0x2
+  Copy         = 0x3
+  AndInverted  = 0x4
+  Noop         = 0x5
+  Xor          = 0x6
+  Or           = 0x7
+  Nor          = 0x8
+  Equiv        = 0x9
+  Invert       = 0xa
+  OrReverse    = 0xb
+  CopyInverted = 0xc
+  OrInverted   = 0xd
+  Nand         = 0xe
+  Set          = 0xf
 end
 
 end; end

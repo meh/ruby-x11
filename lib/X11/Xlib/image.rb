@@ -48,17 +48,17 @@ class Image
     Image.new(C::XGetImage(drawable.display.to_ffi, drawable.to_ffi, x, y, width, height, plane_mask, format))
   end
 
-	def initialize (pointer)
+  def initialize (pointer)
     raise ArgumentError, 'you have to pass a pointer to the XImage struct' unless pointer.is_a?(FFI::Pointer)
 
     @value = pointer
 
-		ObjectSpace.define_finalizer self, self.class.finalizer(display, to_ffi)
-	end
+    ObjectSpace.define_finalizer self, self.class.finalizer(display, to_ffi)
+  end
 
-	def to_ffi
-		@value
-	end
+  def to_ffi
+    @value
+  end
 end
 
 end

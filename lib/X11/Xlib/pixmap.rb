@@ -29,10 +29,10 @@
 module X11
 
 class Pixmap < Drawable
-	module Format
-		XY = 1
-		Z  = 2
-	end
+  module Format
+    XY = 1
+    Z  = 2
+  end
 
   def self.finalizer (display, pixmap)
     proc {
@@ -41,20 +41,20 @@ class Pixmap < Drawable
   end
 
   singleton_namedic :screen, :width, :height, :depth, :optional => [:width, :height, :depth => 24]
-	def self.create (drawable, width, height, depth=24)
-		id = C::XCreatePixmap(display.to_ffi, drawable.to_ffi, width, height, depth)
+  def self.create (drawable, width, height, depth=24)
+    id = C::XCreatePixmap(display.to_ffi, drawable.to_ffi, width, height, depth)
 
     new(screen.display, id).tap {|pixmap|
-  		ObjectSpace.define_finalizer pixmap, finalizer(screen.display, pixmap.to_ffi)
+      ObjectSpace.define_finalizer pixmap, finalizer(screen.display, pixmap.to_ffi)
     }
-	end
+  end
 
-	def to_image
-	end
+  def to_image
+  end
 
-	def to_ffi
-		@value
-	end
+  def to_ffi
+    @value
+  end
 end
 
 end

@@ -28,8 +28,8 @@
 
 class X11::C::Box < FFI::Struct
   layout \
-		:x1, :short,
-		:x2, :short,
-		:y1, :short,
-		:y2, :short
+    :x1, :short,
+    :x2, :short,
+    :y1, :short,
+    :y2, :short
 end

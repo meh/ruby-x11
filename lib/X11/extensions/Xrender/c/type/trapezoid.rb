@@ -28,8 +28,8 @@
 
 class X11::C::XTrapezoid < FFI::Struct
   layout \
-		:top,    :XFixed,
-		:bottom, :XFixed,
-		:left,   X11::C::XLineFixed,
-		:right,  X11::C::XLineFixed
+    :top,    :XFixed,
+    :bottom, :XFixed,
+    :left,   X11::C::XLineFixed,
+    :right,  X11::C::XLineFixed
 end

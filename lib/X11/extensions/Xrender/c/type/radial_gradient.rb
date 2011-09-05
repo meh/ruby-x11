@@ -28,6 +28,6 @@
 
 class X11::C::XRadialGradient < FFI::Struct
   layout \
-		:inner, X11::C::XCircle,
-		:outer, X11::C::XCircle
+    :inner, X11::C::XCircle,
+    :outer, X11::C::XCircle
 end
