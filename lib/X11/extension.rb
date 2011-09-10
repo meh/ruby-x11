@@ -26,16 +26,29 @@
 # or implied.
 #++
 
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+module X11
 
-require 'X11/extensions/Xrandr/c'
+class Extension
+  @@extensions = []
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+  def self.define (name, &block)
+    @@extensions << self.new(name, &block)
+  end
 
-X11::Extension.define 'Xrandr' do |display|
-  
+  def self.list
+    @@extensions
+  end
+
+  attr_reader :name
+
+  def initialize (name, &block)
+    @name  = name
+    @block = block
+  end
+
+  def apply (display)
+    @block.call(display)
+  end
+end
+
 end

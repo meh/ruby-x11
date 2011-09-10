@@ -40,7 +40,11 @@ class Display
       raise ArgumentError, "could not connect to display #{name}" if pointer.null?
 
       Display.new(pointer, options)
-    end
+    end.tap {|display|
+      X11::Extesion.list.each {|extension|
+        extension.apply(display)
+      }
+    }
   end
 
   include ForwardTo
@@ -49,16 +53,16 @@ class Display
   forward_to  :default_screen
 
   def initialize (pointer, options={})
-    @display = pointer.is_a?(C::Display) ? pointer : C::Display.new(pointer)
+    @internal = pointer.is_a?(C::Display) ? pointer : C::Display.new(pointer)
 
     @options = {
       :flush => true
     }.merge(options || {})
   end
 
-  C::Display.layout.members.each_with_index {|name, index|
+  C::Display.layout.members.each {|name|
     define_method name do
-      @display[name]
+      @internal[name]
     end
   }
 
@@ -79,16 +83,16 @@ class Display
   end
 
   def screen (which)
-    Screen.new(self, @display[:screens] + (which * C::Screen.size))
+    Screen.new(self, @internal[:screens] + (which * C::Screen.size))
   end
 
   def default_screen
-    screen(@display[:default_screen])
+    screen(@internal[:default_screen])
   end
 
   def screens
     Enumerator.new {
-      (0 ... @display[:nscreens]).map {|i|
+      (0 ... @internal[:nscreens]).map {|i|
         yield screen(i)
       }
     }
@@ -252,7 +256,7 @@ class Display
   end
 
   def to_ffi
-    @display.pointer
+    @internal.pointer
   end
 end
 

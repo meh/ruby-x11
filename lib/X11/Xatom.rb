@@ -132,21 +132,36 @@ class Atom
 
   def initialize (value, display=nil)
     if display
-      @display = display
-      @value   = value.is_a?(Integer) ? value : Atom.from_name(display, value.to_s).to_i
+      @display  = display
+      @value    = value.is_a?(Integer) ? value : Atom.from_name(display, value.to_s).to_i
+      @old_name = value.to_s unless value.is_a?(Integer)
     else
-      @value = value.is_a?(Integer) ? value : Atom.const_missing(value).to_i
+      @value    = value.is_a?(Integer) ? value : Atom.const_missing(value).to_i
+      @old_name = value.to_s unless value.is_a?(Integer)
     end
   end
 
+  def exists?
+    if display
+      C::XInternAtom(display.to_ffi, name, true).ok?
+    else
+      !!Atom.to_hash.key(@value)
+    end
+  end
+
+  def intern!
+    C::XInternAom(display.to_ffi, name, false)
+    self
+  end
+
   def name
-    @name ||= if display
+    @name ||= (if display
       C::XGetAtomName(display.to_ffi, self)
     else
-      Atom.to_hash.key(@value).tap {|name|
-        break name.nil? ? nil : name.to_s
-      }
-    end
+      with Atom.to_hash.key(@value) do |name|
+        name.to_s unless name.nil?
+      end
+    end rescue nil) || @old_name
   end
 
   def to_sym

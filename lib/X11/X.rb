@@ -32,6 +32,7 @@ require 'X11/X/c'
 
 module X11
 
+None           = 0
 AnyProperty    = 0
 CopyFromParent = 0
 

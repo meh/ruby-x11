@@ -26,16 +26,29 @@
 # or implied.
 #++
 
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+require 'X11/extensions/Xrandr/output/info'
 
-require 'X11/extensions/Xrandr/c'
+module X11; module Xrandr
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+class Crtc < ID
+  extend Forwardable
 
-X11::Extension.define 'Xrandr' do |display|
-  
+  attr_reader    :resources
+  def_delegators :@resources, :screen
+
+  def initialize (resources, id)
+    super(resources.screen.display, id)
+
+    @resources = resources
+  end
+
+  def info
+    Crtc::Info.get(self)
+  end
+
+  def gamma
+    Crtc::Gamma.get(self)
+  end
 end
+
+end; end

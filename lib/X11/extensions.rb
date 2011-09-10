@@ -79,6 +79,8 @@ end
 module ForwardTo
   def self.included (what)
     what.instance_eval {
+      extend Forwardable
+
       @__forward_to__ = []
 
       def self.forward_to (*what)
@@ -116,3 +118,5 @@ end
 module X11; module C
   extend FFI::Library
 end; end
+
+require 'X11/extension'

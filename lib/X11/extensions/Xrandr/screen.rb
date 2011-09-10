@@ -26,16 +26,18 @@
 # or implied.
 #++
 
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+module X11
 
-require 'X11/extensions/Xrandr/c'
+class Screen
+  forward_to :resources
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+  def resources
+    Xrandr::ScreenResources.new(self, if C::respond_to?(:XRRGetScreenResourcesCurrent)
+      C::XRRGetScreenResourcesCurrent(display.to_ffi, root_window.to_ffi)
+    else
+      C::XRRGetScreenResources(display.to_ffi, root_window.to_ffi)
+    end)
+  end
+end
 
-X11::Extension.define 'Xrandr' do |display|
-  
 end

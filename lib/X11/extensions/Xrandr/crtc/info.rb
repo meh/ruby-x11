@@ -26,16 +26,41 @@
 # or implied.
 #++
 
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+module X11; module Xrandr; class Crtc < ID
 
-require 'X11/extensions/Xrandr/c'
+class Info
+  def self.finalizer (pointer)
+    proc {
+      C::XRRFreeCrtcInfo(pointer)
+    }
+  end
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+  def self.get (crtc)
+    new(crtc, C::XRRGetCrtcInfo(crtc.display.to_ffi, crtc.resources.to_ffi, crtc.to_ffi)).tap {|info|
+      ObjectSpace.define_finalizer info, finalizer(info.to_ffi)
+    }
+  end
 
-X11::Extension.define 'Xrandr' do |display|
-  
+  attr_reader :crtc
+
+  def initialize (crtc, pointer)
+    @crtc     = crtc
+    @internal = pointer.is_a?(C::XRRCrtcInfo) ? pointer : C::XRRCrtcInfo.new(pointer)
+  end
+
+  C::XRRCrtcInfo.layout.members.each {|name|
+    define_method name do
+      @internal[name]
+    end
+  }
+
+  def crtc
+    Crtc.new(output.resources, @internal[:crtc])
+  end
+
+  def to_ffi
+    @internal.pointer
+  end
 end
+
+end; end

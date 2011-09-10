@@ -26,16 +26,55 @@
 # or implied.
 #++
 
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+module X11; module Xrandr; class Crtc < ID
 
-require 'X11/extensions/Xrandr/c'
+class Gamma
+  def self.finalizer (pointer)
+    proc {
+      C::XRRFreeCrtcGamma(pointer)
+    }
+  end
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+  def self.get (crtc)
+    new(crtc, C::XRRGetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi)).tap {|gamma|
+      ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
+    }
+  end
 
-X11::Extension.define 'Xrandr' do |display|
-  
+  def self.create (crtc)
+    new(crtc, C::XRRAllocGamma(C::XRRGetCrtcGammaSize(crtc.display.to_ffi, crtc.to_ffi))).tap {|gamma|
+      ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
+    }
+  end
+
+  attr_reader :crtc
+
+  def initialize (crtc, pointer)
+    @crtc     = crtc
+    @internal = pointer.is_a?(C::XRRCrtcInfo) ? pointer : C::XRRCrtcInfo.new(pointer)
+  end
+
+  def size
+    @internal[:size]
+  end
+
+  [:red, :green, :blue].each {|name|
+    define_method name do
+      @internal[name].read_array_of(:ushort, size)
+    end
+  }
+
+  def crtc
+    Crtc.new(output.resources, @internal[:crtc])
+  end
+
+  def save!
+    C::XRRSetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi, to_ffi)
+  end
+
+  def to_ffi
+    @internal.pointer
+  end
 end
+
+end; end

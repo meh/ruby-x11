@@ -26,50 +26,80 @@
 # or implied.
 #++
 
-module X11
+module X11; module Xrandr; class Output < ID
 
-class ID
-  class << self
-    alias [] new
+class Info
+  def self.finalizer (pointer)
+    proc {
+      C::XRRFreeOutputInfo(pointer)
+    }
   end
 
-  attr_reader :display
-
-  def initialize (display, id)
-    @display  = display
-    @internal = id.to_i
+  def self.get (output)
+    new(output, C::XRRGetOutputInfo(output.display.to_ffi, output.resources.to_ffi, output.to_ffi).tap {|info|
+      ObjectSpace.define_finalizer info, finalizer(info.to_ffi)
+    }
   end
 
-  def id
-    @internal
+  attr_reader :output
+
+  def initialize (output, pointer)
+    @output   = output
+    @internal = pointer.is_a?(C::XRROutputInfo) ? pointer : C::XRROutputInfo.new(pointer)
   end
+
+  C::XRROutputInfo.layout.members.each {|name|
+    define_method name do
+      @internal[name]
+    end
+  }
   
-  def hash
-    "#{display.to_ffi}-#{to_ffi}"
+  alias width mm_width
+  alias height mm_height
+
+  def name
+    @internal[:name].read_bytes(@internal[:nameLen])
   end
 
-  def == (value)
-    id == value.id
-  end; alias === ==
-
-  def nil?
-    to_i.zero?
+  def crtc
+    Crtc.new(output.resources, @internal[:crtc])
   end
 
-  def ok?
-    !nil?
+  def crtcs
+    Enumerator.new do |e|
+      @internal[:crtcs].read_array_of(:RRCrtc, @internal[:ncrtc]).each {|crtc|
+        e << Crtc.new(self, crtc)
+      }
+    end
   end
 
-  alias to_i id
-  alias to_ffi to_i
-
-  def to_s
-    to_i.to_s(16)
+  def clones
+    Enumerator.new do |e|
+      @internal[:clones].read_array_of(:RROutput, @internal[:nclone]).each {|clone|
+        e << Output.new(self, clone)
+      }
+    end
   end
 
-  def inspect
-    "#<X11::ID: #{to_i}>"
+  def modes
+    Enumerator.new do |e|
+      @internal[:modes].read_array_of(:RRMode, @internal[:nmode]).each {|mode|
+        e << Mode.new(self, mode)
+      }
+    end
+  end
+
+  def preferred
+    Enumerator.new do |e|
+      @internal[:modes].read_array_of(:RRMode, @internal[:npreferred]).each {|mode|
+        e << Mode.new(self, mode)
+      }
+    end
+  end
+
+  def to_ffi
+    @internal.pointer
   end
 end
 
-end
+end; end
