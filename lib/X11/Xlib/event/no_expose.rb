@@ -7,17 +7,17 @@
 # ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # The views and conclusions contained in the software and documentation are those of the
 # authors and should not be interpreted as representing official policies, either expressed
 # or implied.
 #++
 
 class X11::Event::NoExpose < X11::Event::Helper
-  mask      :GCGraphicsExposures
-  attribute :xnoexpose
+	mask      :GCGraphicsExposures
+	attribute :xnoexpose
 
-  manage :drawable
-  manage :major_code
-  manage :minor_code
+	manage :drawable
+	manage :major_code
+	manage :minor_code
 end

@@ -29,53 +29,53 @@
 module X11; module Xrandr
 
 class ScreenResources
-  extend Forwardable
+	extend Forwardable
 
-  attr_reader    :screen
-  def_delegators :@screen, :display
+	attr_reader    :screen
+	def_delegators :@screen, :display
 
-  def initialize (screen, pointer)
-    @screen   = screen
-    @internal = pointer.is_a?(C::XRRScreenResources) ? pointer : C::XRRScreenResources.new(pointer)
-  end
+	def initialize (screen, pointer)
+		@screen   = screen
+		@internal = pointer.is_a?(C::XRRScreenResources) ? pointer : C::XRRScreenResources.new(pointer)
+	end
 
-  C::XRRScreenResources.layout.members.each {|name|
-    define_method name do
-      @internal[name]
-    end
-  }
+	C::XRRScreenResources.layout.members.each {|name|
+		define_method name do
+			@internal[name]
+		end
+	}
 
-  def crtcs
-    Enumerator.new do |e|
-      @internal[:crtcs].read_array_of(:RRCrtc, @internal[:ncrtc]).each {|crtc|
-        e << Crtc.new(self, crtc)
-      }
-    end
-  end
+	def crtcs
+		Enumerator.new do |e|
+			@internal[:crtcs].read_array_of(:RRCrtc, @internal[:ncrtc]).each {|crtc|
+				e << Crtc.new(self, crtc)
+			}
+		end
+	end
 
-  def outputs
-    Enumerator.new do |e|
-      @internal[:outputs].read_array_of(:RROutput, @internal[:noutput]).each {|output|
-        e << Output.new(self, output)
-      }
-    end
-  end
+	def outputs
+		Enumerator.new do |e|
+			@internal[:outputs].read_array_of(:RROutput, @internal[:noutput]).each {|output|
+				e << Output.new(self, output)
+			}
+		end
+	end
 
-  def modes
-    Enumerator.new do |e|
-      @internal[:modes].read_array_of(:RRMode, @internal[:nmode]).each {|mode|
-        e << Mode.new(self, mode)
-      }
-    end
-  end
+	def modes
+		Enumerator.new do |e|
+			@internal[:modes].read_array_of(:RRMode, @internal[:nmode]).each {|mode|
+				e << Mode.new(self, mode)
+			}
+		end
+	end
 
-  def preferred
-    Enumerator.new do |e|
-      @internal[:modes].read_array_of(:RRMode, @internal[:npreferred]).each {|mode|
-        e << Mode.new(self, mode)
-      }
-    end
-  end
+	def preferred
+		Enumerator.new do |e|
+			@internal[:modes].read_array_of(:RRMode, @internal[:npreferred]).each {|mode|
+				e << Mode.new(self, mode)
+			}
+		end
+	end
 end
 
 end; end

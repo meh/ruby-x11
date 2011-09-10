@@ -1,16 +1,16 @@
 #--
 # Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
-# 
+#
 # Redistribution and use in source and binary forms, with or without modification, are
 # permitted provided that the following conditions are met:
-# 
+#
 #    1. Redistributions of source code must retain the above copyright notice, this list of
 #       conditions and the following disclaimer.
-# 
+#
 #    2. Redistributions in binary form must reproduce the above copyright notice, this list
 #       of conditions and the following disclaimer in the documentation and/or other materials
 #       provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY meh ''AS IS'' AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 # FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL meh OR
@@ -20,7 +20,7 @@
 # ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # The views and conclusions contained in the software and documentation are those of the
 # authors and should not be interpreted as representing official policies, either expressed
 # or implied.
@@ -32,42 +32,42 @@ require 'X11/window_manager/desktops'
 module X11
 
 class WindowManager
-  extend Forwardable
+	extend Forwardable
 
-  attr_reader   :display
-  def_delegator :@display, :root_window, :root
+	attr_reader   :display
+	def_delegator :@display, :root_window, :root
 
-  def initialize (display=nil)
-    @display = display || X11::Display.open
-  end
+	def initialize (display=nil)
+		@display = display || X11::Display.open
+	end
 
-  def name
-    begin
-      root.properties[:_NET_SUPPORTING_WM_CHECK].value.first.properties[:_NET_WM_NAME].value.first
-    rescue
-      Supports.raise '_NET_WM_NAME or _NET_SUPPORTING_WM_CHECK'
-    end
-  end
+	def name
+		begin
+			root.properties[:_NET_SUPPORTING_WM_CHECK].value.first.properties[:_NET_WM_NAME].value.first
+		rescue
+			Supports.raise '_NET_WM_NAME or _NET_SUPPORTING_WM_CHECK'
+		end
+	end
 
-  def supports
-    Supports.new(self)
-  end
+	def supports
+		Supports.new(self)
+	end
 
-  def desktops
-    Desktops.new(self)
-  end
+	def desktops
+		Desktops.new(self)
+	end
 
-  def supports? (what)
-    supports.has?(what)
-  end
+	def supports? (what)
+		supports.has?(what)
+	end
 
-  def clients
-    begin
-      root.properties[:_NET_CLIENT_LIST].value
-    rescue
-      Supports.raise :_NET_CLIENT_LIST
-    end
-  end
+	def clients
+		begin
+			root.properties[:_NET_CLIENT_LIST].value
+		rescue
+			Supports.raise :_NET_CLIENT_LIST
+		end
+	end
 end
 
 end

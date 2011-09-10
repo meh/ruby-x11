@@ -1,16 +1,16 @@
 #--
 # Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
-# 
+#
 # Redistribution and use in source and binary forms, with or without modification, are
 # permitted provided that the following conditions are met:
-# 
+#
 #    1. Redistributions of source code must retain the above copyright notice, this list of
 #       conditions and the following disclaimer.
-# 
+#
 #    2. Redistributions in binary form must reproduce the above copyright notice, this list
 #       of conditions and the following disclaimer in the documentation and/or other materials
 #       provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY meh ''AS IS'' AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 # FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL meh OR
@@ -20,7 +20,7 @@
 # ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # The views and conclusions contained in the software and documentation are those of the
 # authors and should not be interpreted as representing official policies, either expressed
 # or implied.
@@ -29,52 +29,52 @@
 module X11; module Xrandr; class Crtc < ID
 
 class Gamma
-  def self.finalizer (pointer)
-    proc {
-      C::XRRFreeCrtcGamma(pointer)
-    }
-  end
+	def self.finalizer (pointer)
+		proc {
+			C::XRRFreeCrtcGamma(pointer)
+		}
+	end
 
-  def self.get (crtc)
-    new(crtc, C::XRRGetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi)).tap {|gamma|
-      ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
-    }
-  end
+	def self.get (crtc)
+		new(crtc, C::XRRGetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi)).tap {|gamma|
+			ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
+		}
+	end
 
-  def self.create (crtc)
-    new(crtc, C::XRRAllocGamma(C::XRRGetCrtcGammaSize(crtc.display.to_ffi, crtc.to_ffi))).tap {|gamma|
-      ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
-    }
-  end
+	def self.create (crtc)
+		new(crtc, C::XRRAllocGamma(C::XRRGetCrtcGammaSize(crtc.display.to_ffi, crtc.to_ffi))).tap {|gamma|
+			ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
+		}
+	end
 
-  attr_reader :crtc
+	attr_reader :crtc
 
-  def initialize (crtc, pointer)
-    @crtc     = crtc
-    @internal = pointer.is_a?(C::XRRCrtcInfo) ? pointer : C::XRRCrtcInfo.new(pointer)
-  end
+	def initialize (crtc, pointer)
+		@crtc     = crtc
+		@internal = pointer.is_a?(C::XRRCrtcInfo) ? pointer : C::XRRCrtcInfo.new(pointer)
+	end
 
-  def size
-    @internal[:size]
-  end
+	def size
+		@internal[:size]
+	end
 
-  [:red, :green, :blue].each {|name|
-    define_method name do
-      @internal[name].read_array_of(:ushort, size)
-    end
-  }
+	[:red, :green, :blue].each {|name|
+		define_method name do
+			@internal[name].read_array_of(:ushort, size)
+		end
+	}
 
-  def crtc
-    Crtc.new(output.resources, @internal[:crtc])
-  end
+	def crtc
+		Crtc.new(output.resources, @internal[:crtc])
+	end
 
-  def save!
-    C::XRRSetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi, to_ffi)
-  end
+	def save!
+		C::XRRSetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi, to_ffi)
+	end
 
-  def to_ffi
-    @internal.pointer
-  end
+	def to_ffi
+		@internal.pointer
+	end
 end
 
 end; end

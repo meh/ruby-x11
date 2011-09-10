@@ -1,16 +1,16 @@
 #--
 # Copyleft meh. [http://meh.paranoid.pk | meh@paranoici.org]
-# 
+#
 # Redistribution and use in source and binary forms, with or without modification, are
 # permitted provided that the following conditions are met:
-# 
+#
 #    1. Redistributions of source code must retain the above copyright notice, this list of
 #       conditions and the following disclaimer.
-# 
+#
 #    2. Redistributions in binary form must reproduce the above copyright notice, this list
 #       of conditions and the following disclaimer in the documentation and/or other materials
 #       provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY meh ''AS IS'' AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 # FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL meh OR
@@ -20,7 +20,7 @@
 # ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # The views and conclusions contained in the software and documentation are those of the
 # authors and should not be interpreted as representing official policies, either expressed
 # or implied.
@@ -29,34 +29,34 @@
 module X11
 
 class Display
-  def select_window (frame=false)
-    grab_pointer false, Mask::Event[:ButtonPress, :ButtonRelease], :sync, :async, root_window, Cursor::Font.new(self, :crosshair) do
-      target  = nil
-      buttons = 0
-      
-      while target.nil? || !buttons.zero?
-        allow_events Event::Mode::SyncPointer
+	def select_window (frame=false)
+		grab_pointer false, Mask::Event[:ButtonPress, :ButtonRelease], :sync, :async, root_window, Cursor::Font.new(self, :crosshair) do
+			target  = nil
+			buttons = 0
 
-        case (event = root_window.next_event(Mask::Event[:ButtonPress, :ButtonRelease], :select => false)).name
-          when :ButtonPress
-            if target.nil?
-              target = event.subwindow
+			while target.nil? || !buttons.zero?
+				allow_events Event::Mode::SyncPointer
 
-              if target.nil?
-                target = root_window
-              end
-            end
+				case (event = root_window.next_event(Mask::Event[:ButtonPress, :ButtonRelease], :select => false)).name
+					when :ButtonPress
+						if target.nil?
+							target = event.subwindow
 
-            buttons += 1
+							if target.nil?
+								target = root_window
+							end
+						end
 
-          when :ButtonRelease
-            buttons -= 1 if buttons > 0
-        end
-      end
+						buttons += 1
 
-      frame ? target : target.client
-    end
-  end
+					when :ButtonRelease
+						buttons -= 1 if buttons > 0
+				end
+			end
+
+			frame ? target : target.client
+		end
+	end
 end
 
 end
