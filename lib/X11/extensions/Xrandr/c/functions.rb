@@ -74,14 +74,14 @@ attach_function :XRRGetOutputProperty, [:pointer, :RROutput, :Atom, :long, :long
 
 attach_function :XRRAllocModeInfo, [:pointer, :int], :pointer
 attach_function :XRRCreateMode, [:pointer, :Window, :pointer], :RRMode
-attach_function :XRRDestroyMode, [:pointer, :RRMode] :void
+attach_function :XRRDestroyMode, [:pointer, :RRMode], :void
 attach_function :XRRAddOutputMode, [:pointer, :RROutput, :RRMode], :void
 attach_function :XRRDeleteOutputMode, [:pointer, :RROutput, :RRMode], :void
 attach_function :XRRFreeModeInfo, [:pointer], :void
 
-attach_function :XRRGetCrtcInfo, [:pointer, :poiter, :RRCrtc]
+attach_function :XRRGetCrtcInfo, [:pointer, :pointer, :RRCrtc], :pointer
 attach_function :XRRFreeCrtcInfo, [:pointer], :void
-attach_function :XRRSetCrtcConfig, [:pointer, :poiner, :RRCrtc, :Time, :int, :int, :RRMode, :Rotation, :pointer, :int], :Status
+attach_function :XRRSetCrtcConfig, [:pointer, :pointer, :RRCrtc, :Time, :int, :int, :RRMode, :Rotation, :pointer, :int], :Status
 
 attach_function :XRRGetCrtcGammaSize, [:pointer, :RRCrtc], :int
 attach_function :XRRGetCrtcGamma, [:pointer, :RRCrtc], :pointer

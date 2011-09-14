@@ -33,6 +33,8 @@ module FFI
 	typedef :XID, :RROutput
 	typedef :XID, :RRCrtc
 	typedef :XID, :RRMode
+
+	typedef :ulong, :XRRModeFlags
 end
 
 require 'X11/extensions/Xrandr/c/type/screen_size'

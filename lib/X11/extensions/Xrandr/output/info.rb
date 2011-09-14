@@ -36,7 +36,7 @@ class Info
 	end
 
 	def self.get (output)
-		new(output, C::XRRGetOutputInfo(output.display.to_ffi, output.resources.to_ffi, output.to_ffi).tap {|info|
+		new(output, C::XRRGetOutputInfo(output.display.to_ffi, output.resources.to_ffi, output.to_ffi)).tap {|info|
 			ObjectSpace.define_finalizer info, finalizer(info.to_ffi)
 		}
 	end
@@ -102,4 +102,4 @@ class Info
 	end
 end
 
-end; end
+end; end; end

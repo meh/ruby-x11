@@ -26,31 +26,5 @@
 # or implied.
 #++
 
-module FFI
-	typedef :int, :XFixed
-	typedef :double, :XDouble
-end
-
-require 'X11/extensions/Xrender/c/type/render_direct_format'
-require 'X11/extensions/Xrender/c/type/render_pict_format'
-require 'X11/extensions/Xrender/c/type/render_picture_attributes'
-require 'X11/extensions/Xrender/c/type/render_color'
-require 'X11/extensions/Xrender/c/type/glyph_info'
-require 'X11/extensions/Xrender/c/type/glyph_elt8'
-require 'X11/extensions/Xrender/c/type/glyph_elt16'
-require 'X11/extensions/Xrender/c/type/glyph_elt32'
-require 'X11/extensions/Xrender/c/type/point_double'
-require 'X11/extensions/Xrender/c/type/point_fixed'
-require 'X11/extensions/Xrender/c/type/line_fixed'
-require 'X11/extensions/Xrender/c/type/triangle'
-require 'X11/extensions/Xrender/c/type/circle'
-require 'X11/extensions/Xrender/c/type/trapezoid'
-require 'X11/extensions/Xrender/c/type/transform'
-require 'X11/extensions/Xrender/c/type/filters'
-require 'X11/extensions/Xrender/c/type/index_value'
-require 'X11/extensions/Xrender/c/type/anim_cursor'
-require 'X11/extensions/Xrender/c/type/span_fix'
-require 'X11/extensions/Xrender/c/type/trap'
-require 'X11/extensions/Xrender/c/type/linear_gradient'
-require 'X11/extensions/Xrender/c/type/radial_gradient'
-require 'X11/extensions/Xrender/c/type/conical_gradient'
+require 'X11/extensions/Xrender/c/types'
+require 'X11/extensions/Xrender/c/functions'

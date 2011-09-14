@@ -58,7 +58,18 @@ class Screen
 	end
 
 	def windows
-		[root_window] + root_window.subwindows(true)
+		Enumerator.new do |e|
+			e.yield root_window
+
+			root_window.subwindows(true).each {|win|
+				e.yield win
+			}
+		end
+	end
+
+	memoize
+	def to_i
+		C::XScreenNumberOfScreen(to_ffi)
 	end
 
 	def to_ffi

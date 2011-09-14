@@ -71,6 +71,18 @@ class Window < Drawable
 		Window.new(display, parent.typecast(:Window))
 	end
 
+	namedic :parent, :x, :y, :optional => [:x, :y]
+	def reparent (parent, x=nil, y=nil)
+		position.tap {|p|
+			x ||= p.x
+			y ||= p.y
+		}
+
+		parent.tap {
+			C::XReparentWindow(display.to_ffi, to_ffi, parent.to_ffi, x, y)
+		}
+	end
+
 	def revert_to?
 		@revert_to
 	end
@@ -84,17 +96,17 @@ class Window < Drawable
 	end
 
 	def attributes
-		with FFI::MemoryPointer.new(C::XWindowAttributes) do |attr|
+		FFI::MemoryPointer.new(C::XWindowAttributes).tap! {|attr|
 			C::XGetWindowAttributes(display.to_ffi, to_ffi, attr)
 
 			Attributes.new(self, attr)
-		end
+		}
 	end
 
 	def viewable?
-		with attributes do |attr|
+		attributes.tap! {|attr|
 			!attr.input_only? && attr.viewable?
-		end
+		}
 	end
 
 	def properties
@@ -102,9 +114,9 @@ class Window < Drawable
 	end
 
 	def size
-		with attributes do |attr|
+		attributes.tap! {|attr|
 			Struct.new(:width, :height).new(attr.width, attr.height)
-		end
+		}
 	end
 
 	def position
@@ -119,10 +131,10 @@ class Window < Drawable
 
 	namedic :x, :y, :optional => [:x, :y]
 	def move (x=nil, y=nil)
-		with position do |p|
+		position.tap {|p|
 			x ||= p.x
 			y ||= p.y
-		end
+		}
 
 		C::XMoveWindow(display.to_ffi, to_ffi, x, y)
 
@@ -133,10 +145,10 @@ class Window < Drawable
 
 	namedic :width, :height, :optional => [:width, :height], :alias => { :w => :width, :h => :height }
 	def resize (width=nil, height=nil)
-		with attributes do |attr|
+		attributes.tap {|attr|
 			width  ||= attr.width
 			height ||= attr.height
-		end
+		}
 
 		C::XResizeWindow(display.to_ffi, to_ffi, width, height)
 
@@ -147,9 +159,25 @@ class Window < Drawable
 
 	def raise
 		C::XRaiseWindow(display.to_ffi, to_ffi)
-
 		display.flush
+		self
+	end
 
+	def iconify
+		C::XIconifyWindow(display.to_ffi, to_ffi, screen.to_i)
+		display.flush
+		self
+	end
+
+	def withdraw
+		C::XWithdrawWindow(display.to_ffi, to_ffi, screen.to_i)
+		display.flush
+		self
+	end
+
+	def lower
+		C::XLowerWindow(display.to_ffi, to_ffi)
+		display.flush
 		self
 	end
 
@@ -197,21 +225,22 @@ class Window < Drawable
 
 			C::XQueryTree(display.to_ffi, id, root, parent, children, number)
 
-			return if children.typecast(:pointer).null?
+			next if children.typecast(:pointer).null?
 
 			children.typecast(:pointer).read_array_of(:Window, number.typecast(:uint)).each {|win|
-				with Window.new(display, win) do |win|
-					e << win
+				Window.new(display, win).tap! {|win|
+					e.yield win
 
 					if deep
 						win.subwindows(true).each {|win|
-							e << win
+							e.yield win
 						}
 					end
-				end
+				}
 			}
 
 			C::XFree(children.typecast(:pointer))
+		end
 	end
 
 	namedic :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
@@ -385,9 +414,9 @@ class Window < Drawable
 
 	def inspect
 		begin
-			with attributes do |attr|
+			attributes.tap! {|attr|
 				"#<X11::Window(#{id}): #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
-			end
+			}
 		rescue BadWindow
 			"#<X11::Window: invalid window>"
 		end

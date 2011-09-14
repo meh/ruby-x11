@@ -28,11 +28,11 @@
 
 class X11::C::XRRCrtcTransformAttributes < FFI::Struct
 	layout \
-		:pendingTransform, XTransform,
+		:pendingTransform, X11::C::XTransform,
 		:pendingFilter,    :string,
 		:pendingNparams,   :int,
 		:pendingParams,    :pointer,
-		:currentTransform, XTransform,
+		:currentTransform, X11::C::XTransform,
 		:currentFilter,    :string,
 		:currentNparams,   :int,
 		:currentParams,    :pointer

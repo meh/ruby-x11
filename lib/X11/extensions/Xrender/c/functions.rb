@@ -28,6 +28,8 @@
 
 module X11; module C
 
+ffi_lib_add 'Xrender'
+
 attach_function :XRenderQueryExtension, [:pointer, :pointer, :pointer], :Bool
 attach_function :XRenderQueryVersion, [:pointer, :pointer, :pointer], :Status
 attach_function :XRenderQueryFormats, [:pointer], :Status
@@ -42,7 +44,7 @@ attach_function :XRenderFindStandardFormat, [:pointer, :int], :pointer
 
 attach_function :XRenderCreatePicture, [:pointer, :Drawable, :pointer, :ulong, :pointer], :Picture
 attach_function :XRenderChangePicture, [:pointer, :Picture, :ulong, :pointer], :void
-attach_function :XRenderSetPictureClipRectangle, [:pointer, :Picture, :int, :int, :pointer, :int], :void
-attach_function :XRenderSetPictureRegion, [:pointer, :Picture, :Region], :void
+attach_function :XRenderSetPictureClipRectangles, [:pointer, :Picture, :int, :int, :pointer, :int], :void
+attach_function :XRenderSetPictureClipRegion, [:pointer, :Picture, :pointer], :void
 
 end; end

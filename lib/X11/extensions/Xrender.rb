@@ -28,6 +28,7 @@
 
 require 'X11/Xlib'
 require 'X11/Xutil'
+require 'X11/Xregion'
 require 'X11/extensions/render'
 
 require 'X11/extensions/Xrender/c'

@@ -26,7 +26,9 @@
 # or implied.
 #++
 
-require 'X11/extensions/Xrandr/output/info'
+require 'X11/extensions/Xrandr/crtc/info'
+require 'X11/extensions/Xrandr/crtc/gamma'
+require 'X11/extensions/Xrandr/crtc/panning'
 
 module X11; module Xrandr
 
@@ -48,6 +50,10 @@ class Crtc < ID
 
 	def gamma
 		Crtc::Gamma.get(self)
+	end
+
+	def panning
+		Crtc::Panning.get(self)
 	end
 end
 

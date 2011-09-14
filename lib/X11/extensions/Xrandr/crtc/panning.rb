@@ -26,24 +26,49 @@
 # or implied.
 #++
 
-require 'X11/Xlib'
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+module X11; module Xrandr; class Crtc < ID
 
-require 'X11/extensions/Xrandr/c'
+class Panning
+	def self.finalizer (pointer)
+		proc {
+			C::XRRFreePanning(pointer)
+		}
+	end
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+	def self.get (crtc)
+		new(crtc, C::XRRGetPanning(crtc.display.to_ffi, crtc.resources.to_ffi, crtc.to_ffi)).tap {|panning|
+			ObjectSpace.define_finalizer panning, finalizer(panning.to_ffi)
+		}
+	end
 
-require 'X11/extensions/Xrandr/event'
+	attr_reader :crtc
 
-X11::Extension.define 'Xrandr' do |display|
-	major = FFI::MemoryPointer.new :int
-	minor = FFI::MemoryPointer.new :int
+	def initialize (crtc, pointer)
+		@crtc     = crtc
+		@internal = pointer.is_a?(C::XRRPanning) ? pointer : C::XRRPanning.new(pointer)
+	end
 
-	X11::C::XRRQueryVersion(display.to_ffi, major, minor)
+	C::XRRPanning.layout.members.each {|name|
+		define_method name do
+			@internal[name]
+		end
+	}
 
-	self.new(Struct.new(:version).new(Versionub.parse("#{major.typecast(:int)}.#{minor.typecast(:int)}")))
+	def track
+		Struct.new(:left, :top, :width, :height).new(track_left, track_top, track_width, track_height)
+	end
+
+	def border
+		Struct.new(:left, :top, :right, :bottom).new(border_left, border_top, border_right, border_bottom)
+	end
+
+	def save!
+		C::XRRSetPanning(crtc.display.to_ffi, crtc.resources.to_ffi, crtc.to_ffi, to_ffi)
+	end
+
+	def to_ffi
+		@internal.pointer
+	end
 end
+
+end; end; end

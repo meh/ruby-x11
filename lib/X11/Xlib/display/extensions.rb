@@ -26,24 +26,24 @@
 # or implied.
 #++
 
-require 'X11/Xlib'
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+module X11; class Display
 
-require 'X11/extensions/Xrandr/c'
+class Extensions < Array
+	attr_reader :display
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+	def initialize (display)
+		@display = display
+	end
 
-require 'X11/extensions/Xrandr/event'
+	def load (extension)
+		self << extension.apply(display)
+	end
 
-X11::Extension.define 'Xrandr' do |display|
-	major = FFI::MemoryPointer.new :int
-	minor = FFI::MemoryPointer.new :int
+	def available
+		Enumerator.new do |e|
 
-	X11::C::XRRQueryVersion(display.to_ffi, major, minor)
-
-	self.new(Struct.new(:version).new(Versionub.parse("#{major.typecast(:int)}.#{minor.typecast(:int)}")))
+		end
+	end
 end
+
+end; end

@@ -54,13 +54,9 @@ class Info
 		end
 	}
 
-	def crtc
-		Crtc.new(output.resources, @internal[:crtc])
-	end
-
 	def to_ffi
 		@internal.pointer
 	end
 end
 
-end; end
+end; end; end

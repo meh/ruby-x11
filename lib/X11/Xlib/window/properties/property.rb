@@ -55,14 +55,14 @@ class Property
 
 	extend Forwardable
 
-	attr_reader    :window, :atom, :value
+	attr_reader    :window, :value
 	def_delegators :@window, :display
 	def_delegators :@atom, :to_s, :to_i, :to_ffi
 	def_delegator  :@atom, :to_s, :name
 
-	def initialize (window, atom)
+	def initialize (window, name)
 		@window = window
-		@atom   = atom
+		@atom   = name
 	end
 
 	def nil?
@@ -76,7 +76,7 @@ class Property
 		after    = FFI::MemoryPointer.new :ulong
 		property = FFI::MemoryPointer.new :pointer
 
-		return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
+		return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, to_ffi,
 			0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
 		return if property.typecast(:pointer).null?
@@ -87,19 +87,52 @@ class Property
 					{ 0 => :void, 8 => :char, 16 => :short, 32 => :long }[format.typecast(:int)]), MaxLength].min)))
 	end
 
+	def value= (value, type=nil, mode=:replace)
+		format, data = Property.transform(self).input(Property::Parser.parse(self).input(
+			value.is_a?(Array) ? value : [value], type || self.type))
+	end
+
+	def << (value, type=nil)
+
+	end
+
+	def >> (value, type=nil)
+
+	end
+
 	def type
+		@type ? @type : type?
+	end
+
+	def type?
 		type     = FFI::MemoryPointer.new :Atom
 		format   = FFI::MemoryPointer.new :int
 		length   = FFI::MemoryPointer.new :ulong
 		after    = FFI::MemoryPointer.new :ulong
 		property = FFI::MemoryPointer.new :pointer
 
-		return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, atom.to_ffi,
+		return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, to_ffi,
 			0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
 		return if property.typecast(:pointer).null?
 
 		Atom.new(type.typecast(:Atom).to_i, display)
+	end
+
+	def type!
+		@type = nil
+		type?
+	end
+
+	def type= (type)
+		@type = type
+	end
+
+	def rotate (positions=1)
+		array = FFI::MemoryPointer.new(:Atom)
+		array.write(to_ffi, :Atom)
+
+		C::XRotateWindowProperties(display.to_ffi, window.to_ffi, array, 1, positions)
 	end
 
 	def inspect

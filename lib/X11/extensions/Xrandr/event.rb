@@ -26,24 +26,4 @@
 # or implied.
 #++
 
-require 'X11/Xlib'
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
-
-require 'X11/extensions/Xrandr/c'
-
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
-
-require 'X11/extensions/Xrandr/event'
-
-X11::Extension.define 'Xrandr' do |display|
-	major = FFI::MemoryPointer.new :int
-	minor = FFI::MemoryPointer.new :int
-
-	X11::C::XRRQueryVersion(display.to_ffi, major, minor)
-
-	self.new(Struct.new(:version).new(Versionub.parse("#{major.typecast(:int)}.#{minor.typecast(:int)}")))
-end
+#require 'X11/extensions/Xrandr/events'

@@ -37,13 +37,21 @@ class Output < ID
 	def_delegators :@resources, :screen
 
 	def initialize (resources, id)
-		super(resources.screen.display, id)
+		if resources.is_a?(Display)
+			super(resorces, id)
+		else
+			super(resources.screen.display, id)
 
-		@resources = resources
+			@resources = resources
+		end
 	end
 
 	def info
 		Output::Info.get(self)
+	end
+
+	def properties
+
 	end
 end
 

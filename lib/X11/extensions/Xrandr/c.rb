@@ -26,5 +26,5 @@
 # or implied.
 #++
 
-require 'X11/Xlib/c/types'
-require 'X11/Xlib/c/functions'
+require 'X11/extensions/Xrandr/c/types'
+require 'X11/extensions/Xrandr/c/functions'

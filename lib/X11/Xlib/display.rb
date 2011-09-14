@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/Xlib/display/extensions'
+
 module X11
 
 class Display
@@ -36,24 +38,25 @@ class Display
 			args
 		end
 
-		with X11::C::XOpenDisplay(name) do |pointer|
+		X11::C::XOpenDisplay(name).tap! {|pointer|
 			raise ArgumentError, "could not connect to display #{name}" if pointer.null?
 
 			Display.new(pointer, options)
-		end.tap {|display|
-			X11::Extesion.list.each {|extension|
-				extension.apply(display)
+		}.tap {|display|
+			X11::Extension.list.each {|extension|
+				display.extensions.load(extension)
 			}
 		}
 	end
 
 	include ForwardTo
 
-	attr_reader :options
+	attr_reader :options, :extensions
 	forward_to  :default_screen
 
 	def initialize (pointer, options={})
-		@internal = pointer.is_a?(C::Display) ? pointer : C::Display.new(pointer)
+		@internal   = pointer.is_a?(C::Display) ? pointer : C::Display.new(pointer)
+		@extensions = Extensions.new(self)
 
 		@options = {
 			:flush => true
@@ -65,6 +68,10 @@ class Display
 			@internal[name]
 		end
 	}
+
+	def autoflush?;    !!options[:flush];       end
+	def autoflush!;    options[:flush] = true;  end
+	def no_autoflush!; options[:flush] = false; end
 
 	def flush
 		flush! if options[:flush]
@@ -91,9 +98,9 @@ class Display
 	end
 
 	def screens
-		Enumerator.new {
+		Enumerator.new {|e|
 			(0 ... @internal[:nscreens]).map {|i|
-				yield screen(i)
+				e.yield screen(i)
 			}
 		}
 	end

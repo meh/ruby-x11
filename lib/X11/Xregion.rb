@@ -26,4 +26,7 @@
 # or implied.
 #++
 
+require 'X11/X'
+require 'X11/Xlib'
+
 require 'X11/Xregion/c'

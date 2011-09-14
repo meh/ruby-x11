@@ -8,7 +8,7 @@ OptionParser.new do |o|
 	options[:frame] = false
 	options[:root]  = false
 
-	o.on '-D', '--display [DISPLAY]', 'the X server to contact' do |value|
+	o.on '-d', '--display [DISPLAY]', 'the X server to contact' do |value|
 		options[:display] = value
 	end
 
@@ -16,7 +16,7 @@ OptionParser.new do |o|
 		options[:frame] = true
 	end
 
-	o.on '-S', '--spy', 'examine window properties forever' do
+	o.on '-s', '--spy', 'examine window properties forever' do
 		options[:spy] = true
 	end
 
@@ -27,7 +27,6 @@ OptionParser.new do |o|
 	o.on '-r', '--root', 'examine the root window' do
 		options[:root] = true
 	end
-
 end.parse!
 
 module Output

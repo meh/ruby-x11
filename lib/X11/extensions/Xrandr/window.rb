@@ -26,24 +26,16 @@
 # or implied.
 #++
 
-require 'X11/Xlib'
-require 'X11/extensions/randr'
-require 'X11/extensions/Xrender'
+module X11
 
-require 'X11/extensions/Xrandr/c'
+class Window
+	def primary_output
+		Xrandr::Output.new(display, C::XRRGetOutputPrimary(display.to_ffi, to_ffi))
+	end
 
-require 'X11/extensions/Xrandr/screen'
-require 'X11/extensions/Xrandr/screen_resources'
-require 'X11/extensions/Xrandr/crtc'
-require 'X11/extensions/Xrandr/output'
+	def primary_output= (value)
+		C::XRRSetOutputPrimary(display.to_ffi, to_ffi, value.to_ffi)
+	end
+end
 
-require 'X11/extensions/Xrandr/event'
-
-X11::Extension.define 'Xrandr' do |display|
-	major = FFI::MemoryPointer.new :int
-	minor = FFI::MemoryPointer.new :int
-
-	X11::C::XRRQueryVersion(display.to_ffi, major, minor)
-
-	self.new(Struct.new(:version).new(Versionub.parse("#{major.typecast(:int)}.#{minor.typecast(:int)}")))
 end

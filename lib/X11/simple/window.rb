@@ -44,7 +44,7 @@ class Window < Drawable
 
 		return win if properties.has? :WM_STATE
 
-		win.subwindows.reverse.select {|subwin|
+		win.subwindows.to_a.reverse.select {|subwin|
 			next unless subwin.viewable?
 
 			unless subwin.properties.has? :WM_STATE

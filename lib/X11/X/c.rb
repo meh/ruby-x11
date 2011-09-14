@@ -42,6 +42,7 @@ module ::FFI
 	typedef :XID,   :Cursor
 	typedef :XID,   :Colormap
 	typedef :XID,   :GC
+	typedef :XID,   :GContext
 	typedef :XID,   :KeySym
 	typedef :uchar, :KeyCode
 end

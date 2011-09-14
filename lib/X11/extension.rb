@@ -47,7 +47,18 @@ class Extension
 	end
 
 	def apply (display)
-		@block.call(display)
+		instance_exec display, &@block
+	end
+
+	def new (data)
+		result = dup
+
+		result.instance_variable_set :@data, data
+		result.define_singleton_method :method_missing do |*args, &block|
+			@data.__send__ *args, &block
+		end
+
+		result
 	end
 end
 

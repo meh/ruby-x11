@@ -30,6 +30,8 @@ require 'forwardable'
 require 'ostruct'
 
 require 'ffi'
+require 'ffi/extra'
+require 'versionub'
 require 'memoized'
 require 'refining'
 require 'retarded'
@@ -37,7 +39,6 @@ require 'bitmap'
 require 'namedic'
 require 'with'
 require 'on_require'
-require 'ffi/extra'
 
 module Kernel
 	def suppress_warnings
@@ -68,6 +69,26 @@ end
 
 class Bitmap::Value
 	alias to_ffi to_i
+end
+
+class Integer
+	alias ok? zero?
+
+	def to_ffi
+		self
+	end
+end
+
+class String
+	def to_ffi
+		self
+	end
+end
+
+class NilClass
+	def to_ffi
+		self
+	end
 end
 
 class Array

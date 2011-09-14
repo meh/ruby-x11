@@ -47,12 +47,23 @@ class Properties
 		end
 	end
 
+	def []= (atom, value, type=nil)
+		Property.new(window, Atom[atom, display]).value = value, type
+	end
+
 	def has? (atom)
 		!!self[atom]
 	end
 
 	def delete (atom)
 		C::XDeleteProperty(display.to_ffi, window.to_ffi, Atom[atom, display].to_ffi)
+	end
+
+	def rotate (properties, positions=1)
+		array = FFI::MemoryPointer.new(:Atom, properties.length)
+		array.write_array_of(:Atom, properties.map { |name| name.to_ffi })
+
+		C::XRotateWindowProperties(display.to_ffi, window.to_ffi, array, properties.length, positions)
 	end
 
 	def each (&block)
