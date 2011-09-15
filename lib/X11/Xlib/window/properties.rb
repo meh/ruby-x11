@@ -70,7 +70,7 @@ class Properties
 		number = FFI::MemoryPointer.new :int
 		list   = C::XListProperties(display.to_ffi, window.to_ffi, number)
 
-		return if list.null?
+		return self if list.null?
 
 		list.read_array_of(:Atom, number.typecast(:int)).each {|atom|
 			block.call Property.new(window, Atom.new(atom.to_i, display))

@@ -39,6 +39,13 @@ class Extensions < Array
 		self << extension.apply(display)
 	end
 
+	memoize
+	def [] (name)
+		find {|extension|
+			extension.name.downcase == name.to_s.downcase
+		}
+	end
+
 	def available
 		Enumerator.new do |e|
 

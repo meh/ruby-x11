@@ -26,57 +26,14 @@
 # or implied.
 #++
 
-module X11
+module X11; module Xrandr; class Output < ID; class Properties; class Property
 
-class Screen
-	include ForwardTo
-
-	attr_reader :display
-	forward_to  :root_window
-
-	def initialize (display, screen)
-		@display = display
-		@screen  = screen.typecast(C::Screen)
-	end
-
-	C::Screen.layout.members.each {|name|
-		next if [:display].member?(name)
-
-		define_method name do
-			@screen[name]
-		end
-	}
-
-	def width (metric=false)
-		@screen[metric ? :mwidth : :width]
-	end
-
-	def height (metric=false)
-		@screen[metric ? :mheight : :height]
-	end
-
-	def root_window
-		Window.new(@display, @screen[:root])
-	end
-
-	def windows
-		Enumerator.new do |e|
-			e.yield root_window
-
-			root_window.subwindows(true).each {|win|
-				e.yield win
-			}
-		end
-	end
-
-	memoize
-	def to_i
-		C::XScreenNumberOfScreen(to_ffi)
-	end
-
-	def to_ffi
-		@screen.pointer
+Parser.register :ATOM do
+	output do |property, data|
+		Parser.format(property, data, 'a').map {|data|
+			data.first
+		}
 	end
 end
 
-end
+end; end; end; end; end

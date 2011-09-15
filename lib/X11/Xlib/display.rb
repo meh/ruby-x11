@@ -69,6 +69,10 @@ class Display
 		end
 	}
 
+	def name
+		C::XDisplayString(to_ffi)
+	end
+
 	def autoflush?;    !!options[:flush];       end
 	def autoflush!;    options[:flush] = true;  end
 	def no_autoflush!; options[:flush] = false; end

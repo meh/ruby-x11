@@ -27,6 +27,7 @@
 #++
 
 require 'X11/extensions/Xrandr/output/info'
+require 'X11/extensions/Xrandr/output/properties'
 
 module X11; module Xrandr
 
@@ -51,7 +52,7 @@ class Output < ID
 	end
 
 	def properties
-
+		Properties.new(self)
 	end
 end
 

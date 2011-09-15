@@ -26,124 +26,53 @@
 # or implied.
 #++
 
-require 'forwardable'
-require 'ostruct'
+require 'X11/extensions/Xrandr/output/properties/property'
 
-require 'ffi'
-require 'ffi/extra'
-require 'versionub'
-require 'memoized'
-require 'refining'
-require 'retarded'
-require 'bitmap'
-require 'namedic'
-require 'with'
-require 'on_require'
+module X11; module Xrandr; class Output < ID
 
-module Kernel
-	def suppress_warnings
-		exception = nil
-		tmp, $VERBOSE = $VERBOSE, nil
+class Properties
+	include Enumerable
+	extend  Forwardable
 
-		begin
-			result = yield
-		rescue Exception => e
-			exception = e
-		end
+	attr_reader    :output
+	def_delegators :@output, :display
 
-		$VERBOSE = tmp
+	def initialize (output)
+		@output = output
+	end
 
-		if exception
-			raise exception
-		else
-			result
+	def [] (atom)
+		if !(property = Property.new(output, Atom[atom, display])).nil?
+			property
 		end
 	end
-end
 
-class Object
-	def to_bool
-		!!self
-	end
-end
-
-class Bitmap::Value
-	alias to_ffi to_i
-end
-
-class Integer
-	alias ok? zero?
-
-	def to_ffi
-		self
-	end
-end
-
-class String
-	def to_ffi
-		self
-	end
-end
-
-class NilClass
-	def to_ffi
-		self
-	end
-end
-
-class FFI::Pointer
-	def to_ffi
-		self
-	end
-end
-
-class Array
-	def singly
-		length == 1 ? first : self
-	end
-end
-
-module ForwardTo
-	def self.included (what)
-		what.instance_eval {
-			extend Forwardable
-
-			@__forward_to__ = []
-
-			def self.forward_to (*what)
-				return @__forward_to__ if what.empty?
-
-				@__forward_to__ << what
-				@__forward_to__.flatten!
-				@__forward_to__.compact!
-				@__forward_to__.uniq!
-			end
-		}
+	def []= (atom, value, type=nil)
+		Property.new(output, Atom[atom, display]).value = value, type
 	end
 
-	def method_missing (name, *args, &block)
-		self.class.forward_to.each {|target|
-			target = if target.to_s.start_with?('@')
-				instance_variable_get name
-			else
-				if target.is_a?(Array)
-					__send__ target.first, *target[1 .. -1]
-				else
-					__send__ target
-				end
-			end
+	def has? (atom)
+		!!self[atom]
+	end
 
-			if target.respond_to? name
-				return target.__send__ name, *args, &block
-			end
+	def delete (atom)
+		C::XRRDeleteOutputProperty(display.to_ffi, output.to_ffi, Atom[atom, display].to_ffi)
+	end
+
+	def each (&block)
+		number = FFI::MemoryPointer.new :int
+		list   = C::XRRListOutputProperties(display.to_ffi, output.to_ffi, number)
+
+		return self if list.null?
+
+		list.read_array_of(:Atom, number.typecast(:int)).each {|atom|
+			block.call Property.new(output, Atom.new(atom.to_i, display))
 		}
 
-		super
+		C::XFree(list)
+
+		self
 	end
 end
 
-module X11; module C
-	extend FFI::Library
-end; end
-
-require 'X11/extension'
+end; end; end

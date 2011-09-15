@@ -26,124 +26,52 @@
 # or implied.
 #++
 
-require 'forwardable'
-require 'ostruct'
+module X11; module Xrandr; class Output < ID; class Properties; class Property
 
-require 'ffi'
-require 'ffi/extra'
-require 'versionub'
-require 'memoized'
-require 'refining'
-require 'retarded'
-require 'bitmap'
-require 'namedic'
-require 'with'
-require 'on_require'
+module Parser
+	@transforms = {
+		:default => Transform.new(:default) {
+			input do |property, data|
+				data
+			end
 
-module Kernel
-	def suppress_warnings
-		exception = nil
-		tmp, $VERBOSE = $VERBOSE, nil
-
-		begin
-			result = yield
-		rescue Exception => e
-			exception = e
-		end
-
-		$VERBOSE = tmp
-
-		if exception
-			raise exception
-		else
-			result
-		end
-	end
-end
-
-class Object
-	def to_bool
-		!!self
-	end
-end
-
-class Bitmap::Value
-	alias to_ffi to_i
-end
-
-class Integer
-	alias ok? zero?
-
-	def to_ffi
-		self
-	end
-end
-
-class String
-	def to_ffi
-		self
-	end
-end
-
-class NilClass
-	def to_ffi
-		self
-	end
-end
-
-class FFI::Pointer
-	def to_ffi
-		self
-	end
-end
-
-class Array
-	def singly
-		length == 1 ? first : self
-	end
-end
-
-module ForwardTo
-	def self.included (what)
-		what.instance_eval {
-			extend Forwardable
-
-			@__forward_to__ = []
-
-			def self.forward_to (*what)
-				return @__forward_to__ if what.empty?
-
-				@__forward_to__ << what
-				@__forward_to__.flatten!
-				@__forward_to__.compact!
-				@__forward_to__.uniq!
+			output do |property, data|
+				data
 			end
 		}
+	}
+
+	def self.register (name, &block)
+		@transforms[name.to_s] = Transform.new(name, &block)
 	end
 
-	def method_missing (name, *args, &block)
-		self.class.forward_to.each {|target|
-			target = if target.to_s.start_with?('@')
-				instance_variable_get name
-			else
-				if target.is_a?(Array)
-					__send__ target.first, *target[1 .. -1]
-				else
-					__send__ target
+	def self.parse (property)
+		(@transforms[property.type.to_s] || @transforms[:default]).for(property)
+	end
+
+	def self.format (property, data, format)
+		real = format.chars.map {|char|
+			case char
+				when ?c, ?a, ?w then 'L!'
+				when ?i, ?b     then 'l!'
+				else char
+			end
+		}.join
+
+		data.bytes.each_slice(data.unpack(real).pack(real).length).map {|s|
+			s.map { |d| d.chr }.join.unpack(real).each_with_index.map {|data, index|
+				case format[index].chr
+					when ?a then Atom.new(data, property.display)
+					when ?w then Window.new(property.display, data)
+					when ?b then !data.nil? && !data.zero?
+					else data
 				end
-			end
-
-			if target.respond_to? name
-				return target.__send__ name, *args, &block
-			end
+			}
 		}
-
-		super
 	end
 end
 
-module X11; module C
-	extend FFI::Library
-end; end
+end; end; end; end; end
 
-require 'X11/extension'
+require 'X11/extensions/Xrandr/output/properties/property/parser/atom'
+require 'X11/extensions/Xrandr/output/properties/property/parser/integer'

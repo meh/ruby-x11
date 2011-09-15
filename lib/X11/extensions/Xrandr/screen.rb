@@ -31,8 +31,8 @@ module X11
 class Screen
 	forward_to :resources
 
-	def resources
-		Xrandr::ScreenResources.new(self, if C::respond_to?(:XRRGetScreenResourcesCurrent)
+	def resources (flush=false)
+		Xrandr::ScreenResources.new(self, if C::respond_to?(:XRRGetScreenResourcesCurrent) && !flush
 			C::XRRGetScreenResourcesCurrent(display.to_ffi, root_window.to_ffi)
 		else
 			C::XRRGetScreenResources(display.to_ffi, root_window.to_ffi)
