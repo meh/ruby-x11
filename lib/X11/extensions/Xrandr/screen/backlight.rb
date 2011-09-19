@@ -26,24 +26,51 @@
 # or implied.
 #++
 
-require 'X11/extensions/Xrandr/screen/backlight'
+module X11; module Xrandr
 
-module X11
+class Backlight
+	attr_reader :screen
 
-class Screen
-	forward_to :resources
+	def initialize (screen)
+		@screen = screen
 
-	def resources (flush=false)
-		Xrandr::ScreenResources.new(self, if C::respond_to?(:XRRGetScreenResourcesCurrent) && !flush
-			C::XRRGetScreenResourcesCurrent(display.to_ffi, root_window.to_ffi)
-		else
-			C::XRRGetScreenResources(display.to_ffi, root_window.to_ffi)
-		end)
+		@property = catch :end do
+			screen.resources.outputs.each {|output|
+				if output.properties.has?(:BACKLIGHT) || output.properties.has?(:Backlight)
+					throw :end, output.properties[:BACKLIGHT] || output.properties[:Baclight]
+				end
+			}
+		end
+
+		@property.info.tap {|info|
+			@min = info.min
+			@max = info.max
+		}
 	end
 
-	def backlight
-		Xrandr::Backlight.new(self)
+	def set (percent)
+		@property.value = (percent * (@max - @min) / 100).ceil
+	end
+
+	def get
+		((@property.value.first - @min) * 100.0 / (@max - @min)).to_i
+	end
+
+	def + (value)
+		set(to_i + value)
+		self
+	end
+
+	def - (value)
+		set(to_i - value)
+		self
+	end
+
+	alias to_i get
+
+	def inspect
+		"#<X11::Xrandr::Backlight: #{to_i}%>"
 	end
 end
 
-end
+end; end
