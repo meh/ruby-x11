@@ -31,24 +31,34 @@ require 'X11/Xlib/window/properties/property/parser'
 module X11; class Window < Drawable; class Properties
 
 class Property
-	@transforms = {
-		:default => Transform.new(:default) {
-			input do |property, data|
+	module Mode
+		Replace = 0
+		Prepend = 1
+		Append  = 2
+
+		def self.[] (what)
+			what.is_a?(Integer) ? what : const_get(what.to_s.downcase.capitalize)
+		end
+	end
+		
+	Transforms = {
+		default: Transform.new(:default) {
+			output do |property, data|
 				data
 			end
 
-			output do |property, data|
-				data
+			input do |property, value, type|
+				[value, type]
 			end
 		}
 	}
 
 	def self.register (name, &block)
-		@transforms[name.to_s] = Transform.new(name, &block)
+		Transforms[name.to_s] = Transform.new(name, &block)
 	end
 
 	def self.transform (property)
-		(@transforms[property.name] || @transforms[:default]).for(property)
+		(Transforms[property.name] || Transforms[:default]).for(property)
 	end
 
 	MaxLength = 500000
@@ -88,16 +98,22 @@ class Property
 	end
 
 	def value= (value, type=nil, mode=:replace)
-		format, data = Property.transform(self).input(Property::Parser.parse(self).input(
-			value.is_a?(Array) ? value : [value], type || self.type))
+		type ||= self.type
+
+		format, data, length = Property::Parser.parse(self).input(*Property.transform(self).input(
+			value.is_a?(Array) ? value : [value], type))
+
+		C::XChangeProperty(display.to_ffi, window.to_ffi, to_ffi, type.to_ffi, format, Mode[mode], data, length)
+
+		display.flush
 	end
 
 	def << (value, type=nil)
-
+		self.value = value, type, :append
 	end
 
 	def >> (value, type=nil)
-
+		self.value = value, type, :prepend
 	end
 
 	def type

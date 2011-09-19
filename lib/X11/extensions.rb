@@ -124,7 +124,7 @@ module ForwardTo
 	def method_missing (name, *args, &block)
 		self.class.forward_to.each {|target|
 			target = if target.to_s.start_with?('@')
-				instance_variable_get name
+				instance_variable_get target
 			else
 				if target.is_a?(Array)
 					__send__ target.first, *target[1 .. -1]

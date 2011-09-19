@@ -34,6 +34,12 @@ Parser.register :STRING do
 
 		data.split("\0")
 	end
+
+	input do |property, data, type|
+		data = data.join("\0") + "\0"
+
+		[8, data, data.length]
+	end
 end
 
 Parser.register :UTF8_STRING do
@@ -41,6 +47,12 @@ Parser.register :UTF8_STRING do
 		data.force_encoding 'UTF-8' rescue nil
 
 		data.split("\0")
+	end
+
+	input do |property, data, type|
+		data = data.join("\0") + "\0"
+
+		[8, data, data.length]
 	end
 end
 

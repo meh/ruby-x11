@@ -31,10 +31,6 @@ module X11; class Window < Drawable; class Properties; class Property
 module Parser
 	@transforms = {
 		:default => Transform.new(:default) {
-			input do |property, data|
-				data
-			end
-
 			output do |property, data|
 				data
 			end
@@ -77,6 +73,7 @@ require 'X11/Xlib/window/properties/property/parser/arc'
 require 'X11/Xlib/window/properties/property/parser/atom'
 require 'X11/Xlib/window/properties/property/parser/cardinal'
 require 'X11/Xlib/window/properties/property/parser/hints'
+require 'X11/Xlib/window/properties/property/parser/integer'
 require 'X11/Xlib/window/properties/property/parser/state'
 require 'X11/Xlib/window/properties/property/parser/string'
 require 'X11/Xlib/window/properties/property/parser/window'

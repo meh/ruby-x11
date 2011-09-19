@@ -31,10 +31,6 @@ module X11; module Xrandr; class Output < ID; class Properties; class Property
 module Parser
 	@transforms = {
 		:default => Transform.new(:default) {
-			input do |property, data|
-				data
-			end
-
 			output do |property, data|
 				data
 			end

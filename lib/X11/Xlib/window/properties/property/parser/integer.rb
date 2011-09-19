@@ -26,7 +26,7 @@
 # or implied.
 #++
 
-module X11; module Xrandr; class Output < ID; class Properties; class Property
+module X11; class Window < Drawable; class Properties; class Property
 
 Parser.register :INTEGER do
 	output do |property, data|
@@ -34,10 +34,6 @@ Parser.register :INTEGER do
 			data.first
 		}
 	end
-
-	input do |property, data, type|
-		[32, data.pack('i!*'), data.length]
-	end
 end
 
-end; end; end; end; end
+end; end; end; end

@@ -28,15 +28,45 @@
 
 module X11; module Xrandr; class Output < ID; class Properties; class Property
 
-Parser.register :INTEGER do
-	output do |property, data|
-		Parser.format(property, data, 'i!').map {|data|
-			data.first
-		}
+class Info
+	include ForwardTo
+
+	attr_reader :property
+	forward_to  :@instance
+
+	def initialize (property, pointer)
+		@property = property
+		@internal = pointer.is_a?(C::XRRPropertyInfo) ? pointer : C::XRRPropertyInfo.new(pointer)
+
+		return if nil?
+
+		if range?
+			@instance = Range.new(*@internal[:values].read_array_of(:long, 2))
+		else
+			@instance = @internal[:values].read_array_of(:long, @internal[:num_values])
+		end
 	end
 
-	input do |property, data, type|
-		[32, data.pack('i!*'), data.length]
+	def nil?
+		@internal[:values].null?
+	end
+
+	def range?
+		@internal[:range]
+	end
+
+	def pending?
+		@internal[:pending]
+	end
+
+	def immutable?
+		@internal[:immutable]
+	end
+
+	undef_method :inspect, :to_s
+
+	def to_ffi
+		@internal.pointer
 	end
 end
 
