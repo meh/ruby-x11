@@ -1,6 +1,7 @@
 #! /usr/bin/env ruby
 require 'optparse'
 require 'X11/extensions/Xrandr'
+require 'ap'
 
 options = {}
 
@@ -9,12 +10,12 @@ OptionParser.new do |o|
 		options[:display] = value
 	end
 
-	o.on '-s', '--set [PERCENTAGE]' do |value|
+	o.on '-S', '--set [PERCENTAGE]' do |value|
 		options[:get] = false
 		options[:set] = value.to_i
 	end
 
-	o.on '-g', '--get' do
+	o.on '-G', '--get' do
 		options[:get] = true
 	end
 
@@ -27,6 +28,14 @@ OptionParser.new do |o|
 		options[:get] = false
 		options[:dec] = value.to_i
 	end
+
+	o.on '-t', '--time MILLISECONDS' do |value|
+		options[:time] = value.to_i
+	end
+
+	o.on '-s', '--steps STEPS' do |value|
+		options[:steps] = value.to_i
+	end
 end.parse!
 
 X11::Display.open(options[:display]).tap {|display|
@@ -35,12 +44,42 @@ X11::Display.open(options[:display]).tap {|display|
 			options[{ ?= => :set, ?+ => :inc, ?- => :dec }[ARGV.first]] = ARGV.last.to_i
 		end
 
-		if options[:set]
-			backlight.set options[:set]
-		elsif options[:inc]
-			backlight + options[:inc]
-		elsif options[:dec]
-			backlight - options[:dec]
+		if options[:set] || options[:inc] || options[:dec]
+			if options[:steps] || options[:time]
+				options[:time]  ||= 200
+				options[:steps] ||= 20
+			end
+
+			current = backlight.get
+			new     = if options[:set]
+				options[:set]
+			elsif options[:inc]
+				current + options[:inc]
+			elsif options[:dec]
+				current - options[:dec]
+			end.tap! {|n|
+				if n < 0
+					0
+				elsif n > 100
+					100
+				else
+					n
+				end
+			}
+
+			if options[:steps]
+				if current > new
+					-current .. -new
+				else
+					current .. new
+				end.step(options[:steps]) {|i|
+					backlight.set(i.abs)
+
+					sleep options[:time] / 1000.0 / options[:steps]
+				}
+			else
+				backlight.set new
+			end
 		else
 			puts backlight.to_i
 		end
