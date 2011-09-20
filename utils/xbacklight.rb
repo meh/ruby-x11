@@ -5,11 +5,11 @@ require 'X11/extensions/Xrandr'
 options = {}
 
 OptionParser.new do |o|
-	o.on '-d', '--display [DISPLAY]', 'the X server to contact' do |value|
+	o.on '-d', '--display DISPLAY', 'the X server to contact' do |value|
 		options[:display] = value
 	end
 
-	o.on '-S', '--set [PERCENTAGE]' do |value|
+	o.on '-S', '--set PERCENTAGE' do |value|
 		options[:get] = false
 		options[:set] = value.to_i
 	end
@@ -18,22 +18,22 @@ OptionParser.new do |o|
 		options[:get] = true
 	end
 
-	o.on '-I', '--inc [PERCENTAGE]' do |value|
+	o.on '-I', '--inc PERCENTAGE', Integer do |value|
 		options[:get] = false
-		options[:inc] = value.to_i
+		options[:inc] = value
 	end
 
-	o.on '-D', '--dec [PERCENTAGE]' do |value|
+	o.on '-D', '--dec PERCENTAGE', Integer do |value|
 		options[:get] = false
-		options[:dec] = value.to_i
+		options[:dec] = value
 	end
 
-	o.on '-t', '--time MILLISECONDS' do |value|
-		options[:time] = value.to_i
+	o.on '-t', '--time MILLISECONDS', Integer, 'fade time in milliseconds' do |value|
+		options[:time] = value
 	end
 
-	o.on '-s', '--steps STEPS' do |value|
-		options[:steps] = value.to_i
+	o.on '-s', '--steps STEPS', Integer, 'number of steps in fade' do |value|
+		options[:steps] = value
 	end
 end.parse!
 
