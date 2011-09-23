@@ -266,6 +266,10 @@ class Display
 		}
 	end
 
+	def atom (name)
+		Atom[name, self]
+	end
+
 	def to_ffi
 		@internal.pointer
 	end

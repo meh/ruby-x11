@@ -143,7 +143,8 @@ class Atom
 
 	def exists?
 		if display
-			C::XInternAtom(display.to_ffi, name, true).ok?
+			begin; name
+			rescue BadAtom; false; end
 		else
 			!!Atom.to_hash.key(@value)
 		end

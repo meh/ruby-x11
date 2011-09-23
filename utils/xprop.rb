@@ -8,7 +8,7 @@ OptionParser.new do |o|
 	options[:frame] = false
 	options[:root]  = false
 
-	o.on '-d', '--display [DISPLAY]', 'the X server to contact' do |value|
+	o.on '-d', '--display DISPLAY', 'the X server to contact' do |value|
 		options[:display] = value
 	end
 
@@ -20,7 +20,7 @@ OptionParser.new do |o|
 		options[:spy] = true
 	end
 
-	o.on '-i', '--id [ID]', 'resource id of window to examine' do |value|
+	o.on '-i', '--id ID', 'resource id of window to examine' do |value|
 		options[:id] = value
 	end
 
