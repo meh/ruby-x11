@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/misc/temperature'
+
 require 'X11/extensions/Xrandr/crtc/info'
 require 'X11/extensions/Xrandr/crtc/gamma'
 require 'X11/extensions/Xrandr/crtc/panning'
@@ -50,6 +52,14 @@ class Crtc < ID
 
 	def gamma
 		Crtc::Gamma.get(self)
+	end
+
+	namedic :value, :brightness, :correction, :optional => 1 .. -1
+	def temperature (value, brightness=1.0, correction=nil)
+		Temperature.gamma(value, gamma.size, brightness, correction).tap {|ramps|
+			gamma.set(:red => ramps.red, :green => ramps.green, :blue => ramps.blue)
+			display.flush
+		}
 	end
 
 	def panning

@@ -26,6 +26,8 @@
 # or implied.
 #++
 
+require 'X11/misc/temperature'
+
 require 'X11/extensions/xf86vmode/screen/gamma'
 
 module X11
@@ -37,6 +39,14 @@ class Screen
 
 	def gamma= (*args)
 		gamma.set(*args)
+	end
+	
+	namedic :value, :brightness, :correction, :optional => 1 .. -1
+	def temperature (value, brightness=1.0, correction=nil)
+		Temperature.gamma(value, gamma.ramp.size, brightness, correction).tap {|ramps|
+			gamma.ramp.set(:red => ramps.red, :green => ramps.green, :blue => ramps.blue)
+			display.flush
+		}
 	end
 end
 

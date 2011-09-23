@@ -26,11 +26,9 @@
 # or implied.
 #++
 
-require 'X11/extensions/xf86vmode/screen/gamma/ramp'
+module X11; module XF86VidMode; class Gamma
 
-module X11; module XF86VidMode
-
-class Gamma
+class Ramp
 	extend Forwardable
 
 	attr_reader    :screen
@@ -40,22 +38,35 @@ class Gamma
 		@screen = screen
 	end
 
-	def get
-		C::XF86VidModeGamma.new.tap! {|p|
-			C::XF86VidModeGetGamma(display.to_ffi, screen.to_i, p)
-
-			Struct.new(:red, :green, :blue).new(p[:red], p[:green], p[:blue])
+	def size
+		FFI::MemoryPointer.new(:int).tap! {|p|
+			C::XF86VidModeGetGammaRampSize(display.to_ffi, screen.to_i, p)
+			p.typecast(:int)
 		}
+	end
+
+	def get
+		red, green, blue = Array.new(3) { FFI::MemoryPointer.new(:ushort, size) }
+
+		C::XF86VidModeGetGammaRamp(display.to_ffi, screen.to_i, size, red, green, blue)
+
+		Struct.new(:red, :green, :blue).new(
+			red.read_array_of(:ushort, size),
+			green.read_array_of(:ushort, size),
+			blue.read_array_of(:ushort, size)
+		)
 	end
 
 	namedic :red, :green, :blue, :optional => 0 .. -1
 	def set (red=nil, green=nil, blue=nil)
-		get.tap {|gamma|
-			C::XF86VidModeSetGamma(display.to_ffi, screen.to_i, C::XF86VidModeGamma.new.tap {|p|
-				p[:red]   = red   || gamma.red
-				p[:green] = green || gamma.green
-				p[:blue]  = blue  || gamma.blue
-			})
+		get.tap {|ramps|
+			memory = Struct.new(:red, :green, :blue).new(*Array.new(3) { FFI::MemoryPointer.new(:ushort, size) })
+
+			memory.red.write_array_of(:ushort,   red   || ramps.red)
+			memory.green.write_array_of(:ushort, green || ramps.green)
+			memory.blue.write_array_of(:ushort,  blue  || ramps.blue)
+
+			C::XF86VidModeSetGammaRamp(display.to_ffi, screen.to_i, size, memory.red, memory.green, memory.blue)
 
 			display.flush
 		}
@@ -70,10 +81,6 @@ class Gamma
 			set(color => value)[color]
 		end
 	}
-
-	def ramp
-		Ramp.new(screen)
-	end
 end
 
-end; end
+end; end; end

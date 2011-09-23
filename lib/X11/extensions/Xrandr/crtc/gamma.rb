@@ -51,7 +51,7 @@ class Gamma
 
 	def initialize (crtc, pointer)
 		@crtc     = crtc
-		@internal = pointer.is_a?(C::XRRCrtcInfo) ? pointer : C::XRRCrtcInfo.new(pointer)
+		@internal = pointer.is_a?(C::XRRCrtcGamma) ? pointer : C::XRRCrtcGamma.new(pointer)
 	end
 
 	def size
@@ -62,14 +62,33 @@ class Gamma
 		define_method name do
 			@internal[name].read_array_of(:ushort, size)
 		end
+
+		define_method "#{name}=" do |value|
+			@internal[name].write_array_of(:ushort, value)
+		end
+
+		define_method "#{name}!" do |value|
+			__send__ "#{name}=", value
+			save!
+		end
 	}
 
-	def crtc
-		Crtc.new(output.resources, @internal[:crtc])
+	def get
+		Struct.new(:red, :green, :blue).new(red, green, blue)
+	end
+
+	namedic :red, :green, :blue, :optional => 0 .. -1
+	def set (red=nil, green=nil, blue=nil)
+		self.red   = red   if red
+		self.green = green if green
+		self.blue  = blue  if blue
+
+		save!
 	end
 
 	def save!
 		C::XRRSetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi, to_ffi)
+		self
 	end
 
 	def to_ffi

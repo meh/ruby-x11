@@ -71,32 +71,6 @@ class Bitmap::Value
 	alias to_ffi to_i
 end
 
-class Integer
-	alias ok? zero?
-
-	def to_ffi
-		self
-	end
-end
-
-class String
-	def to_ffi
-		self
-	end
-end
-
-class NilClass
-	def to_ffi
-		self
-	end
-end
-
-class FFI::Pointer
-	def to_ffi
-		self
-	end
-end
-
 class Array
 	def singly
 		length == 1 ? first : self
@@ -140,6 +114,10 @@ module ForwardTo
 
 		super
 	end
+end
+
+class Integer
+	alias ok? zero?
 end
 
 module X11; module C
