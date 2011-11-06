@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 require 'optparse'
-require 'X11/extensions/xf86vmode'
+require 'X11/Xlib'
 
 options = {}
 
@@ -37,12 +37,12 @@ end.parse!
 X11::Display.open(options[:display]).tap {|display|
 	(options[:screen] ? display.screen(options[:screen]) : display.default_screen).tap {|screen|
 		screen.gamma.tap {|gamma|
-			puts "-> Red #{"%6.3f" % gamma.red}, Green #{"%6.3f" % gamma.green}, Blue #{"%6.3f" % gamma.blue}" unless options[:quiet]
+			puts "-> Red #{'%6.3f' % gamma.red}, Green #{'%6.3f' % gamma.green}, Blue #{'%6.3f' % gamma.blue}" unless options[:quiet]
 
 			if options[:gamma] || options[:red] || options[:green] || options[:blue]
 				gamma.set(options[:red] || options[:gamma], options[:green] || options[:gamma], options[:blue] || options[:gamma])
 
-				puts "<- Red #{"%6.3f" % gamma.red}, Green #{"%6.3f" % gamma.green}, Blue #{"%6.3f" % gamma.blue}" unless options[:quiet]
+				puts "<- Red #{'%6.3f' % gamma.red}, Green #{'%6.3f' % gamma.green}, Blue #{'%6.3f' % gamma.blue}" unless options[:quiet]
 			end
 		}
 	}
