@@ -26,7 +26,7 @@
 # or implied.
 #++
 
-class X11::Event::EnterNotify < X11::Event::Helper
+class X11::Event::LeaveNotify < X11::Event::Helper
 	extend X11::Event::Generic::Crossing
 
 	mask :LeaveWindow
