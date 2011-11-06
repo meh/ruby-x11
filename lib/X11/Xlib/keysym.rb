@@ -29,16 +29,43 @@
 module X11
 
 class Keysym
-	def initialize (value)
-		if value.is_a?(Integer)
+	def self.const_missing (name)
+		C::XStringToKeysym(name.to_s)
+	end
+
+	def self.method_missing (name, *)
+		C::XStringToKeysym(name.to_s)
+	end
+
+	def self.[] (what, display = nil)
+		new(what, display)
+	end
+
+	attr_reader :display
+
+	def initialize (value, display = nil)
+		if value == 0
+			@number = 0
+			@string = :any
+		elsif value.is_a?(Integer)
 			@number = value
 			@string = C::XKeysymToString(@number)
+
+			raise ArgumentError, 'invalid keysym' if @string.nil?
 		else
 			@string = value.to_s
 			@number = C::XStringToKeysym(@string).to_i
+
+			raise ArgumentError, 'invalid keysym' if @number.zero?
 		end
 
-		raise ArgumentError, 'invalid keysym' if @number.zero? or @string.nil?
+		@display = display
+	end
+
+	def to_keycode
+		raise 'no display specified' unless @display
+
+		C::XKeysymToKeycode(display.to_ffi, to_i)
 	end
 
 	def to_s

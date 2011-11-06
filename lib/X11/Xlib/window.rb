@@ -245,7 +245,7 @@ class Window < Drawable
 
 	namedic :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
 	def grab_pointer (owner_events=true, event_mask=Mask::Event[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0, &block)
-		result = C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
+		result = C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
 
 		if block && result
 			begin
@@ -262,22 +262,18 @@ class Window < Drawable
 		display.ungrab_pointer(time)
 	end
 
-	def keysym_to_keycode (keysym)
-		C::XKeysymToKeycode(to_ffi, keysym)
-	end
-
 	namedic :key, :modifiers, :normal?, :pointer, :keyboard, :optional => 1 .. -1
 	def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:sync)
-		C::XGrabKey(display.to_ffi, keycode.to_keycode, modifiers, to_ffi, !!owner_events, mode2int(pointer_mode), mode2int(keyboard_mode))
+		C::XGrabKey(display.to_ffi, Keysym[keycode, display].to_keycode, modifiers, to_ffi, !!owner_events, mode_to_int(pointer_mode), mode_to_int(keyboard_mode))
 	end
 
 	def ungrab_key (keycode, modifiers=0)
-		C::XUngrabKey(display.to_ffi, keycode.to_keycode, modifiers, to_ffi)
+		C::XUngrabKey(display.to_ffi, Keysym[keycode, display].to_keycode, modifiers, to_ffi)
 	end
 
 	namedic :button, :modifiers, :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :optional => 0 .. -1
 	def grab_button (button, modifiers=0, owner_events=true, event_mask=Mask::Event[:ButtonPress], pointer_mode=:async, keyboard_mode=:sync, confine_to=0, cursor=0)
-		C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask.to_ffi, mode2int(pointer_mode), mode2int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
+		C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask.to_ffi, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
 	end
 
 	def ungrab_button (button, modifiers=0)
@@ -309,7 +305,7 @@ class Window < Drawable
 	end
 
 	def reported_events= (mask)
-		return unless mask.is_a?(Bitmap::Value)
+		mask = Mask::Event[mask] unless mask.is_a?(Bitmap::Value)
 
 		(@reported_events = mask).tap {
 			C::XSelectInput(display.to_ffi, to_ffi, mask.to_ffi)
@@ -422,12 +418,10 @@ class Window < Drawable
 		end
 	end
 
-	private
+	protected
 
-	GRAB_MODE = { :sync => false, :async => true }
-
-	def mode2int (mode)
-		(mode == true or GRAB_MODE[mode]) ? 1 : 0
+	def mode_to_int (mode)
+		(mode == true || mode == :async) ? 1 : 0
 	end
 end
 

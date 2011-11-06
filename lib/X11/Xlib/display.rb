@@ -131,7 +131,13 @@ class Display
 		C::XUngrabPointer(to_ffi, time)
 	end
 
+	def ungrab_key (*args, &block)
+		default_screen.root_window.ungrab_key(*args, &block)
+	end
+
 	def keysym_to_keycode (keysym)
+		return keysym if keysym.is_a?(Integer)
+
 		C::XKeysymToKeycode(to_ffi, keysym)
 	end
 

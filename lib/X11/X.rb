@@ -35,5 +35,7 @@ module X11
 None           = 0
 AnyProperty    = 0
 CopyFromParent = 0
+AnyKey         = 0
+AnyModifier    = 1 << 15
 
 end

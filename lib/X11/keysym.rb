@@ -27,21 +27,3 @@
 #++
 
 require 'X11/Xlib'
-
-module X11
-
-class Keysym
-	def self.const_missing (name)
-		C::XStringToKeysym(name.to_s)
-	end
-
-	def self.method_missing (name, *)
-		C::XStringToKeysym(name.to_s)
-	end
-
-	def self.[] (what)
-		what.is_a?(Integer) ? Keysym.new(what) : self.method_missing(what)
-	end
-end
-
-end
