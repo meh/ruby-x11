@@ -29,6 +29,7 @@
 require 'forwardable'
 require 'ostruct'
 
+require 'require/on'
 require 'ffi'
 require 'ffi/extra'
 require 'versionub'
@@ -38,7 +39,6 @@ require 'retarded'
 require 'bitmap'
 require 'namedic'
 require 'with'
-require 'on_require'
 
 module Kernel
 	def suppress_warnings

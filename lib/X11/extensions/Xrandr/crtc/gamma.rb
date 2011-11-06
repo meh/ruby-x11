@@ -88,6 +88,7 @@ class Gamma
 
 	def save!
 		C::XRRSetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi, to_ffi)
+		crtc.display.flush
 		self
 	end
 

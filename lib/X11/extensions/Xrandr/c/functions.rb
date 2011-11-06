@@ -56,51 +56,51 @@ attach_function :XRRRates, [:pointer, :int, :int, :pointer], :pointer
 attach_function :XRRTimes, [:pointer, :int, :pointer], :Time
 
 # 1.2 additions
-attach_function :XRRGetScreenSizeRange, [:pointer, :Window, :pointer, :pointer, :pointer, :pointer], :Status
-attach_function :XRRSetScreenSize, [:pointer, :Window, :int, :int, :int, :int], :void
+attach_function! :XRRGetScreenSizeRange, [:pointer, :Window, :pointer, :pointer, :pointer, :pointer], :Status
+attach_function! :XRRSetScreenSize, [:pointer, :Window, :int, :int, :int, :int], :void
 
-attach_function :XRRGetScreenResources, [:pointer, :Window], :pointer
-attach_function :XRRFreeScreenResources, [:pointer], :void
+attach_function! :XRRGetScreenResources, [:pointer, :Window], :pointer
+attach_function! :XRRFreeScreenResources, [:pointer], :void
 
-attach_function :XRRGetOutputInfo, [:pointer, :pointer, :RROutput], :pointer
-attach_function :XRRFreeOutputInfo, [:pointer], :void
+attach_function! :XRRGetOutputInfo, [:pointer, :pointer, :RROutput], :pointer
+attach_function! :XRRFreeOutputInfo, [:pointer], :void
 
-attach_function :XRRListOutputProperties, [:pointer, :RROutput, :pointer], :pointer
-attach_function :XRRQueryOutputProperty, [:pointer, :RROutput, :Atom], :pointer
-attach_function :XRRConfigureOutputProperty, [:pointer, :RROutput, :Atom, :Bool, :Bool, :int, :pointer], :void
-attach_function :XRRChangeOutputProperty, [:pointer, :RROutput, :Atom, :Atom, :int, :int, :pointer, :int], :void
-attach_function :XRRDeleteOutputProperty, [:pointer, :RROutput, :Atom], :void
-attach_function :XRRGetOutputProperty, [:pointer, :RROutput, :Atom, :long, :long, :Bool, :Bool, :Atom, :pointer, :pointer, :pointer, :pointer, :pointer], :int
+attach_function! :XRRListOutputProperties, [:pointer, :RROutput, :pointer], :pointer
+attach_function! :XRRQueryOutputProperty, [:pointer, :RROutput, :Atom], :pointer
+attach_function! :XRRConfigureOutputProperty, [:pointer, :RROutput, :Atom, :Bool, :Bool, :int, :pointer], :void
+attach_function! :XRRChangeOutputProperty, [:pointer, :RROutput, :Atom, :Atom, :int, :int, :pointer, :int], :void
+attach_function! :XRRDeleteOutputProperty, [:pointer, :RROutput, :Atom], :void
+attach_function! :XRRGetOutputProperty, [:pointer, :RROutput, :Atom, :long, :long, :Bool, :Bool, :Atom, :pointer, :pointer, :pointer, :pointer, :pointer], :int
 
-attach_function :XRRAllocModeInfo, [:pointer, :int], :pointer
-attach_function :XRRCreateMode, [:pointer, :Window, :pointer], :RRMode
-attach_function :XRRDestroyMode, [:pointer, :RRMode], :void
-attach_function :XRRAddOutputMode, [:pointer, :RROutput, :RRMode], :void
-attach_function :XRRDeleteOutputMode, [:pointer, :RROutput, :RRMode], :void
-attach_function :XRRFreeModeInfo, [:pointer], :void
+attach_function! :XRRAllocModeInfo, [:pointer, :int], :pointer
+attach_function! :XRRCreateMode, [:pointer, :Window, :pointer], :RRMode
+attach_function! :XRRDestroyMode, [:pointer, :RRMode], :void
+attach_function! :XRRAddOutputMode, [:pointer, :RROutput, :RRMode], :void
+attach_function! :XRRDeleteOutputMode, [:pointer, :RROutput, :RRMode], :void
+attach_function! :XRRFreeModeInfo, [:pointer], :void
 
-attach_function :XRRGetCrtcInfo, [:pointer, :pointer, :RRCrtc], :pointer
-attach_function :XRRFreeCrtcInfo, [:pointer], :void
-attach_function :XRRSetCrtcConfig, [:pointer, :pointer, :RRCrtc, :Time, :int, :int, :RRMode, :Rotation, :pointer, :int], :Status
+attach_function! :XRRGetCrtcInfo, [:pointer, :pointer, :RRCrtc], :pointer
+attach_function! :XRRFreeCrtcInfo, [:pointer], :void
+attach_function! :XRRSetCrtcConfig, [:pointer, :pointer, :RRCrtc, :Time, :int, :int, :RRMode, :Rotation, :pointer, :int], :Status
 
-attach_function :XRRGetCrtcGammaSize, [:pointer, :RRCrtc], :int
-attach_function :XRRGetCrtcGamma, [:pointer, :RRCrtc], :pointer
-attach_function :XRRAllocGamma, [:int], :pointer
-attach_function :XRRSetCrtcGamma, [:pointer, :RRCrtc, :pointer], :void
-attach_function :XRRFreeGamma, [:pointer], :void
+attach_function! :XRRGetCrtcGammaSize, [:pointer, :RRCrtc], :int
+attach_function! :XRRGetCrtcGamma, [:pointer, :RRCrtc], :pointer
+attach_function! :XRRAllocGamma, [:int], :pointer
+attach_function! :XRRSetCrtcGamma, [:pointer, :RRCrtc, :pointer], :void
+attach_function! :XRRFreeGamma, [:pointer], :void
 
 # 1.3 additions
-attach_function :XRRGetScreenResourcesCurrent, [:pointer, :Window], :pointer
-attach_function :XRRUpdateConfiguration, [:pointer], :int
+attach_function! :XRRGetScreenResourcesCurrent, [:pointer, :Window], :pointer
+attach_function! :XRRUpdateConfiguration, [:pointer], :int
 
-attach_function :XRRSetCrtcTransform, [:pointer, :RRCrtc, :pointer, :string, :pointer, :int], :void
-attach_function :XRRGetCrtcTransform, [:pointer, :RRCrtc, :pointer], :Status
+attach_function! :XRRSetCrtcTransform, [:pointer, :RRCrtc, :pointer, :string, :pointer, :int], :void
+attach_function! :XRRGetCrtcTransform, [:pointer, :RRCrtc, :pointer], :Status
 
-attach_function :XRRGetPanning, [:pointer, :pointer, :RRCrtc], :pointer
-attach_function :XRRFreePanning, [:pointer], :void
-attach_function :XRRSetPanning, [:pointer, :pointer, :RRCrtc, :pointer], :Status
+attach_function! :XRRGetPanning, [:pointer, :pointer, :RRCrtc], :pointer
+attach_function! :XRRFreePanning, [:pointer], :void
+attach_function! :XRRSetPanning, [:pointer, :pointer, :RRCrtc, :pointer], :Status
 
-attach_function :XRRSetOutputPrimary, [:pointer, :Window, :RROutput], :void
-attach_function :XRRGetOutputPrimary, [:pointer, :Window], :RROutput
+attach_function! :XRRSetOutputPrimary, [:pointer, :Window, :RROutput], :void
+attach_function! :XRRGetOutputPrimary, [:pointer, :Window], :RROutput
 
 end; end
