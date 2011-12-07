@@ -48,7 +48,7 @@ class Gamma
 		}
 	end
 
-	namedic :red, :green, :blue, :optional => 0 .. -1
+	named :red, :green, :blue, :optional => 0 .. -1
 	def set (red=nil, green=nil, blue=nil)
 		get.tap {|gamma|
 			C::XF86VidModeSetGamma(display.to_ffi, screen.to_i, C::XF86VidModeGamma.new.tap {|p|

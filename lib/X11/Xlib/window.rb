@@ -32,7 +32,7 @@ require 'X11/Xlib/window/properties'
 module X11
 
 class Window < Drawable
-	singleton_namedic :display, :parent, :x, :y, :width, :height, :border_width, :depth, :input_only?, :visual, :attributes, :optional => 1 .. -1, :alias => { :w => :width, :h => :height }
+	singleton_named :display, :parent, :x, :y, :width, :height, :border_width, :depth, :input_only?, :visual, :attributes, :optional => 1 .. -1, :alias => { :w => :width, :h => :height }
 	def self.create (display, parent=nil, x=nil, y=nil, width=nil, height=nil, border_width=nil, depth=nil, input_only=nil, visual=nil, attributes=nil)
 		parent       ||= display.root_window
 		x            ||= display.width / 2
@@ -71,7 +71,7 @@ class Window < Drawable
 		Window.new(display, parent.typecast(:Window))
 	end
 
-	namedic :parent, :x, :y, :optional => [:x, :y]
+	named :parent, :x, :y, :optional => [:x, :y]
 	def reparent (parent, x=nil, y=nil)
 		position.tap {|p|
 			x ||= p.x
@@ -129,7 +129,7 @@ class Window < Drawable
 		Struct.new(:x, :y).new(x.typecast(:int), y.typecast(:int))
 	end
 
-	namedic :x, :y, :optional => [:x, :y]
+	named :x, :y, :optional => [:x, :y]
 	def move (x=nil, y=nil)
 		position.tap {|p|
 			x ||= p.x
@@ -143,7 +143,7 @@ class Window < Drawable
 		self
 	end
 
-	namedic :width, :height, :optional => [:width, :height], :alias => { :w => :width, :h => :height }
+	named :width, :height, :optional => [:width, :height], :alias => { :w => :width, :h => :height }
 	def resize (width=nil, height=nil)
 		attributes.tap {|attr|
 			width  ||= attr.width
@@ -243,7 +243,7 @@ class Window < Drawable
 		end
 	end
 
-	namedic :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
+	named :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
 	def grab_pointer (owner_events=true, event_mask=Mask::Event[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0, &block)
 		result = C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
 
@@ -262,7 +262,7 @@ class Window < Drawable
 		display.ungrab_pointer(time)
 	end
 
-	namedic :key, :modifiers, :normal?, :pointer, :keyboard, :optional => 1 .. -1
+	named :key, :modifiers, :normal?, :pointer, :keyboard, :optional => 1 .. -1
 	def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:sync)
 		C::XGrabKey(display.to_ffi, Keysym[keycode, display].to_keycode, modifiers, to_ffi, !!owner_events, mode_to_int(pointer_mode), mode_to_int(keyboard_mode))
 	end
@@ -271,7 +271,7 @@ class Window < Drawable
 		C::XUngrabKey(display.to_ffi, Keysym[keycode, display].to_keycode, modifiers, to_ffi)
 	end
 
-	namedic :button, :modifiers, :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :optional => 0 .. -1
+	named :button, :modifiers, :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :optional => 0 .. -1
 	def grab_button (button, modifiers=0, owner_events=true, event_mask=Mask::Event[:ButtonPress], pointer_mode=:async, keyboard_mode=:sync, confine_to=0, cursor=0)
 		C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask.to_ffi, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
 	end

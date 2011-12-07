@@ -77,7 +77,7 @@ class Gamma
 		Struct.new(:red, :green, :blue).new(red, green, blue)
 	end
 
-	namedic :red, :green, :blue, :optional => 0 .. -1
+	named :red, :green, :blue, :optional => 0 .. -1
 	def set (red=nil, green=nil, blue=nil)
 		self.red   = red   if red
 		self.green = green if green

@@ -29,7 +29,7 @@
 module X11
 
 class Drawable < ID
-	namedic :x, :y, :width, :height, :to, :destination, :gc, :optional => 0 .. -1
+	named :x, :y, :width, :height, :to, :destination, :gc, :optional => 0 .. -1
 	def copy (x=nil, y=nil, width=nil, height=nil, to=nil, destination=nil, gc=nil)
 		x           ||= 0
 		y           ||= 0

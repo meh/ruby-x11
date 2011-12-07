@@ -33,7 +33,7 @@ module X11
 class Hints
 	attr_reader :flags, :state, :icon, :group
 
-	namedic :flags, :input?, :state, :icon, :group
+	named :flags, :input?, :state, :icon, :group
 	def initialize (flags, input, state, icon, group)
 		@flags = flags
 		@input = input

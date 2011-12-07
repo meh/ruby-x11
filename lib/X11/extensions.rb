@@ -33,11 +33,11 @@ require 'require/on'
 require 'ffi'
 require 'ffi/extra'
 require 'versionub'
-require 'memoized'
+require 'call-me/memoize'
+require 'call-me/named'
 require 'refining'
 require 'retarded'
 require 'bitmap'
-require 'namedic'
 require 'with'
 
 module Kernel

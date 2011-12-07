@@ -436,7 +436,7 @@ class Temperature
 		})
 	end
 
-	singleton_namedic :temperature, :size, :brightness, :correction, :optional => 2 .. -1
+	singleton_named :temperature, :size, :brightness, :correction, :optional => 2 .. -1
 	def self.gamma (temperature, size, brightness=1.0, correction=nil)
 		white_point = white_point(temperature)
 		correction  = Struct.new(:red, :green, :blue).new(*case correction

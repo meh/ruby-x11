@@ -57,7 +57,7 @@ class Ramp
 		)
 	end
 
-	namedic :red, :green, :blue, :optional => 0 .. -1
+	named :red, :green, :blue, :optional => 0 .. -1
 	def set (red=nil, green=nil, blue=nil)
 		get.tap {|ramps|
 			memory = Struct.new(:red, :green, :blue).new(*Array.new(3) { FFI::MemoryPointer.new(:ushort, size) })

@@ -40,7 +40,7 @@ class Pixmap < Drawable
 		}
 	end
 
-	singleton_namedic :screen, :width, :height, :depth, :optional => [:width, :height, :depth => 24]
+	singleton_named :screen, :width, :height, :depth, :optional => [:width, :height, :depth => 24]
 	def self.create (drawable, width, height, depth=24)
 		id = C::XCreatePixmap(display.to_ffi, drawable.to_ffi, width, height, depth)
 

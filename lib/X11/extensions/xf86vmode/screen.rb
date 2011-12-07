@@ -41,7 +41,7 @@ class Screen
 		gamma.set(*args)
 	end
 	
-	namedic :value, :brightness, :correction, :optional => 1 .. -1
+	named :value, :brightness, :correction, :optional => 1 .. -1
 	def temperature (value, brightness=1.0, correction=nil)
 		Temperature.gamma(value, gamma.ramp.size, brightness, correction).tap {|ramps|
 			gamma.ramp.set(:red => ramps.red, :green => ramps.green, :blue => ramps.blue)

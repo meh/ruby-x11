@@ -9,15 +9,14 @@ Gem::Specification.new {|s|
 	s.files        = Dir.glob('lib/**/*.rb')
 	s.require_path = 'lib'
 
-	s.add_dependency('ffi') unless defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
+	s.add_dependency 'ffi'
 
-	s.add_dependency('versionub')
-	s.add_dependency('memoized')
-	s.add_dependency('refining')
-	s.add_dependency('retarded')
-	s.add_dependency('bitmap')
-	s.add_dependency('namedic')
-	s.add_dependency('with')
-	s.add_dependency('require-extra')
-	s.add_dependency('ffi-extra')
+	s.add_dependency 'versionub'
+	s.add_dependency 'call-me'
+	s.add_dependency 'refining'
+	s.add_dependency 'retarded'
+	s.add_dependency 'bitmap'
+	s.add_dependency 'with'
+	s.add_dependency 'require-extra'
+	s.add_dependency 'ffi-extra'
 }

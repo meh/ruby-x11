@@ -35,7 +35,7 @@ class Image
 		}
 	end
 
-	singleton_namedic :drawable, :x, :y, :width, :height, :plane, :format, :optional => 1 .. -1, :alias => { :w => :width, :h => :height }
+	singleton_named :drawable, :x, :y, :width, :height, :plane, :format, :optional => 1 .. -1, :alias => { :w => :width, :h => :height }
 	def self.from (drawable, x=nil, y=nil, width=nil, height=nil, plane_mask=nil, format=nil)
 		display      = drawable.display
 		x          ||= 0
