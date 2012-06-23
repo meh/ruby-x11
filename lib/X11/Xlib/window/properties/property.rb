@@ -67,7 +67,7 @@ class Property
 
 	attr_reader    :window, :value
 	def_delegators :@window, :display
-	def_delegators :@atom, :to_s, :to_i, :to_ffi
+	def_delegators :@atom, :to_s, :to_i, :to_native
 	def_delegator  :@atom, :to_s, :name
 
 	def initialize (window, name)
@@ -86,7 +86,7 @@ class Property
 		after    = FFI::MemoryPointer.new :ulong
 		property = FFI::MemoryPointer.new :pointer
 
-		return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, to_ffi,
+		return unless C::XGetWindowProperty(display.to_native, window.to_native, to_native,
 			0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
 		return if property.typecast(:pointer).null?
@@ -103,7 +103,7 @@ class Property
 		format, data, length = Property::Parser.parse(self).input(*Property.transform(self).input(
 			value.is_a?(Array) ? value : [value], type))
 
-		C::XChangeProperty(display.to_ffi, window.to_ffi, to_ffi, type.to_ffi, format, Mode[mode], data, length)
+		C::XChangeProperty(display.to_native, window.to_native, to_native, type.to_native, format, Mode[mode], data, length)
 
 		display.flush
 	end
@@ -127,7 +127,7 @@ class Property
 		after    = FFI::MemoryPointer.new :ulong
 		property = FFI::MemoryPointer.new :pointer
 
-		return unless C::XGetWindowProperty(display.to_ffi, window.to_ffi, to_ffi,
+		return unless C::XGetWindowProperty(display.to_native, window.to_native, to_native,
 			0, (MaxLength + 3) / 4, false, AnyProperty, type, format, length, after, property).ok?
 
 		return if property.typecast(:pointer).null?
@@ -146,9 +146,9 @@ class Property
 
 	def rotate (positions=1)
 		array = FFI::MemoryPointer.new(:Atom)
-		array.write(to_ffi, :Atom)
+		array.write(to_native, :Atom)
 
-		C::XRotateWindowProperties(display.to_ffi, window.to_ffi, array, 1, positions)
+		C::XRotateWindowProperties(display.to_native, window.to_native, array, 1, positions)
 	end
 
 	def inspect

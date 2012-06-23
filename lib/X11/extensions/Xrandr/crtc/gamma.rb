@@ -36,14 +36,14 @@ class Gamma
 	end
 
 	def self.get (crtc)
-		new(crtc, C::XRRGetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi)).tap {|gamma|
-			ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
+		new(crtc, C::XRRGetCrtcGamma(crtc.display.to_native, crtc.to_native)).tap {|gamma|
+			ObjectSpace.define_finalizer gamma, finalizer(gamma.to_native)
 		}
 	end
 
 	def self.create (crtc)
-		new(crtc, C::XRRAllocGamma(C::XRRGetCrtcGammaSize(crtc.display.to_ffi, crtc.to_ffi))).tap {|gamma|
-			ObjectSpace.define_finalizer gamma, finalizer(gamma.to_ffi)
+		new(crtc, C::XRRAllocGamma(C::XRRGetCrtcGammaSize(crtc.display.to_native, crtc.to_native))).tap {|gamma|
+			ObjectSpace.define_finalizer gamma, finalizer(gamma.to_native)
 		}
 	end
 
@@ -87,12 +87,12 @@ class Gamma
 	end
 
 	def save!
-		C::XRRSetCrtcGamma(crtc.display.to_ffi, crtc.to_ffi, to_ffi)
+		C::XRRSetCrtcGamma(crtc.display.to_native, crtc.to_native, to_native)
 		crtc.display.flush
 		self
 	end
 
-	def to_ffi
+	def to_native
 		@internal.pointer
 	end
 end

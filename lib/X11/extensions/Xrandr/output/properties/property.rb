@@ -68,7 +68,7 @@ class Property
 
 	attr_reader    :output, :value
 	def_delegators :@output, :display
-	def_delegators :@atom, :to_s, :to_i, :to_ffi
+	def_delegators :@atom, :to_s, :to_i, :to_native
 	def_delegator  :@atom, :to_s, :name
 
 	def initialize (output, name)
@@ -81,7 +81,7 @@ class Property
 	end
 
 	def info
-		Info.new(self, C::XRRQueryOutputProperty(display.to_ffi, output.to_ffi, to_ffi))
+		Info.new(self, C::XRRQueryOutputProperty(display.to_native, output.to_native, to_native))
 	end
 
 	def value
@@ -91,7 +91,7 @@ class Property
 		after    = FFI::MemoryPointer.new :ulong
 		property = FFI::MemoryPointer.new :pointer
 
-		return unless C::XRRGetOutputProperty(display.to_ffi, output.to_ffi, to_ffi,
+		return unless C::XRRGetOutputProperty(display.to_native, output.to_native, to_native,
 			0, (MaxLength + 3) / 4, false, false, AnyProperty, type, format, length, after, property).ok?
 
 		return if property.typecast(:pointer).null?
@@ -108,7 +108,7 @@ class Property
 		format, data, length = Property::Parser.parse(self).input(*Property.transform(self).input(
 			value.is_a?(Array) ? value : [value], type))
 
-		C::XRRChangeOutputProperty(display.to_ffi, output.to_ffi, to_ffi, type.to_ffi, format, Mode[mode], data, length)
+		C::XRRChangeOutputProperty(display.to_native, output.to_native, to_native, type.to_native, format, Mode[mode], data, length)
 
 		display.flush
 	end
@@ -132,7 +132,7 @@ class Property
 		after    = FFI::MemoryPointer.new :ulong
 		property = FFI::MemoryPointer.new :pointer
 
-		return unless C::XRRGetOutputProperty(display.to_ffi, output.to_ffi, to_ffi,
+		return unless C::XRRGetOutputProperty(display.to_native, output.to_native, to_native,
 			0, (MaxLength + 3) / 4, false, false, AnyProperty, type, format, length, after, property).ok?
 
 		return if property.typecast(:pointer).null?

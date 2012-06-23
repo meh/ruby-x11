@@ -36,10 +36,10 @@ class Drawable < ID
 		width       ||= self.width
 		height      ||= self.height
 		to          ||= [0, 0]
-		destination ||= Pixmap.create(to_ffi, width, height)
+		destination ||= Pixmap.create(to_native, width, height)
 		gc          ||= GraphicContext.new
 
-		C::XCopyArea(display.to_ffi, to_ffi, destination.to_ffi, gc.to_ffi, x, y, width, height, to.first, to.last)
+		C::XCopyArea(display.to_native, to_native, destination.to_native, gc.to_native, x, y, width, height, to.first, to.last)
 
 		destination
 	end

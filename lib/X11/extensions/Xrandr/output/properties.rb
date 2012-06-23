@@ -56,12 +56,12 @@ class Properties
 	end
 
 	def delete (atom)
-		C::XRRDeleteOutputProperty(display.to_ffi, output.to_ffi, Atom[atom, display].to_ffi)
+		C::XRRDeleteOutputProperty(display.to_native, output.to_native, Atom[atom, display].to_native)
 	end
 
 	def each (&block)
 		number = FFI::MemoryPointer.new :int
-		list   = C::XRRListOutputProperties(display.to_ffi, output.to_ffi, number)
+		list   = C::XRRListOutputProperties(display.to_native, output.to_native, number)
 
 		return self if list.null?
 

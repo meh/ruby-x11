@@ -35,9 +35,9 @@ class Screen
 
 	def resources (flush=false)
 		Xrandr::ScreenResources.new(self, if C::respond_to?(:XRRGetScreenResourcesCurrent) && !flush
-			C::XRRGetScreenResourcesCurrent(display.to_ffi, root_window.to_ffi)
+			C::XRRGetScreenResourcesCurrent(display.to_native, root_window.to_native)
 		else
-			C::XRRGetScreenResources(display.to_ffi, root_window.to_ffi)
+			C::XRRGetScreenResources(display.to_native, root_window.to_native)
 		end)
 	end
 

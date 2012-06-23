@@ -35,7 +35,7 @@ class GraphicContext
 	def self.create (display, drawable, values=nil)
 		raise ArgumentError, 'the passed value is not drawable' unless drawable.is_a?(Drawable)
 
-		GraphicContext.new(display, C::XCreateGC(display.to_ffi, drawable.to_ffi, *Values.new(self, values).to_ffi))
+		GraphicContext.new(display, C::XCreateGC(display.to_native, drawable.to_native, *Values.new(self, values).to_native))
 	end
 
 	attr_reader :display
@@ -47,21 +47,21 @@ class GraphicContext
 
 	def copy (mask=nil)
 		GraphicContext.new(display, drawable).tap {|gc|
-			C::XCopyGC(display.to_ffi, to_ffi, gc.to_ffi, mask ? mask.to_ffi : result.values.to_ffi.first)
+			C::XCopyGC(display.to_native, to_native, gc.to_native, mask ? mask.to_native : result.values.to_native.first)
 
 			gc.values.mask = mask || gc.values.mask
 		}
 	end
 
 	def id
-		C::XGContextFromGC(to_ffi)
+		C::XGContextFromGC(to_native)
 	end
 
 	def flush
-		C::XFlushGC(display.to_ffi, to_ffi)
+		C::XFlushGC(display.to_native, to_native)
 	end
 
-	def to_ffi
+	def to_native
 		@value
 	end
 end

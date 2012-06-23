@@ -65,7 +65,7 @@ class Info
 
 	undef_method :inspect, :to_s
 
-	def to_ffi
+	def to_native
 		@internal.pointer
 	end
 end

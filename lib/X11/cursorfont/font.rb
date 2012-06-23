@@ -139,8 +139,8 @@ class Font
 		Shapes[@shape].to_s
 	end
 
-	def to_ffi
-		C::XCreateFontCursor(display.to_ffi, @shape)
+	def to_native
+		C::XCreateFontCursor(display.to_native, @shape)
 	end
 end
 

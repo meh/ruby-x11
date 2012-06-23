@@ -83,7 +83,7 @@ class Status
 
 	def to_i
 		@value
-	end; alias to_ffi to_i
+	end; alias to_native to_i
 
 	def inspect
 		to_sym.to_s

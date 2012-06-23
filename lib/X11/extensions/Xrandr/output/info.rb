@@ -36,8 +36,8 @@ class Info
 	end
 
 	def self.get (output)
-		new(output, C::XRRGetOutputInfo(output.display.to_ffi, output.resources.to_ffi, output.to_ffi)).tap {|info|
-			ObjectSpace.define_finalizer info, finalizer(info.to_ffi)
+		new(output, C::XRRGetOutputInfo(output.display.to_native, output.resources.to_native, output.to_native)).tap {|info|
+			ObjectSpace.define_finalizer info, finalizer(info.to_native)
 		}
 	end
 
@@ -97,7 +97,7 @@ class Info
 		end
 	end
 
-	def to_ffi
+	def to_native
 		@internal.pointer
 	end
 end

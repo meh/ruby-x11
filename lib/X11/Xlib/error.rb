@@ -56,7 +56,7 @@ class Error < Exception
 		@minor    = event[:minor_code]
 
 		FFI::MemoryPointer.new(512).tap {|string|
-			C::XGetErrorText(@display.to_ffi, @error, string, string.size)
+			C::XGetErrorText(@display.to_native, @error, string, string.size)
 
 			super(string.typecast(:string))
 		}

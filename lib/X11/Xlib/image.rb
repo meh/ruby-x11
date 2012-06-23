@@ -45,7 +45,7 @@ class Image
 		plane_mask ||= Planes.all
 		format     ||= Pixmap::Format::Z
 
-		Image.new(C::XGetImage(drawable.display.to_ffi, drawable.to_ffi, x, y, width, height, plane_mask, format))
+		Image.new(C::XGetImage(drawable.display.to_native, drawable.to_native, x, y, width, height, plane_mask, format))
 	end
 
 	def initialize (pointer)
@@ -53,10 +53,10 @@ class Image
 
 		@value = pointer
 
-		ObjectSpace.define_finalizer self, self.class.finalizer(display, to_ffi)
+		ObjectSpace.define_finalizer self, self.class.finalizer(display, to_native)
 	end
 
-	def to_ffi
+	def to_native
 		@value
 	end
 end

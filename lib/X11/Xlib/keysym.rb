@@ -65,7 +65,7 @@ class Keysym
 	def to_keycode
 		raise 'no display specified' unless @display
 
-		C::XKeysymToKeycode(display.to_ffi, to_i)
+		C::XKeysymToKeycode(display.to_native, to_i)
 	end
 
 	def to_s

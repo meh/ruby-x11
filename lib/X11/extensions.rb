@@ -68,7 +68,7 @@ class Object
 end
 
 class Bitmap::Value
-	alias to_ffi to_i
+	alias to_native to_i
 end
 
 class Array

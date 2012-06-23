@@ -42,17 +42,17 @@ class Pixmap < Drawable
 
 	singleton_named :screen, :width, :height, :depth, :optional => [:width, :height, :depth => 24]
 	def self.create (drawable, width, height, depth=24)
-		id = C::XCreatePixmap(display.to_ffi, drawable.to_ffi, width, height, depth)
+		id = C::XCreatePixmap(display.to_native, drawable.to_native, width, height, depth)
 
 		new(screen.display, id).tap {|pixmap|
-			ObjectSpace.define_finalizer pixmap, finalizer(screen.display, pixmap.to_ffi)
+			ObjectSpace.define_finalizer pixmap, finalizer(screen.display, pixmap.to_native)
 		}
 	end
 
 	def to_image
 	end
 
-	def to_ffi
+	def to_native
 		@value
 	end
 end

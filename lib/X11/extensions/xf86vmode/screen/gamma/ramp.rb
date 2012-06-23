@@ -40,7 +40,7 @@ class Ramp
 
 	def size
 		FFI::MemoryPointer.new(:int).tap! {|p|
-			C::XF86VidModeGetGammaRampSize(display.to_ffi, screen.to_i, p)
+			C::XF86VidModeGetGammaRampSize(display.to_native, screen.to_i, p)
 			p.typecast(:int)
 		}
 	end
@@ -48,7 +48,7 @@ class Ramp
 	def get
 		red, green, blue = Array.new(3) { FFI::MemoryPointer.new(:ushort, size) }
 
-		C::XF86VidModeGetGammaRamp(display.to_ffi, screen.to_i, size, red, green, blue)
+		C::XF86VidModeGetGammaRamp(display.to_native, screen.to_i, size, red, green, blue)
 
 		Struct.new(:red, :green, :blue).new(
 			red.read_array_of(:ushort, size),
@@ -66,7 +66,7 @@ class Ramp
 			memory.green.write_array_of(:ushort, green || ramps.green)
 			memory.blue.write_array_of(:ushort,  blue  || ramps.blue)
 
-			C::XF86VidModeSetGammaRamp(display.to_ffi, screen.to_i, size, memory.red, memory.green, memory.blue)
+			C::XF86VidModeSetGammaRamp(display.to_native, screen.to_i, size, memory.red, memory.green, memory.blue)
 
 			display.flush
 		}

@@ -36,8 +36,8 @@ class Panning
 	end
 
 	def self.get (crtc)
-		new(crtc, C::XRRGetPanning(crtc.display.to_ffi, crtc.resources.to_ffi, crtc.to_ffi)).tap {|panning|
-			ObjectSpace.define_finalizer panning, finalizer(panning.to_ffi)
+		new(crtc, C::XRRGetPanning(crtc.display.to_native, crtc.resources.to_native, crtc.to_native)).tap {|panning|
+			ObjectSpace.define_finalizer panning, finalizer(panning.to_native)
 		}
 	end
 
@@ -63,10 +63,10 @@ class Panning
 	end
 
 	def save!
-		C::XRRSetPanning(crtc.display.to_ffi, crtc.resources.to_ffi, crtc.to_ffi, to_ffi)
+		C::XRRSetPanning(crtc.display.to_native, crtc.resources.to_native, crtc.to_native, to_native)
 	end
 
-	def to_ffi
+	def to_native
 		@internal.pointer
 	end
 end

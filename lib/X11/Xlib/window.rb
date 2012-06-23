@@ -65,7 +65,7 @@ class Window < Drawable
 		number   = FFI::MemoryPointer.new :uint
 		children = FFI::MemoryPointer.new :pointer
 
-		C::XQueryTree(display.to_ffi, id, root, parent, children, number)
+		C::XQueryTree(display.to_native, id, root, parent, children, number)
 		C::XFree(children.typecast(:pointer))
 
 		Window.new(display, parent.typecast(:Window))
@@ -79,7 +79,7 @@ class Window < Drawable
 		}
 
 		parent.tap {
-			C::XReparentWindow(display.to_ffi, to_ffi, parent.to_ffi, x, y)
+			C::XReparentWindow(display.to_native, to_native, parent.to_native, x, y)
 		}
 	end
 
@@ -97,7 +97,7 @@ class Window < Drawable
 
 	def attributes
 		FFI::MemoryPointer.new(C::XWindowAttributes).tap! {|attr|
-			C::XGetWindowAttributes(display.to_ffi, to_ffi, attr)
+			C::XGetWindowAttributes(display.to_native, to_native, attr)
 
 			Attributes.new(self, attr)
 		}
@@ -124,7 +124,7 @@ class Window < Drawable
 		x     = FFI::MemoryPointer.new :int
 		y     = FFI::MemoryPointer.new :int
 
-		C::XTranslateCoordinates(display.to_ffi, to_ffi, root.to_ffi, 0, 0, x, y, child)
+		C::XTranslateCoordinates(display.to_native, to_native, root.to_native, 0, 0, x, y, child)
 
 		Struct.new(:x, :y).new(x.typecast(:int), y.typecast(:int))
 	end
@@ -136,7 +136,7 @@ class Window < Drawable
 			y ||= p.y
 		}
 
-		C::XMoveWindow(display.to_ffi, to_ffi, x, y)
+		C::XMoveWindow(display.to_native, to_native, x, y)
 
 		display.flush
 
@@ -150,7 +150,7 @@ class Window < Drawable
 			height ||= attr.height
 		}
 
-		C::XResizeWindow(display.to_ffi, to_ffi, width, height)
+		C::XResizeWindow(display.to_native, to_native, width, height)
 
 		display.flush
 
@@ -158,34 +158,34 @@ class Window < Drawable
 	end
 
 	def raise
-		C::XRaiseWindow(display.to_ffi, to_ffi)
+		C::XRaiseWindow(display.to_native, to_native)
 		display.flush
 		self
 	end
 
 	def iconify
-		C::XIconifyWindow(display.to_ffi, to_ffi, screen.to_i)
+		C::XIconifyWindow(display.to_native, to_native, screen.to_i)
 		display.flush
 		self
 	end
 
 	def withdraw
-		C::XWithdrawWindow(display.to_ffi, to_ffi, screen.to_i)
+		C::XWithdrawWindow(display.to_native, to_native, screen.to_i)
 		display.flush
 		self
 	end
 
 	def lower
-		C::XLowerWindow(display.to_ffi, to_ffi)
+		C::XLowerWindow(display.to_native, to_native)
 		display.flush
 		self
 	end
 
 	def map (subwindows=false)
 		if subwindows
-			C::XMapSubwindows(display.to_ffi, to_ffi)
+			C::XMapSubwindows(display.to_native, to_native)
 		else
-			C::XMapWindow(display.to_ffi, to_ffi)
+			C::XMapWindow(display.to_native, to_native)
 		end
 
 		display.flush
@@ -195,9 +195,9 @@ class Window < Drawable
 
 	def unmap (subwindows=false)
 		if subwindows
-			C::XMapSubwindows(display.to_ffi, to_ffi)
+			C::XMapSubwindows(display.to_native, to_native)
 		else
-			C::XMapWindow(display.to_ffi, to_ffi)
+			C::XMapWindow(display.to_native, to_native)
 		end
 
 		self
@@ -205,9 +205,9 @@ class Window < Drawable
 
 	def destroy (subwindows=false)
 		if subwindows
-			C::XDetroyWindow(display.to_ffi, to_ffi)
+			C::XDetroyWindow(display.to_native, to_native)
 		else
-			C::XDestroySubwindows(display.to_ffi, to_ffi)
+			C::XDestroySubwindows(display.to_native, to_native)
 		end
 
 		display.flush
@@ -223,7 +223,7 @@ class Window < Drawable
 			number   = FFI::MemoryPointer.new :uint
 			children = FFI::MemoryPointer.new :pointer
 
-			C::XQueryTree(display.to_ffi, id, root, parent, children, number)
+			C::XQueryTree(display.to_native, id, root, parent, children, number)
 
 			next if children.typecast(:pointer).null?
 
@@ -245,7 +245,7 @@ class Window < Drawable
 
 	named :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :time, :optional => 0 .. -1
 	def grab_pointer (owner_events=true, event_mask=Mask::Event[:NoEvent], pointer_mode=:sync, keyboard_mode=:async, confine_to=0, cursor=0, time=0, &block)
-		result = C::XGrabPointer(display.to_ffi, to_ffi, !!owner_events, event_mask.to_ffi, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi, time).zero?
+		result = C::XGrabPointer(display.to_native, to_native, !!owner_events, event_mask.to_native, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_native, cursor.to_native, time).zero?
 
 		if block && result
 			begin
@@ -264,20 +264,20 @@ class Window < Drawable
 
 	named :key, :modifiers, :normal?, :pointer, :keyboard, :optional => 1 .. -1
 	def grab_key (keycode, modifiers=0, owner_events=true, pointer_mode=:async, keyboard_mode=:sync)
-		C::XGrabKey(display.to_ffi, Keysym[keycode, display].to_keycode, modifiers, to_ffi, !!owner_events, mode_to_int(pointer_mode), mode_to_int(keyboard_mode))
+		C::XGrabKey(display.to_native, Keysym[keycode, display].to_keycode, modifiers, to_native, !!owner_events, mode_to_int(pointer_mode), mode_to_int(keyboard_mode))
 	end
 
 	def ungrab_key (keycode, modifiers=0)
-		C::XUngrabKey(display.to_ffi, Keysym[keycode, display].to_keycode, modifiers, to_ffi)
+		C::XUngrabKey(display.to_native, Keysym[keycode, display].to_keycode, modifiers, to_native)
 	end
 
 	named :button, :modifiers, :normal?, :mask, :pointer, :keyboard, :confine_to, :cursor, :optional => 0 .. -1
 	def grab_button (button, modifiers=0, owner_events=true, event_mask=Mask::Event[:ButtonPress], pointer_mode=:async, keyboard_mode=:sync, confine_to=0, cursor=0)
-		C::XGrabButton(display.to_ffi, button, modifiers, to_ffi, !!owner_events, event_mask.to_ffi, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_ffi, cursor.to_ffi)
+		C::XGrabButton(display.to_native, button, modifiers, to_native, !!owner_events, event_mask.to_native, mode_to_int(pointer_mode), mode_to_int(keyboard_mode), confine_to.to_native, cursor.to_native)
 	end
 
 	def ungrab_button (button, modifiers=0)
-		C::XUngrabButton(display.to_ffi, button, modifiers, to_ffi)
+		C::XUngrabButton(display.to_native, button, modifiers, to_native)
 	end
 
 	def under_pointer
@@ -285,7 +285,7 @@ class Window < Drawable
 		child = FFI::MemoryPointer.new :Window
 		dummy = FFI::MemoryPointer.new :int
 
-		C::XQueryPointer(display.to_ffi, to_ffi, root, child, dummy, dummy, dummy, dummy, dummy)
+		C::XQueryPointer(display.to_native, to_native, root, child, dummy, dummy, dummy, dummy, dummy)
 
 		Window.new(display, child.typecast(:Window))
 	end
@@ -296,9 +296,9 @@ class Window < Drawable
 		x     = FFI::MemoryPointer.new :int
 
 		if on_root
-			C::XQueryPointer(display.to_ffi, to_ffi, dummy, dummy, x, y, dummy, dummy, dummy)
+			C::XQueryPointer(display.to_native, to_native, dummy, dummy, x, y, dummy, dummy, dummy)
 		else
-			C::XQueryPointer(display.to_ffi, to_ffi, dummy, dummy, dummy, dummy, x, y, dummy)
+			C::XQueryPointer(display.to_native, to_native, dummy, dummy, dummy, dummy, x, y, dummy)
 		end
 
 		[x.typecast(:int), y.typecast(:int)]
@@ -308,7 +308,7 @@ class Window < Drawable
 		mask = Mask::Event[mask] unless mask.is_a?(Bitmap::Value)
 
 		(@reported_events = mask).tap {
-			C::XSelectInput(display.to_ffi, to_ffi, mask.to_ffi)
+			C::XSelectInput(display.to_native, to_native, mask.to_native)
 		}
 	end; alias select_input reported_events=
 
@@ -349,12 +349,12 @@ class Window < Drawable
 
 				begin
 					if options[:blocking?] == false
-						C::XCheckIfEvent(display.to_ffi, event, callback, nil) or return
+						C::XCheckIfEvent(display.to_native, event, callback, nil) or return
 					else
 						if options[:delete] != false
-							C::XIfEvent(display.to_ffi, event, callback, nil)
+							C::XIfEvent(display.to_native, event, callback, nil)
 						else
-							C::XPeekIfEvent(display.to_ffi, event, callback, nil)
+							C::XPeekIfEvent(display.to_native, event, callback, nil)
 						end
 					end
 				ensure
@@ -367,7 +367,7 @@ class Window < Drawable
 			end
 
 			if what.is_a?(Symbol)
-				C::XCheckTypedWindowEvent(display.to_ffi, to_ffi, Event.index(what), event) or return
+				C::XCheckTypedWindowEvent(display.to_native, to_native, Event.index(what), event) or return
 			else
 				old  = reported_events
 				what = Mask::Event.all if what.nil?
@@ -375,13 +375,13 @@ class Window < Drawable
 				self.reported_events += what unless options[:select] == false || old.has?(what)
 
 				if options[:blocking?] == false
-					C::XCheckWindowEvent(display.to_ffi, to_ffi, what.to_ffi, event) or return
+					C::XCheckWindowEvent(display.to_native, to_native, what.to_native, event) or return
 				else
-					C::XWindowEvent(display.to_ffi, to_ffi, what.to_ffi, event)
+					C::XWindowEvent(display.to_native, to_native, what.to_native, event)
 				end
 
 				if options[:delete] == false
-					C::XPutBackEvent(to_ffi, event.to_ffi)
+					C::XPutBackEvent(to_native, event.to_native)
 				end
 
 				self.reported_events = old unless reported_events == old

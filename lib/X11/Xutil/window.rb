@@ -32,7 +32,7 @@ class Window < Drawable
 	def title
 		text = FFI::MemoryPointer.new :pointer
 
-		C::XFetchName(display.to_ffi, to_ffi, text)
+		C::XFetchName(display.to_native, to_native, text)
 
 		return if text.typecast(:pointer).null?
 
@@ -44,7 +44,7 @@ class Window < Drawable
 	def class_hint
 		return if (hint = C::XAllocClassHint()).null?
 
-		if C::XGetClassHint(display.to_ffi, to_ffi, hint).zero?
+		if C::XGetClassHint(display.to_native, to_native, hint).zero?
 			C::XFree(hint)
 
 			return

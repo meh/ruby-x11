@@ -71,10 +71,10 @@ class Screen
 
 	memoize
 	def to_i
-		C::XScreenNumberOfScreen(to_ffi)
+		C::XScreenNumberOfScreen(to_native)
 	end
 
-	def to_ffi
+	def to_native
 		@screen.pointer
 	end
 end

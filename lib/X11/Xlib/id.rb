@@ -45,7 +45,7 @@ class ID
 	end
 
 	def hash
-		"#{display.to_ffi}-#{to_ffi}"
+		"#{display.to_native}-#{to_native}"
 	end
 
 	def == (value)
@@ -61,7 +61,7 @@ class ID
 	end
 
 	alias to_i id
-	alias to_ffi to_i
+	alias to_native to_i
 
 	def to_s
 		to_i.to_s(16)

@@ -42,7 +42,7 @@ class Gamma
 
 	def get
 		C::XF86VidModeGamma.new.tap! {|p|
-			C::XF86VidModeGetGamma(display.to_ffi, screen.to_i, p)
+			C::XF86VidModeGetGamma(display.to_native, screen.to_i, p)
 
 			Struct.new(:red, :green, :blue).new(p[:red], p[:green], p[:blue])
 		}
@@ -51,7 +51,7 @@ class Gamma
 	named :red, :green, :blue, :optional => 0 .. -1
 	def set (red=nil, green=nil, blue=nil)
 		get.tap {|gamma|
-			C::XF86VidModeSetGamma(display.to_ffi, screen.to_i, C::XF86VidModeGamma.new.tap {|p|
+			C::XF86VidModeSetGamma(display.to_native, screen.to_i, C::XF86VidModeGamma.new.tap {|p|
 				p[:red]   = red   || gamma.red
 				p[:green] = green || gamma.green
 				p[:blue]  = blue  || gamma.blue

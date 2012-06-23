@@ -30,11 +30,11 @@ module X11
 
 class Window
 	def primary_output
-		Xrandr::Output.new(display, C::XRRGetOutputPrimary(display.to_ffi, to_ffi))
+		Xrandr::Output.new(display, C::XRRGetOutputPrimary(display.to_native, to_native))
 	end
 
 	def primary_output= (value)
-		C::XRRSetOutputPrimary(display.to_ffi, to_ffi, value.to_ffi)
+		C::XRRSetOutputPrimary(display.to_native, to_native, value.to_native)
 	end
 end
 

@@ -36,7 +36,7 @@ X11::Extension.define 'xf86vmode' do |display|
 	major = FFI::MemoryPointer.new :int
 	minor = FFI::MemoryPointer.new :int
 
-	X11::C::XF86VidModeQueryVersion(display.to_ffi, major, minor)
+	X11::C::XF86VidModeQueryVersion(display.to_native, major, minor)
 
 	self.new(Struct.new(:version).new(Versionub.parse("#{major.typecast(:int)}.#{minor.typecast(:int)}")))
 end

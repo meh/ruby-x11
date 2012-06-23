@@ -119,7 +119,7 @@ class Atom
 	end
 
 	def self.from_name (display, name, if_exists=false)
-		C::XInternAtom(display.to_ffi, name, if_exists).tap {|atom|
+		C::XInternAtom(display.to_native, name, if_exists).tap {|atom|
 			break atom.to_i == 0 ? nil : atom.to_i
 		}
 	end
@@ -151,13 +151,13 @@ class Atom
 	end
 
 	def intern!
-		C::XInternAom(display.to_ffi, name, false)
+		C::XInternAom(display.to_native, name, false)
 		self
 	end
 
 	def name
 		@name ||= (if display
-			C::XGetAtomName(display.to_ffi, self)
+			C::XGetAtomName(display.to_native, self)
 		else
 			with Atom.to_hash.key(@value) do |name|
 				name.to_s unless name.nil?
@@ -175,7 +175,7 @@ class Atom
 
 	def to_i
 		@value
-	end; alias to_ffi to_i
+	end; alias to_native to_i
 end
 
 end

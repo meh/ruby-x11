@@ -36,8 +36,8 @@ class Info
 	end
 
 	def self.get (crtc)
-		new(crtc, C::XRRGetCrtcInfo(crtc.display.to_ffi, crtc.resources.to_ffi, crtc.to_ffi)).tap {|info|
-			ObjectSpace.define_finalizer info, finalizer(info.to_ffi)
+		new(crtc, C::XRRGetCrtcInfo(crtc.display.to_native, crtc.resources.to_native, crtc.to_native)).tap {|info|
+			ObjectSpace.define_finalizer info, finalizer(info.to_native)
 		}
 	end
 
@@ -54,7 +54,7 @@ class Info
 		end
 	}
 
-	def to_ffi
+	def to_native
 		@internal.pointer
 	end
 end

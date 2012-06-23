@@ -92,7 +92,7 @@ class Attributes
 
 	end
 
-	def to_ffi
+	def to_native
 		@attributes
 	end
 end

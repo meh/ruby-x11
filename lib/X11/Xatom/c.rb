@@ -36,7 +36,7 @@ module Atom
 	native_type :ulong
 
 	def self.to_native (value, ctx)
-		value.to_ffi
+		value.to_native
 	end
 
 	def self.from_native (value, ctx)

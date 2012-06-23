@@ -33,7 +33,7 @@ class Values
 		@struct = C::XGCValues.new
 	end
 
-	def to_ffi
+	def to_native
 		@struct
 	end
 end

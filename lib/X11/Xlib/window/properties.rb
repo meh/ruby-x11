@@ -56,19 +56,19 @@ class Properties
 	end
 
 	def delete (atom)
-		C::XDeleteProperty(display.to_ffi, window.to_ffi, Atom[atom, display].to_ffi)
+		C::XDeleteProperty(display.to_native, window.to_native, Atom[atom, display].to_native)
 	end
 
 	def rotate (properties, positions=1)
 		array = FFI::MemoryPointer.new(:Atom, properties.length)
-		array.write_array_of(:Atom, properties.map { |name| name.to_ffi })
+		array.write_array_of(:Atom, properties.map { |name| name.to_native })
 
-		C::XRotateWindowProperties(display.to_ffi, window.to_ffi, array, properties.length, positions)
+		C::XRotateWindowProperties(display.to_native, window.to_native, array, properties.length, positions)
 	end
 
 	def each (&block)
 		number = FFI::MemoryPointer.new :int
-		list   = C::XListProperties(display.to_ffi, window.to_ffi, number)
+		list   = C::XListProperties(display.to_native, window.to_native, number)
 
 		return self if list.null?
 
