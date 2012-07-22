@@ -59,7 +59,7 @@ class Display
 	end
 
 	def active_window
-		unless X11::WindowManager.supports? :ACTIVE_WINDOW
+		unless X11::WindowManager.new.supports? :ACTIVE_WINDOW
 			raise 'the window manager does not support this extension'
 		end
 
