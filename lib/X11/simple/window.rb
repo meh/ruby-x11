@@ -30,6 +30,8 @@ module X11
 
 class Window < Drawable
 	def client
+		return unless valid?
+
 		win = if roots = properties[:_NET_VIRTUAL_ROOTS]
 			roots.value.any? {|vroot|
 				next unless self == vroot

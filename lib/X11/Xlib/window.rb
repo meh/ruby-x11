@@ -408,14 +408,20 @@ class Window < Drawable
 		}
 	end
 
+	def valid?
+		attributes
+
+		true
+	rescue BadWindow
+		false
+	end
+
 	def inspect
-		begin
-			attributes.tap! {|attr|
-				"#<X11::Window(#{id}): #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
-			}
-		rescue BadWindow
-			"#<X11::Window: invalid window>"
-		end
+		return '#<X11::Window: invalid window>' unless valid?
+
+		attributes.tap! {|attr|
+			"#<X11::Window(#{id}): #{attr.width}x#{attr.height} (#{attr.x}; #{attr.y})>"
+		}
 	end
 
 	protected
