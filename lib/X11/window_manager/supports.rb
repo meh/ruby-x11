@@ -46,6 +46,12 @@ class Supports
 		@window_manager = window_manager
 	end
 
+	def has? (name)
+		any? {|feature|
+			feature.to_atom.to_sym.to_s.end_with? name.to_s
+		}
+	end
+
 	def to_a
 		wm.root.properties[:_NET_SUPPORTED].value.map {|feature|
 			Feature.new(self, feature)
