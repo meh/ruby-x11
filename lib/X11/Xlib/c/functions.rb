@@ -331,7 +331,7 @@ attach_function :XRestackWindows, [:pointer, :pointer, :int], :int
 attach_function :XRotateBuffers, [:pointer, :int], :int
 attach_function :XRotateWindowProperties, [:pointer, :Window, :pointer, :int, :int], :int
 attach_function :XScreenCount, [:pointer], :int
-attach_function :XSelectInput, [:pointer, :Window, :long], :int
+attach_function :XSelectInput, [:pointer, :Window, :long], :int, :blocking => true
 attach_function :XSendEvent, [:pointer, :Window, :Bool, :long, :pointer], :Status
 attach_function :XSetAccessControl, [:pointer, :int], :int
 attach_function :XSetArcMode, [:pointer, :GC, :int], :int
@@ -374,7 +374,7 @@ attach_function :XStoreColor, [:pointer, :Colormap, :pointer], :int
 attach_function :XStoreColors, [:pointer, :Colormap, :pointer, :int], :int
 attach_function :XStoreName, [:pointer, :Window, :string], :int
 attach_function :XStoreNamedColor, [:pointer, :Colormap, :string, :ulong, :int], :int
-attach_function :XSync, [:pointer, :Bool], :int
+attach_function :XSync, [:pointer, :Bool], :int, :blocking => true
 attach_function :XTextExtents, [:pointer, :string, :int, :pointer, :pointer, :pointer, :pointer], :int
 attach_function :XTextExtents16, [:pointer, :pointer, :int, :pointer, :pointer, :pointer, :pointer], :int
 attach_function :XTextWidth, [:pointer, :string, :int], :int
