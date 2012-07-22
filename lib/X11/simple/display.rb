@@ -57,6 +57,14 @@ class Display
 			frame ? target : target.client
 		end
 	end
+
+	def active_window
+		unless X11::WindowManager.supports? :ACTIVE_WINDOW
+			raise 'the window manager does not support this extension'
+		end
+
+		root_window.properties[:_NET_ACTIVE_WINDOW].value.first
+	end
 end
 
 end
